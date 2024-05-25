@@ -1,6 +1,6 @@
 package com.github.houbb.nginx4j.config;
 
-import com.github.houbb.nginx4j.support.index.NginxIndexContent;
+import com.github.houbb.nginx4j.support.index.NginxIndexFile;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatch;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public class NginxConfig {
      */
     private List<String> httpServerIndexList;
 
-    private NginxIndexContent nginxIndexContent;
+    private NginxIndexFile nginxIndexFile;
 
     private NginxRequestDispatch nginxRequestDispatch;
 
@@ -40,12 +40,12 @@ public class NginxConfig {
         this.nginxRequestDispatch = nginxRequestDispatch;
     }
 
-    public NginxIndexContent getNginxIndexContent() {
-        return nginxIndexContent;
+    public NginxIndexFile getNginxIndexContent() {
+        return nginxIndexFile;
     }
 
-    public void setNginxIndexContent(NginxIndexContent nginxIndexContent) {
-        this.nginxIndexContent = nginxIndexContent;
+    public void setNginxIndexContent(NginxIndexFile nginxIndexFile) {
+        this.nginxIndexFile = nginxIndexFile;
     }
 
     public String getCharset() {

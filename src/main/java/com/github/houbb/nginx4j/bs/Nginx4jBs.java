@@ -4,8 +4,8 @@ import com.github.houbb.heaven.util.common.ArgUtil;
 import com.github.houbb.nginx4j.api.INginxServer;
 import com.github.houbb.nginx4j.config.NginxConfig;
 import com.github.houbb.nginx4j.exception.Nginx4jException;
-import com.github.houbb.nginx4j.support.index.NginxIndexContent;
-import com.github.houbb.nginx4j.support.index.NginxIndexContentDefault;
+import com.github.houbb.nginx4j.support.index.NginxIndexFile;
+import com.github.houbb.nginx4j.support.index.NginxIndexFileDefault;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatch;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchDefault;
 import com.github.houbb.nginx4j.support.server.NginxServerNetty;
@@ -39,7 +39,7 @@ public class Nginx4jBs {
     /**
      * 首页内容
      */
-    private NginxIndexContent nginxIndexContent = new NginxIndexContentDefault();
+    private NginxIndexFile nginxIndexFile = new NginxIndexFileDefault();
 
     /**
      * 请求分发
@@ -51,8 +51,8 @@ public class Nginx4jBs {
 
     private INginxServer nginxServer = new NginxServerNetty();
 
-    public Nginx4jBs nginxIndexContent(NginxIndexContent nginxIndexContent) {
-        this.nginxIndexContent = nginxIndexContent;
+    public Nginx4jBs nginxIndexContent(NginxIndexFile nginxIndexFile) {
+        this.nginxIndexFile = nginxIndexFile;
         return this;
     }
 
@@ -108,7 +108,7 @@ public class Nginx4jBs {
         nginxConfig.setHttpServerListen(httpServerListen);
         nginxConfig.setHttpServerIndexList(httpServerIndexList);
         nginxConfig.setNginxRequestDispatch(nginxRequestDispatch);
-        nginxConfig.setNginxIndexContent(nginxIndexContent);
+        nginxConfig.setNginxIndexContent(nginxIndexFile);
 
         return this;
     }

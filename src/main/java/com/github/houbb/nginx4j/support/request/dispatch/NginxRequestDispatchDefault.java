@@ -1,14 +1,20 @@
 package com.github.houbb.nginx4j.support.request.dispatch;
 
+import com.github.houbb.heaven.support.tuple.impl.Pair;
 import com.github.houbb.heaven.util.io.FileUtil;
 import com.github.houbb.heaven.util.lang.StringUtil;
+import com.github.houbb.heaven.util.util.ArrayPrimitiveUtil;
+import com.github.houbb.heaven.util.util.ArrayUtil;
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
 import com.github.houbb.nginx4j.config.NginxConfig;
 import com.github.houbb.nginx4j.support.server.NginxServerSocket;
+import com.github.houbb.nginx4j.util.InnerMimeUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
+
+import java.io.File;
 
 
 /**
@@ -35,28 +41,37 @@ public class NginxRequestDispatchDefault implements NginxRequestDispatch {
             return buildCommentResp(null, HttpResponseStatus.BAD_REQUEST, requestInfoBo, nginxConfig);
         }
 
-
-        final String basicPath = nginxConfig.getHttpServerRoot();
-        final String path = requestInfoBo.uri();
-
-        boolean isRootPath = isRootPath(requestInfoBo, nginxConfig);
-        // 根路径
-        if(isRootPath) {
-            log.info("[Nginx] current req meet root path");
-            String indexContent = nginxConfig.getNginxIndexContent().getContent(nginxConfig);
-            return buildCommentResp(indexContent, HttpResponseStatus.OK, requestInfoBo, nginxConfig);
-        }
-
-        // other
-        String fullPath = FileUtil.buildFullPath(basicPath, path);
+        // 文件
+        File targetFile = getTargetFile(requestInfoBo, nginxConfig);
         // 是否存在
-        if(FileUtil.exists(fullPath)) {
-            // TODO: 后续这里的文件类型要根据具体的文件变化
-            String fileContent = FileUtil.getFileContent(fullPath);
-            return buildCommentResp(fileContent, HttpResponseStatus.OK, requestInfoBo, nginxConfig);
+        if(targetFile.exists()) {
+            byte[] fileContent = FileUtil.getFileBytes(targetFile);
+            FullHttpResponse response = buildCommentResp(fileContent, HttpResponseStatus.OK, requestInfoBo, nginxConfig);
+
+            // 设置文件类别
+            String contentType = InnerMimeUtil.getContentType(targetFile);
+            setContentType(response, contentType);
+
+            return response;
         }  else {
             return buildCommentResp(null, HttpResponseStatus.NOT_FOUND, requestInfoBo, nginxConfig);
         }
+    }
+
+    protected File getTargetFile(final FullHttpRequest request, final NginxConfig nginxConfig) {
+        boolean isRootPath = isRootPath(request, nginxConfig);
+        // 根路径
+        if(isRootPath) {
+            log.info("[Nginx] current req meet root path");
+            return nginxConfig.getNginxIndexContent().getIndexFile(nginxConfig);
+        }
+
+        final String basicPath = nginxConfig.getHttpServerRoot();
+        final String path = request.uri();
+
+        // other
+        String fullPath = FileUtil.buildFullPath(basicPath, path);
+        return new File(fullPath);
     }
 
     protected boolean isRootPath(final FullHttpRequest request, final NginxConfig nginxConfig) {
@@ -75,27 +90,26 @@ public class NginxRequestDispatchDefault implements NginxRequestDispatch {
      *                 "\r\n" +
      *                 "%s";
      *
-     * @param rawText 原始内容
+     * @param bytes 原始内容
      * @param status 结果枚举
      * @param request 请求内容
      * @param nginxConfig 配置
      * @return 结果
      */
-    protected FullHttpResponse buildCommentResp(String rawText,
+    protected FullHttpResponse buildCommentResp(byte[] bytes,
                                             final HttpResponseStatus status,
                                             final FullHttpRequest request,
                                             final NginxConfig nginxConfig) {
-        String defaultContent = status.toString();
-        if(StringUtil.isNotEmpty(rawText)) {
-            defaultContent = rawText;
+        byte[] defaultContent = new byte[]{};
+        if(ArrayPrimitiveUtil.isNotEmpty(bytes)) {
+            defaultContent = bytes;
         }
 
         // 构造响应
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
-                status, Unpooled.copiedBuffer(defaultContent, CharsetUtil.UTF_8));
+                status, Unpooled.copiedBuffer(defaultContent));
         // 头信息
-        // TODO: 根据文件变化
-        response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain; charset=UTF-8");
+        response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain;");
         response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
         //如果request中有KEEP ALIVE信息
         if (HttpUtil.isKeepAlive(request)) {
@@ -103,6 +117,11 @@ public class NginxRequestDispatchDefault implements NginxRequestDispatch {
         }
 
         return response;
+    }
+
+    protected void setContentType(FullHttpResponse response,
+                                  String contentType) {
+        response.headers().set(HttpHeaderNames.CONTENT_TYPE, contentType);
     }
 
 }

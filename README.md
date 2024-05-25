@@ -91,11 +91,12 @@ http://localhost:8080/asdfasdf
 - [x] index.html
 - [x] 404 403 等常见页面
 - [x] 基于 netty 的请求/响应封装
-- [ ] 各种文件类型的请求头处理
+- [x] 各种文件类型的请求头处理
 - [ ] 文件夹？
+- [ ] 大文件的分段传输？chunk
+- [ ] range 范围请求
 - [ ] 常见请求头/headers/cookie 的处理
 - [ ] 请求的压缩 gzip 等常见压缩算法
-- [ ] range 范围请求
 - [ ] rewrite 请求头信息重写
 - [ ] ETag 和 Last-Modified
 - [ ] CORS
