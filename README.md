@@ -6,7 +6,7 @@
  > ^ <
 ```
 
-nginx4j 是 nginx 的简单 java 版本。
+nginx4j 是 nginx 的java 版本。
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.houbb/nginx4j/badge.svg)](http://mvnrepository.com/artifact/com.github.houbb/nginx4j)
 [![Build Status](https://www.travis-ci.org/houbb/nginx4j.svg?branch=master)](https://www.travis-ci.org/houbb/nginx4j?branch=master)
