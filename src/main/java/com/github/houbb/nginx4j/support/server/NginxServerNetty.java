@@ -8,13 +8,15 @@ import com.github.houbb.nginx4j.exception.Nginx4jException;
 import com.github.houbb.nginx4j.support.handler.NginxNettyServerHandler;
 import com.github.houbb.nginx4j.util.InnerNetUtil;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpRequestDecoder;
+import io.netty.handler.codec.http.HttpResponseEncoder;
+import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.stream.ChunkedWriteHandler;
 
 /**
  * netty 实现
@@ -51,7 +53,14 @@ public class NginxServerNetty implements INginxServer {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(new NginxNettyServerHandler(nginxConfig));
+                            ChannelPipeline p = ch.pipeline();
+
+                            p.addLast(new HttpRequestDecoder()); // 请求消息解码器
+                            p.addLast(new HttpObjectAggregator(65536)); // 目的是将多个消息转换为单一的request或者response对象
+                            p.addLast(new HttpResponseEncoder()); // 响应解码器
+                            p.addLast(new ChunkedWriteHandler()); // 目的是支持异步大文件传输
+                            // 业务逻辑
+                            p.addLast(new NginxNettyServerHandler(nginxConfig));
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)

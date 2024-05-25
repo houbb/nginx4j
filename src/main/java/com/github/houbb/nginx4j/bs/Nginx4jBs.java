@@ -6,14 +6,9 @@ import com.github.houbb.nginx4j.config.NginxConfig;
 import com.github.houbb.nginx4j.exception.Nginx4jException;
 import com.github.houbb.nginx4j.support.index.NginxIndexContent;
 import com.github.houbb.nginx4j.support.index.NginxIndexContentDefault;
-import com.github.houbb.nginx4j.support.request.convert.NginxRequestConvertor;
-import com.github.houbb.nginx4j.support.request.convert.NginxRequestConvertorDefault;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatch;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchDefault;
-import com.github.houbb.nginx4j.support.response.NginxResponse;
-import com.github.houbb.nginx4j.support.response.NginxResponseDefault;
 import com.github.houbb.nginx4j.support.server.NginxServerNetty;
-import com.github.houbb.nginx4j.support.server.NginxServerSocket;
 
 import java.util.Arrays;
 import java.util.List;
@@ -51,26 +46,10 @@ public class Nginx4jBs {
      */
     private NginxRequestDispatch nginxRequestDispatch = new NginxRequestDispatchDefault();
 
-    /**
-     * 请求转换
-     */
-    private NginxRequestConvertor nginxRequestConvertor = new NginxRequestConvertorDefault();
 
     private NginxConfig nginxConfig;
 
     private INginxServer nginxServer = new NginxServerNetty();
-
-    private NginxResponse nginxResponse = new NginxResponseDefault();
-
-    public Nginx4jBs nginxResponse(NginxResponse nginxResponse) {
-        this.nginxResponse = nginxResponse;
-        return this;
-    }
-
-    public Nginx4jBs nginxRequestConvertor(NginxRequestConvertor nginxRequestConvertor) {
-        this.nginxRequestConvertor = nginxRequestConvertor;
-        return this;
-    }
 
     public Nginx4jBs nginxIndexContent(NginxIndexContent nginxIndexContent) {
         this.nginxIndexContent = nginxIndexContent;
@@ -130,8 +109,6 @@ public class Nginx4jBs {
         nginxConfig.setHttpServerIndexList(httpServerIndexList);
         nginxConfig.setNginxRequestDispatch(nginxRequestDispatch);
         nginxConfig.setNginxIndexContent(nginxIndexContent);
-        nginxConfig.setNginxRequestConvertor(nginxRequestConvertor);
-        nginxConfig.setNginxResponse(nginxResponse);
 
         return this;
     }

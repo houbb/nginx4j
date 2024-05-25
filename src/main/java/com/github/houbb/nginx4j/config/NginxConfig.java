@@ -1,9 +1,7 @@
 package com.github.houbb.nginx4j.config;
 
 import com.github.houbb.nginx4j.support.index.NginxIndexContent;
-import com.github.houbb.nginx4j.support.request.convert.NginxRequestConvertor;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatch;
-import com.github.houbb.nginx4j.support.response.NginxResponse;
 
 import java.util.List;
 
@@ -33,26 +31,6 @@ public class NginxConfig {
     private NginxIndexContent nginxIndexContent;
 
     private NginxRequestDispatch nginxRequestDispatch;
-
-    private NginxRequestConvertor nginxRequestConvertor;
-
-    private NginxResponse nginxResponse;
-
-    public NginxResponse getNginxResponse() {
-        return nginxResponse;
-    }
-
-    public void setNginxResponse(NginxResponse nginxResponse) {
-        this.nginxResponse = nginxResponse;
-    }
-
-    public NginxRequestConvertor getNginxRequestConvertor() {
-        return nginxRequestConvertor;
-    }
-
-    public void setNginxRequestConvertor(NginxRequestConvertor nginxRequestConvertor) {
-        this.nginxRequestConvertor = nginxRequestConvertor;
-    }
 
     public NginxRequestDispatch getNginxRequestDispatch() {
         return nginxRequestDispatch;

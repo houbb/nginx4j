@@ -38,7 +38,7 @@ nginx4j 是 nginx 的java 版本。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>nginx4j</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
 </dependency>
 ```
 
@@ -90,9 +90,10 @@ http://localhost:8080/asdfasdf
 - [x] 基于 netty 实现
 - [x] index.html
 - [x] 404 403 等常见页面
+- [x] 基于 netty 的请求/响应封装
+- [ ] 各种文件类型的请求头处理
 - [ ] 文件夹？
 - [ ] 常见请求头/headers/cookie 的处理
-- [ ] 各种文件类型的处理？
 - [ ] 请求的压缩 gzip 等常见压缩算法
 - [ ] range 范围请求
 - [ ] rewrite 请求头信息重写
