@@ -12,6 +12,10 @@ nginx4j 是 nginx 的java 版本。
 [![Build Status](https://www.travis-ci.org/houbb/nginx4j.svg?branch=master)](https://www.travis-ci.org/houbb/nginx4j?branch=master)
 [![Coverage Status](https://coveralls.io/repos/github/houbb/nginx4j/badge.svg?branch=master)](https://coveralls.io/github/houbb/nginx4j?branch=master)
 
+如果你想知道 servlet 如何处理的，可以参考我的另一个项目：
+
+>  [简易版 tomcat](https://github.com/houbb/minicat)
+
 # 特性
 
 - 静态网资源支持
