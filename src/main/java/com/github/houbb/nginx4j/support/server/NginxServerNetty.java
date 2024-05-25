@@ -16,6 +16,12 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
+/**
+ * netty 实现
+ *
+ * @author 老马啸西风
+ * @since 0.2.0
+ */
 public class NginxServerNetty implements INginxServer {
 
     private static final Log log = LogFactory.getLog(NginxServerNetty.class);
