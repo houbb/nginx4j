@@ -16,6 +16,10 @@ nginx4j 是 nginx 的java 版本。
 
 - 静态网资源支持
 
+- 默认 index.html
+
+- 404
+
 - 基于 netty 的 nio 高性能
 
 # 变更日志
@@ -30,7 +34,7 @@ nginx4j 是 nginx 的java 版本。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>nginx4j</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
 </dependency>
 ```
 
@@ -65,8 +69,43 @@ Welcome to nginx4j!
 hello nginx4j!
 ```
 
+## 不存在
+
+http://localhost:8080/asdfasdf
+
+返回：
+
+```
+404 Not Found: The requested resource was not found on this server.
+```
+
 # ROAD-MAP
 
-- [ ] 基于 netty 实现
-- [ ] index.html
-- [ ] 404 403 等常见页面
+## static
+
+- [x] 基于 netty 实现
+- [x] index.html
+- [x] 404 403 等常见页面
+- [ ] 文件夹？
+- [ ] 常见请求头/headers/cookie 的处理
+- [ ] 各种文件类型的处理？
+- [ ] 请求的压缩 gzip 等常见压缩算法
+- [ ] range 范围请求
+- [ ] rewrite 请求头信息重写
+- [ ] ETag 和 Last-Modified
+- [ ] CORS
+- [ ] http2
+- [ ] http3
+- [ ] ssl/https
+
+## 反向代理
+
+- [ ] reverse-proxy
+- [ ] load-balance
+
+## system
+
+- [ ] cache
+- [ ] filter 过滤器
+- [ ] listener 监听器
+- [ ] rateLimit 限流
