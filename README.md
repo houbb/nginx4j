@@ -11,14 +11,12 @@ nginx4j 是 nginx 的java 版本。
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.houbb/nginx4j/badge.svg)](http://mvnrepository.com/artifact/com.github.houbb/nginx4j)
 [![Build Status](https://www.travis-ci.org/houbb/nginx4j.svg?branch=master)](https://www.travis-ci.org/houbb/nginx4j?branch=master)
 [![Coverage Status](https://coveralls.io/repos/github/houbb/nginx4j/badge.svg?branch=master)](https://coveralls.io/github/houbb/nginx4j?branch=master)
-KK
+
 # 特性
 
-- 简单的启动实现
+- 静态网资源支持
 
-- servlet 支持
-
-- 静态网页支持
+- 基于 netty 的 nio 高性能
 
 # 变更日志
 
@@ -69,6 +67,6 @@ hello nginx4j!
 
 # ROAD-MAP
 
-- [ ] netty 实现
+- [ ] 基于 netty 实现
 - [ ] index.html
 - [ ] 404 403 等常见页面
