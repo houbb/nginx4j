@@ -9,6 +9,7 @@ import com.github.houbb.nginx4j.util.InnerMimeUtil;
 import com.github.houbb.nginx4j.util.InnerRespUtil;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.io.File;
@@ -33,8 +34,7 @@ public class NginxRequestDispatchFileSmall extends AbstractNginxRequestDispatchF
         FullHttpResponse response = InnerRespUtil.buildCommentResp(fileContent, HttpResponseStatus.OK, request, nginxConfig);
 
         // 设置文件类别
-        String contentType = InnerMimeUtil.getContentType(targetFile);
-        InnerRespUtil.setContentType(response, contentType);
+        response.headers().set(HttpHeaderNames.CONTENT_TYPE, InnerMimeUtil.getContentTypeWithCharset(targetFile, context.getNginxConfig().getCharset()));
 
         return response;
     }

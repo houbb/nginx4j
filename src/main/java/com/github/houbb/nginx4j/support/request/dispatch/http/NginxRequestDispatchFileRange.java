@@ -3,7 +3,6 @@ package com.github.houbb.nginx4j.support.request.dispatch.http;
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
 import com.github.houbb.nginx4j.constant.NginxConst;
-import com.github.houbb.nginx4j.exception.Nginx4jException;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
 import com.github.houbb.nginx4j.util.InnerMimeUtil;
 import io.netty.buffer.Unpooled;
@@ -13,7 +12,6 @@ import io.netty.handler.codec.http.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
@@ -46,7 +44,7 @@ public class NginxRequestDispatchFileRange extends AbstractNginxRequestDispatch 
         HttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1,
                 start < 0 ? HttpResponseStatus.OK : HttpResponseStatus.PARTIAL_CONTENT);
         // 设置Content-Type
-        response.headers().set(HttpHeaderNames.CONTENT_TYPE, InnerMimeUtil.getContentType(file));
+        response.headers().set(HttpHeaderNames.CONTENT_TYPE, InnerMimeUtil.getContentTypeWithCharset(file, context.getNginxConfig().getCharset()));
 
         if (start >= 0) {
             // 设置Content-Range

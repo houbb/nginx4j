@@ -42,7 +42,7 @@ nginx4j 是基于 netty 实现的 nginx 的java 版本。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>nginx4j</artifactId>
-    <version>0.6.0</version>
+    <version>0.8.0</version>
 </dependency>
 ```
 
@@ -99,8 +99,8 @@ http://localhost:8080/asdfasdf
 - [x] 文件夹的自动索引
 - [x] 大文件的分段传输？chunk
 - [x] range 范围请求
+- [x] 请求的压缩 gzip 等常见压缩算法
 - [ ] 常见请求头/headers/cookie 的处理
-- [ ] 请求的压缩 gzip 等常见压缩算法
 - [ ] rewrite 请求头信息重写
 - [ ] ETag 和 Last-Modified
 - [ ] CORS

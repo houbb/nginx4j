@@ -39,7 +39,7 @@ public class NginxRequestDispatchFileDir extends AbstractNginxRequestDispatchFul
 
             byte[] fileContent = html.getBytes(nginxConfig.getCharset());
             FullHttpResponse response = InnerRespUtil.buildCommentResp(fileContent, HttpResponseStatus.OK, request, nginxConfig);
-            InnerRespUtil.setContentType(response, "text/html;");
+            InnerRespUtil.setContentType(response, "text/html; charset=" + nginxConfig.getCharset());
             return response;
         } catch (Exception e) {
             logger.error("[Nginx] buildDirResp meet ex", e);

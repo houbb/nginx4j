@@ -7,7 +7,6 @@ import com.github.houbb.nginx4j.config.NginxConfig;
 import com.github.houbb.nginx4j.exception.Nginx4jException;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
 import com.github.houbb.nginx4j.util.InnerMimeUtil;
-import com.github.houbb.nginx4j.util.InnerRespUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.*;
@@ -21,6 +20,7 @@ import java.util.zip.GZIPOutputStream;
  * 文件压缩
  *
  * @since 0.8.0
+ * @author 老马啸西风
  */
 public class NginxRequestDispatchFileCompress extends AbstractNginxRequestDispatchFullResp {
 
@@ -43,10 +43,7 @@ public class NginxRequestDispatchFileCompress extends AbstractNginxRequestDispat
         // 设置压缩相关的响应头
         response.headers().set(HttpHeaderNames.CONTENT_ENCODING, HttpHeaderValues.GZIP);
         response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
-
-        // 设置文件类别
-        String contentType = InnerMimeUtil.getContentType(targetFile);
-        InnerRespUtil.setContentType(response, contentType);
+        response.headers().set(HttpHeaderNames.CONTENT_TYPE, InnerMimeUtil.getContentTypeWithCharset(targetFile, context.getNginxConfig().getCharset()));
 
         // 检查请求是否接受GZIP编码
         if (request.headers().contains(HttpHeaderNames.ACCEPT_ENCODING) &&

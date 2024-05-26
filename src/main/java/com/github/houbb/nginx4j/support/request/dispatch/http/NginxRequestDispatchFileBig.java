@@ -36,7 +36,7 @@ public class NginxRequestDispatchFileBig extends AbstractNginxRequestDispatch {
 
         HttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
         response.headers().set(HttpHeaderNames.CONTENT_DISPOSITION, "attachment; filename=\"" + targetFile.getName() + "\"");
-        response.headers().set(HttpHeaderNames.CONTENT_TYPE, InnerMimeUtil.getContentType(targetFile));
+        response.headers().set(HttpHeaderNames.CONTENT_TYPE, InnerMimeUtil.getContentTypeWithCharset(targetFile, context.getNginxConfig().getCharset()));
         response.headers().set(HttpHeaderNames.CONTENT_LENGTH, fileLength);
 
         final ChannelHandlerContext ctx = context.getCtx();
