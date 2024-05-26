@@ -30,6 +30,8 @@ nginx4j 是基于 netty 实现的 nginx 的java 版本。
 
 - 大文件的下载支持
 
+- gzip 压缩
+
 ## 拓展阅读
 
 [从零手写实现 nginx-01-为什么不能有 java 版本的 nginx?](https://houbb.github.io/2018/11/22/nginx-write-01-how-to)
