@@ -87,6 +87,29 @@ http://localhost:8080/asdfasdf
 404 Not Found: The requested resource was not found on this server.
 ```
 
+## gzip
+
+```java
+NginxGzipConfig gzipConfig = new NginxGzipConfig();
+    gzipConfig.setGzip("on");
+    gzipConfig.setGzipMinLength(256);
+    gzipConfig.setGzipTypes(Arrays.asList(
+            "text/plain",
+            "text/css",
+            "text/javascript",
+            "application/json",
+            "application/javascript",
+            "application/xml+rss"
+    ));
+
+Nginx4jBs.newInstance()
+                .nginxGzipConfig(gzipConfig)
+                .init()
+                .start();
+```
+
+可以开启 gzip 的处理。
+
 # ROAD-MAP
 
 ## static
@@ -100,13 +123,13 @@ http://localhost:8080/asdfasdf
 - [x] 大文件的分段传输？chunk
 - [x] range 范围请求
 - [x] 请求的压缩 gzip 等常见压缩算法
-- [ ] 常见请求头/headers/cookie 的处理
 - [ ] rewrite 请求头信息重写
 - [ ] ETag 和 Last-Modified
 - [ ] CORS
 - [ ] http2
 - [ ] http3
 - [ ] ssl/https
+- [ ] 常见请求头/headers/cookie 的处理
 
 ## 反向代理
 
