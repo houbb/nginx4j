@@ -5,12 +5,16 @@ import com.github.houbb.heaven.util.lang.StringUtil;
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
 import com.github.houbb.nginx4j.config.NginxConfig;
+import com.github.houbb.nginx4j.config.NginxGzipConfig;
+import com.github.houbb.nginx4j.constant.EnableStatusEnum;
 import com.github.houbb.nginx4j.constant.NginxConst;
 import com.github.houbb.nginx4j.support.request.dispatch.http.NginxRequestDispatches;
 import com.github.houbb.nginx4j.support.server.NginxServerSocket;
+import com.github.houbb.nginx4j.util.InnerMimeUtil;
 import io.netty.handler.codec.http.FullHttpRequest;
 
 import java.io.File;
+import java.util.List;
 
 
 /**
@@ -62,14 +66,64 @@ public class NginxRequestDispatchManager implements NginxRequestDispatch {
             }
 
             long fileSize = targetFile.length();
+
+            // 是否需要压缩
+            boolean needCompress = isNeedCompress(targetFile, requestInfoBo, nginxConfig);
+            if(needCompress) {
+               return NginxRequestDispatches.fileCompress();
+            }
+
+            // 小文件
             if(fileSize <= NginxConst.BIG_FILE_SIZE) {
                 return NginxRequestDispatches.fileSmall();
             }
-
+            // 大文件
             return NginxRequestDispatches.fileBig();
         }  else {
             return NginxRequestDispatches.http404();
         }
+    }
+
+    /**
+     * 是否需要压缩
+     *
+     *         gzip on;
+     *         gzip_vary on;
+     *         gzip_proxied any;
+     *         gzip_comp_level 5;
+     *         gzip_min_length 256;
+     *         gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+     *
+     * @param request 请求
+     * @param nginxConfig 配置
+     * @return 结果
+     */
+    private boolean isNeedCompress(final File targetFile,
+                                   final FullHttpRequest request,
+                                   final NginxConfig nginxConfig) {
+        final NginxGzipConfig gzipConfig = nginxConfig.getNginxGzipConfig();
+
+        if(EnableStatusEnum.ON.getCode().equalsIgnoreCase(gzipConfig.getGzip())) {
+            // 大小
+            long configSize = gzipConfig.getGzipMinLength();
+            long fileLength = targetFile.length();
+            if(fileLength < configSize) {
+                return false;
+            }
+
+            // 文件类别
+            List<String> configContentTypeList = gzipConfig.getGzipTypes();
+            String contentType = InnerMimeUtil.getContentType(targetFile);
+            if(!configContentTypeList.contains(contentType)) {
+                return false;
+            }
+
+            // 真
+            return true;
+        }
+
+
+        return false;
     }
 
     /**

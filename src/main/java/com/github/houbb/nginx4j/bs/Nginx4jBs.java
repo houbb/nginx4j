@@ -3,6 +3,7 @@ package com.github.houbb.nginx4j.bs;
 import com.github.houbb.heaven.util.common.ArgUtil;
 import com.github.houbb.nginx4j.api.INginxServer;
 import com.github.houbb.nginx4j.config.NginxConfig;
+import com.github.houbb.nginx4j.config.NginxGzipConfig;
 import com.github.houbb.nginx4j.exception.Nginx4jException;
 import com.github.houbb.nginx4j.support.index.NginxIndexFile;
 import com.github.houbb.nginx4j.support.index.NginxIndexFileDefault;
@@ -48,6 +49,16 @@ public class Nginx4jBs {
 
 
     private NginxConfig nginxConfig;
+
+    /**
+     * 压缩类别
+     */
+    private NginxGzipConfig nginxGzipConfig = new NginxGzipConfig();
+
+    public Nginx4jBs nginxGzipConfig(NginxGzipConfig nginxGzipConfig) {
+        this.nginxGzipConfig = nginxGzipConfig;
+        return this;
+    }
 
     private INginxServer nginxServer = new NginxServerNetty();
 
@@ -109,6 +120,7 @@ public class Nginx4jBs {
         nginxConfig.setHttpServerIndexList(httpServerIndexList);
         nginxConfig.setNginxRequestDispatch(nginxRequestDispatch);
         nginxConfig.setNginxIndexContent(nginxIndexFile);
+        nginxConfig.setNginxGzipConfig(nginxGzipConfig);
 
         return this;
     }

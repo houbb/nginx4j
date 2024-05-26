@@ -37,6 +37,27 @@ public class NginxConfig {
 
     private NginxRequestDispatch nginxRequestDispatch;
 
+    /**
+     * @since 0.8.0
+     */
+    private NginxGzipConfig nginxGzipConfig;
+
+    public NginxGzipConfig getNginxGzipConfig() {
+        return nginxGzipConfig;
+    }
+
+    public void setNginxGzipConfig(NginxGzipConfig nginxGzipConfig) {
+        this.nginxGzipConfig = nginxGzipConfig;
+    }
+
+    public NginxIndexFile getNginxIndexFile() {
+        return nginxIndexFile;
+    }
+
+    public void setNginxIndexFile(NginxIndexFile nginxIndexFile) {
+        this.nginxIndexFile = nginxIndexFile;
+    }
+
     public String getHttpServerPrefix() {
         return httpServerPrefix;
     }

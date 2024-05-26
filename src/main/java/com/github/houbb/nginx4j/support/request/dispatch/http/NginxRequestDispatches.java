@@ -31,4 +31,8 @@ public final class NginxRequestDispatches {
         return new NginxRequestDispatchFileRange();
     }
 
+    public static NginxRequestDispatch fileCompress() {
+        return new NginxRequestDispatchFileCompress();
+    }
+
 }
