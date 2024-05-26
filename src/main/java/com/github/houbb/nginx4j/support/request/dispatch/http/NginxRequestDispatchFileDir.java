@@ -42,6 +42,7 @@ public class NginxRequestDispatchFileDir extends AbstractNginxRequestDispatchFul
             InnerRespUtil.setContentType(response, "text/html;");
             return response;
         } catch (Exception e) {
+            logger.error("[Nginx] buildDirResp meet ex", e);
             throw new Nginx4jException(e);
         }
     }

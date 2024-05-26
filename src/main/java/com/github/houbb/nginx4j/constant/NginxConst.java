@@ -10,6 +10,6 @@ public class NginxConst {
     /**
      * CHUNK 大小
      */
-    public static final int CHUNK_SIZE = 8 * 1024 * 1024;
+    public static final int CHUNK_SIZE = 1024 * 1024;
 
 }

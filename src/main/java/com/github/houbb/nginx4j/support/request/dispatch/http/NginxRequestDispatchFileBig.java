@@ -3,6 +3,7 @@ package com.github.houbb.nginx4j.support.request.dispatch.http;
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
 import com.github.houbb.nginx4j.constant.NginxConst;
+import com.github.houbb.nginx4j.exception.Nginx4jException;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
 import com.github.houbb.nginx4j.util.InnerMimeUtil;
 import io.netty.buffer.Unpooled;
@@ -67,6 +68,7 @@ public class NginxRequestDispatchFileBig extends AbstractNginxRequestDispatch {
                     .addListener(ChannelFutureListener.CLOSE);
         } catch (Exception e) {
             logger.error("[Nginx] bigFile meet ex", e);
+            throw new Nginx4jException(e);
         }
     }
 

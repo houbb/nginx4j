@@ -27,4 +27,8 @@ public final class NginxRequestDispatches {
         return new NginxRequestDispatchFileDir();
     }
 
+    public static NginxRequestDispatch fileRange() {
+        return new NginxRequestDispatchFileRange();
+    }
+
 }

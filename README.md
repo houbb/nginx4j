@@ -98,7 +98,7 @@ http://localhost:8080/asdfasdf
 - [x] 各种文件类型的请求头处理
 - [x] 文件夹的自动索引
 - [x] 大文件的分段传输？chunk
-- [ ] range 范围请求
+- [x] range 范围请求
 - [ ] 常见请求头/headers/cookie 的处理
 - [ ] 请求的压缩 gzip 等常见压缩算法
 - [ ] rewrite 请求头信息重写

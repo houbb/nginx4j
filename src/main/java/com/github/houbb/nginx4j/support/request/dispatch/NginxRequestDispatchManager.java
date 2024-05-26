@@ -55,6 +55,12 @@ public class NginxRequestDispatchManager implements NginxRequestDispatch {
                 return NginxRequestDispatches.fileDir();
             }
 
+            // range ?
+            boolean isRangeRequest = isRangeRequest(requestInfoBo, nginxConfig);
+            if(isRangeRequest) {
+                return NginxRequestDispatches.fileRange();
+            }
+
             long fileSize = targetFile.length();
             if(fileSize <= NginxConst.BIG_FILE_SIZE) {
                 return NginxRequestDispatches.fileSmall();
@@ -64,6 +70,19 @@ public class NginxRequestDispatchManager implements NginxRequestDispatch {
         }  else {
             return NginxRequestDispatches.http404();
         }
+    }
+
+    /**
+     * 是否为范围查询
+     * @param request 请求
+     * @param nginxConfig 配置
+     * @return 结果
+     * @since 0.7.0
+     */
+    protected boolean isRangeRequest(final FullHttpRequest request, final NginxConfig nginxConfig) {
+        // 解析Range头
+        String rangeHeader = request.headers().get("Range");
+        return StringUtil.isNotEmpty(rangeHeader);
     }
 
     protected File getTargetFile(final FullHttpRequest request, final NginxConfig nginxConfig) {
