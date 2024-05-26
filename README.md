@@ -123,9 +123,9 @@ Nginx4jBs.newInstance()
 - [x] 大文件的分段传输？chunk
 - [x] range 范围请求
 - [x] 请求的压缩 gzip 等常见压缩算法
+- [ ] CORS
 - [ ] rewrite 请求头信息重写
 - [ ] ETag 和 Last-Modified
-- [ ] CORS
 - [ ] http2
 - [ ] http3
 - [ ] ssl/https
