@@ -16,7 +16,6 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
      * //4. 大文件
      *
      * @param context 上下文
-     * @return 结果
      */
     public void dispatch(final NginxRequestDispatchContext context) {
         doDispatch(context);

@@ -26,7 +26,6 @@ public class NginxRequestDispatchManager implements NginxRequestDispatch {
      * 内容的分发处理
      *
      * @param context 上下文
-     * @return 结果
      */
     public void dispatch(NginxRequestDispatchContext context) {
         final NginxRequestDispatch dispatch = getDispatch(context);

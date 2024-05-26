@@ -11,7 +11,6 @@ public interface NginxRequestDispatch {
      * //4. 大文件
      *
      * @param context 上下文
-     * @return 结果
      */
     void dispatch(final NginxRequestDispatchContext context);
 
