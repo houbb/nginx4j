@@ -6,7 +6,7 @@
  > ^ <
 ```
 
-nginx4j 是 nginx 的java 版本。
+nginx4j 是基于 netty 实现的 nginx 的java 版本。
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.houbb/nginx4j/badge.svg)](http://mvnrepository.com/artifact/com.github.houbb/nginx4j)
 [![Build Status](https://www.travis-ci.org/houbb/nginx4j.svg?branch=master)](https://www.travis-ci.org/houbb/nginx4j?branch=master)
@@ -26,6 +26,8 @@ nginx4j 是 nginx 的java 版本。
 
 - 基于 netty 的 nio 高性能
 
+- 文件夹的自动索引
+
 # 变更日志
 
 > [变更日志](CHANGE_LOG.md)
@@ -38,7 +40,7 @@ nginx4j 是 nginx 的java 版本。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>nginx4j</artifactId>
-    <version>0.4.0</version>
+    <version>0.5.0</version>
 </dependency>
 ```
 
@@ -92,7 +94,7 @@ http://localhost:8080/asdfasdf
 - [x] 404 403 等常见页面
 - [x] 基于 netty 的请求/响应封装
 - [x] 各种文件类型的请求头处理
-- [ ] 文件夹？
+- [x] 文件夹的自动索引
 - [ ] 大文件的分段传输？chunk
 - [ ] range 范围请求
 - [ ] 常见请求头/headers/cookie 的处理

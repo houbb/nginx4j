@@ -8,6 +8,11 @@ import java.util.List;
 public class NginxConfig {
 
     /**
+     * 前缀请求
+     */
+    private String httpServerPrefix;
+
+    /**
      * 文件编码
      */
     private String charset;
@@ -31,6 +36,14 @@ public class NginxConfig {
     private NginxIndexFile nginxIndexFile;
 
     private NginxRequestDispatch nginxRequestDispatch;
+
+    public String getHttpServerPrefix() {
+        return httpServerPrefix;
+    }
+
+    public void setHttpServerPrefix(String httpServerPrefix) {
+        this.httpServerPrefix = httpServerPrefix;
+    }
 
     public NginxRequestDispatch getNginxRequestDispatch() {
         return nginxRequestDispatch;

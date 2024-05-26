@@ -47,6 +47,9 @@ public class NginxServerNetty implements INginxServer {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
 
         try {
+            final String httpServerPrefix = String.format("http://%s:%s/", host, port);
+            nginxConfig.setHttpServerPrefix(httpServerPrefix);
+
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
@@ -69,7 +72,7 @@ public class NginxServerNetty implements INginxServer {
             // Bind and start to accept incoming connections.
             ChannelFuture future = serverBootstrap.bind(port).sync();
 
-            log.info("[Nginx4j] listen on http://{}:{}", host, port);
+            log.info("[Nginx4j] listen on {}", httpServerPrefix);
 
             // Wait until the server socket is closed.
             future.channel().closeFuture().sync();
