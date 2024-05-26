@@ -7,7 +7,7 @@ import com.github.houbb.nginx4j.exception.Nginx4jException;
 import com.github.houbb.nginx4j.support.index.NginxIndexFile;
 import com.github.houbb.nginx4j.support.index.NginxIndexFileDefault;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatch;
-import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchDefault;
+import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchManager;
 import com.github.houbb.nginx4j.support.server.NginxServerNetty;
 
 import java.util.Arrays;
@@ -44,7 +44,7 @@ public class Nginx4jBs {
     /**
      * 请求分发
      */
-    private NginxRequestDispatch nginxRequestDispatch = new NginxRequestDispatchDefault();
+    private NginxRequestDispatch nginxRequestDispatch = new NginxRequestDispatchManager();
 
 
     private NginxConfig nginxConfig;

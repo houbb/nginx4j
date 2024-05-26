@@ -4,13 +4,10 @@ import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
 import com.github.houbb.nginx4j.config.NginxConfig;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatch;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
+import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpUtil;
 
 /**
  * netty 处理类
@@ -29,30 +26,29 @@ public class NginxNettyServerHandler extends SimpleChannelInboundHandler<FullHtt
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
-        logger.info("[Nginx] channelRead writeAndFlush start request={}", request);
+        final String id = ctx.channel().id().asLongText();
+        logger.info("[Nginx] channelRead writeAndFlush start request={}, id={}", request, id);
 
         // 分发
         final NginxRequestDispatch requestDispatch = nginxConfig.getNginxRequestDispatch();
-        FullHttpResponse response = requestDispatch.dispatch(request, nginxConfig);
+        NginxRequestDispatchContext context = new NginxRequestDispatchContext();
+        context.setCtx(ctx);
+        context.setNginxConfig(nginxConfig);
+        context.setRequest(request);
+        requestDispatch.dispatch(context);
 
-        // 结果响应
-        ChannelFuture lastContentFuture = ctx.writeAndFlush(response);
-        //如果不支持keep-Alive，服务器端主动关闭请求
-        if (!HttpUtil.isKeepAlive(request)) {
-            lastContentFuture.addListener(ChannelFutureListener.CLOSE);
-        }
-        logger.info("[Nginx] channelRead writeAndFlush DONE response={}", response);
+        logger.info("[Nginx] channelRead writeAndFlush DONE id={}", id);
     }
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-        ctx.flush();
+//        ctx.flush();
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         logger.error("[Nginx] exceptionCaught", cause);
-        ctx.close();
+//        ctx.close();
     }
 
 }

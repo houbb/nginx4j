@@ -61,7 +61,7 @@ public class NginxServerNetty implements INginxServer {
                             p.addLast(new HttpRequestDecoder()); // 请求消息解码器
                             p.addLast(new HttpObjectAggregator(65536)); // 目的是将多个消息转换为单一的request或者response对象
                             p.addLast(new HttpResponseEncoder()); // 响应解码器
-                            p.addLast(new ChunkedWriteHandler()); // 目的是支持异步大文件传输
+//                            p.addLast(new ChunkedWriteHandler()); // 目的是支持异步大文件传输
                             // 业务逻辑
                             p.addLast(new NginxNettyServerHandler(nginxConfig));
                         }

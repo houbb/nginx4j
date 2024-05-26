@@ -18,15 +18,17 @@ nginx4j 是基于 netty 实现的 nginx 的java 版本。
 
 # 特性
 
+- 基于 netty 的 nio 高性能
+
 - 静态网资源支持
 
 - 默认 index.html
 
 - 404
 
-- 基于 netty 的 nio 高性能
-
 - 文件夹的自动索引
+
+- 大文件的下载支持
 
 # 变更日志
 
@@ -40,7 +42,7 @@ nginx4j 是基于 netty 实现的 nginx 的java 版本。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>nginx4j</artifactId>
-    <version>0.5.0</version>
+    <version>0.6.0</version>
 </dependency>
 ```
 
@@ -95,7 +97,7 @@ http://localhost:8080/asdfasdf
 - [x] 基于 netty 的请求/响应封装
 - [x] 各种文件类型的请求头处理
 - [x] 文件夹的自动索引
-- [ ] 大文件的分段传输？chunk
+- [x] 大文件的分段传输？chunk
 - [ ] range 范围请求
 - [ ] 常见请求头/headers/cookie 的处理
 - [ ] 请求的压缩 gzip 等常见压缩算法

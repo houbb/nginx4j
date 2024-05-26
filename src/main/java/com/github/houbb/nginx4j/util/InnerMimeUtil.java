@@ -1,7 +1,8 @@
 package com.github.houbb.nginx4j.util;
 
-import javax.activation.MimetypesFileTypeMap;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 
 /**
  * @since 0.4.0
@@ -14,8 +15,11 @@ public class InnerMimeUtil {
      * @return 结果
      */
     public static String getContentType(File file) {
-        MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
-        return mimeTypesMap.getContentType(file);
+        try {
+            return Files.probeContentType(file.toPath());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -24,8 +28,7 @@ public class InnerMimeUtil {
      * @return 结果
      */
     public static String getContentType(final String fileFullPath) {
-        MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
-        return mimeTypesMap.getContentType(fileFullPath);
+        return getContentType(new File(fileFullPath));
     }
 
 }
