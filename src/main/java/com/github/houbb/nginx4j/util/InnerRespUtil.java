@@ -22,10 +22,10 @@ public class InnerRespUtil {
      * @param nginxConfig 配置
      * @return 结果
      */
-    public static FullHttpResponse buildCommentResp(byte[] bytes,
-                                                final HttpResponseStatus status,
-                                                final FullHttpRequest request,
-                                                final NginxConfig nginxConfig) {
+    public static FullHttpResponse buildCommonResp(byte[] bytes,
+                                                   final HttpResponseStatus status,
+                                                   final FullHttpRequest request,
+                                                   final NginxConfig nginxConfig) {
         byte[] defaultContent = new byte[]{};
         if(ArrayPrimitiveUtil.isNotEmpty(bytes)) {
             defaultContent = bytes;

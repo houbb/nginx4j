@@ -17,74 +17,63 @@ import io.netty.channel.DefaultFileRegion;
 import io.netty.handler.codec.http.*;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.file.StandardOpenOption;
 
 /**
- * 文件范围查询
+ * 文件
  *
- * @since 0.7.0
+ * @since 0.6.0
  */
-public class NginxRequestDispatchFileRange extends AbstractNginxRequestDispatch {
+public class NginxRequestDispatchFile extends AbstractNginxRequestDispatch {
 
     private static final Log logger = LogFactory.getLog(AbstractNginxRequestDispatchFullResp.class);
 
     @Override
     public void doDispatch(NginxRequestDispatchContext context) {
-        final HttpRequest request = context.getRequest();
-        final File file = context.getFile();
-        final ChannelHandlerContext ctx = context.getCtx();
+        final FullHttpRequest request = context.getRequest();
+        final File targetFile = context.getFile();
+        final String bigFilePath = targetFile.getAbsolutePath();
+        final long fileLength = targetFile.length();
         final NginxConfig nginxConfig = context.getNginxConfig();
+        final ChannelHandlerContext ctx = context.getCtx();
 
-        // 解析Range头
-        String rangeHeader = request.headers().get("Range");
-        logger.info("[Nginx] fileRange start rangeHeader={}", rangeHeader);
+        logger.info("[Nginx] match file, path={}", bigFilePath);
 
-        long fileLength = file.length(); // 假设file是你要发送的File对象
-        long[] range = parseRange(rangeHeader, fileLength);
-        long start = range[0];
-        long end = range[1];
+        HttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
+        // 文件比较大，直接下载处理
+        if(fileLength > NginxConst.BIG_FILE_SIZE) {
+            response.headers().set(HttpHeaderNames.CONTENT_DISPOSITION, "attachment; filename=\"" + targetFile.getName() + "\"");
+        }
+        // 如果请求中有KEEP ALIVE信息
+        if (HttpUtil.isKeepAlive(request)) {
+            response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+        }
+        response.headers().set(HttpHeaderNames.CONTENT_TYPE, InnerMimeUtil.getContentTypeWithCharset(targetFile, context.getNginxConfig().getCharset()));
+        response.headers().set(HttpHeaderNames.CONTENT_LENGTH, fileLength);
 
-        // 构造HTTP响应
-        HttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1,
-                start < 0 ? HttpResponseStatus.OK : HttpResponseStatus.PARTIAL_CONTENT);
-        // 设置Content-Type
-        response.headers().set(HttpHeaderNames.CONTENT_TYPE, InnerMimeUtil.getContentTypeWithCharset(file, nginxConfig.getCharset()));
+        //gzip
+        boolean gzipFlag = InnerGzipUtil.isMatchGzip(context);
+        if(gzipFlag) {
+            File compressFile = InnerGzipUtil.prepareGzip(context, response);
+            context.setFile(compressFile);
+        }
 
-        if (start >= 0) {
-            // 设置Content-Range
-            if (end < 0) {
-                end = fileLength - 1;
-            }
-            response.headers().set(HttpHeaderNames.CONTENT_RANGE, "bytes " + start + "-" + end + "/" + fileLength);
+        // 写基本信息
+        ctx.write(response);
 
-            // 设置Content-Length
-            int contentLength = (int) (end - start + 1);
-            response.headers().set(HttpHeaderNames.CONTENT_LENGTH, contentLength);
+        if(EnableStatusEnum.isEnable(nginxConfig.getNginxSendFileConfig().getSendFile())) {
+            //zero-copy
+            dispatchByZeroCopy(context);
+        } else {
+            // 普通
+            dispatchByRandomAccessFile(context);
+        }
 
-            // 发送响应头
-            ctx.write(response);
-
-            //gzip
-            boolean gzipFlag = InnerGzipUtil.isMatchGzip(context);
-            if(gzipFlag) {
-                InnerGzipUtil.prepareGzip(context, response);
-            }
-
-            // 判断处理方式
-            if(EnableStatusEnum.isEnable(nginxConfig.getNginxSendFileConfig().getSendFile())) {
-                dispatchByZeroCopy(context, range);
-            } else {
-                processCommon(context, range);
-            }
-
-            // 最后处理
-            if(gzipFlag) {
-                InnerGzipUtil.afterGzip(context, response);
-            }
+        // 最后处理
+        if(gzipFlag) {
+            InnerGzipUtil.afterGzip(context, response);
         }
     }
 
@@ -94,23 +83,19 @@ public class NginxRequestDispatchFileRange extends AbstractNginxRequestDispatch 
      *
      * @param context 上下文
      */
-    protected void dispatchByZeroCopy(NginxRequestDispatchContext context, long[] range) {
+    protected void dispatchByZeroCopy(NginxRequestDispatchContext context) {
         final ChannelHandlerContext ctx = context.getCtx();
         final File targetFile = context.getFile();
 
         // 分块传输文件内容
-//        long totalLength = targetFile.length();
+        long totalLength = targetFile.length();
 
         try {
             RandomAccessFile randomAccessFile = new RandomAccessFile(targetFile, "r");
             FileChannel fileChannel = randomAccessFile.getChannel();
 
             // 使用DefaultFileRegion进行零拷贝传输
-            long start = range[0];
-            long end = range[1];
-            long totalLength = end - start + 1;
-
-            DefaultFileRegion fileRegion = new DefaultFileRegion(fileChannel, start, totalLength);
+            DefaultFileRegion fileRegion = new DefaultFileRegion(fileChannel, 0, totalLength);
             ChannelFuture transferFuture = ctx.writeAndFlush(fileRegion);
 
             // 监听传输完成事件
@@ -151,29 +136,36 @@ public class NginxRequestDispatchFileRange extends AbstractNginxRequestDispatch 
         }
     }
 
-    protected void processCommon(NginxRequestDispatchContext context, long[] range) {
-        final File file = context.getFile();
+    // 分块传输文件内容
+
+    /**
+     * 分块传输-普通方式
+     * @param context 上下文
+     */
+    protected void dispatchByRandomAccessFile(NginxRequestDispatchContext context) {
         final ChannelHandlerContext ctx = context.getCtx();
+        final File targetFile = context.getFile();
 
-        long start = range[0];
-        long end = range[1];
+        // 分块传输文件内容
+        long totalLength = targetFile.length();
+        long totalRead = 0;
 
-        try (FileChannel fileChannel = FileChannel.open(file.toPath(), StandardOpenOption.READ)) {
-            fileChannel.position(start); // 设置文件通道的起始位置
-
+        try(RandomAccessFile randomAccessFile = new RandomAccessFile(targetFile, "r")) {
             ByteBuffer buffer = ByteBuffer.allocate(NginxConst.CHUNK_SIZE);
-            while (end >= start) {
-                // 读取文件到ByteBuffer
-                int bytesRead = fileChannel.read(buffer);
+            while (true) {
+                int bytesRead = randomAccessFile.read(buffer.array());
                 if (bytesRead == -1) { // 文件读取完毕
                     break;
                 }
-                buffer.flip(); // 切换到读模式
+                buffer.limit(bytesRead);
+                // 写入分块数据
                 ctx.write(new DefaultHttpContent(Unpooled.wrappedBuffer(buffer)));
-                buffer.compact(); // 保留未读取的数据，并为下次读取腾出空间
-                start += bytesRead; // 更新下一个读取的起始位置
+                buffer.clear(); // 清空缓冲区以供下次使用
+
+                // process 可以考虑加一个 listener
+                totalRead += bytesRead;
+                logger.info("[Nginx] file process >>>>>>>>>>> {}/{}", totalRead, totalLength);
             }
-            ctx.flush(); // 确保所有数据都被发送
 
             // 结果响应
             ChannelFuture lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
@@ -181,23 +173,10 @@ public class NginxRequestDispatchFileRange extends AbstractNginxRequestDispatch 
             if (!HttpUtil.isKeepAlive(context.getRequest())) {
                 lastContentFuture.addListener(ChannelFutureListener.CLOSE);
             }
-        } catch (IOException e) {
-            logger.error("[Nginx] fileRange meet ex", e);
+        } catch (Exception e) {
+            logger.error("[Nginx] file meet ex", e);
             throw new Nginx4jException(e);
         }
-    }
-
-    protected long[] parseRange(String rangeHeader, long totalLength) {
-        // 简单解析Range头，返回[start, end]
-        // Range头格式为: "bytes=startIndex-endIndex"
-        if (rangeHeader != null && rangeHeader.startsWith("bytes=")) {
-            String range = rangeHeader.substring("bytes=".length());
-            String[] parts = range.split("-");
-            long start = parts[0].isEmpty() ? totalLength - 1 : Long.parseLong(parts[0]);
-            long end = parts.length > 1 ? Long.parseLong(parts[1]) : totalLength - 1;
-            return new long[]{start, end};
-        }
-        return new long[]{-1, -1}; // 表示无效的范围请求
     }
 
 }

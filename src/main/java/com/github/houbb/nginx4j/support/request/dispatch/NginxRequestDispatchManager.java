@@ -65,20 +65,8 @@ public class NginxRequestDispatchManager implements NginxRequestDispatch {
                 return NginxRequestDispatches.fileRange();
             }
 
-            long fileSize = targetFile.length();
-
-            // 是否需要压缩
-            boolean needCompress = isNeedCompress(targetFile, requestInfoBo, nginxConfig);
-            if(needCompress) {
-               return NginxRequestDispatches.fileCompress();
-            }
-
-            // 小文件
-            if(fileSize <= NginxConst.BIG_FILE_SIZE) {
-                return NginxRequestDispatches.fileSmall();
-            }
-            // 大文件
-            return NginxRequestDispatches.fileBig();
+            // 文件处理
+            return NginxRequestDispatches.file();
         }  else {
             return NginxRequestDispatches.http404();
         }
@@ -144,7 +132,7 @@ public class NginxRequestDispatchManager implements NginxRequestDispatch {
         // 根路径
         if(isRootPath) {
             log.info("[Nginx] current req meet root path");
-            return nginxConfig.getNginxIndexContent().getIndexFile(nginxConfig);
+            return nginxConfig.getNginxIndexFile().getIndexFile(nginxConfig);
         }
 
         final String basicPath = nginxConfig.getHttpServerRoot();

@@ -42,6 +42,21 @@ public class NginxConfig {
      */
     private NginxGzipConfig nginxGzipConfig;
 
+    /**
+     * 零拷贝配置
+     *
+     * @since 0.9.0
+     */
+    private NginxSendFileConfig nginxSendFileConfig;
+
+    public NginxSendFileConfig getNginxSendFileConfig() {
+        return nginxSendFileConfig;
+    }
+
+    public void setNginxSendFileConfig(NginxSendFileConfig nginxSendFileConfig) {
+        this.nginxSendFileConfig = nginxSendFileConfig;
+    }
+
     public NginxGzipConfig getNginxGzipConfig() {
         return nginxGzipConfig;
     }
@@ -72,14 +87,6 @@ public class NginxConfig {
 
     public void setNginxRequestDispatch(NginxRequestDispatch nginxRequestDispatch) {
         this.nginxRequestDispatch = nginxRequestDispatch;
-    }
-
-    public NginxIndexFile getNginxIndexContent() {
-        return nginxIndexFile;
-    }
-
-    public void setNginxIndexContent(NginxIndexFile nginxIndexFile) {
-        this.nginxIndexFile = nginxIndexFile;
     }
 
     public String getCharset() {
@@ -117,10 +124,15 @@ public class NginxConfig {
     @Override
     public String toString() {
         return "NginxConfig{" +
-                "charset='" + charset + '\'' +
+                "httpServerPrefix='" + httpServerPrefix + '\'' +
+                ", charset='" + charset + '\'' +
                 ", httpServerListen=" + httpServerListen +
                 ", httpServerRoot='" + httpServerRoot + '\'' +
                 ", httpServerIndexList=" + httpServerIndexList +
+                ", nginxIndexFile=" + nginxIndexFile +
+                ", nginxRequestDispatch=" + nginxRequestDispatch +
+                ", nginxGzipConfig=" + nginxGzipConfig +
+                ", nginxSendFileConfig=" + nginxSendFileConfig +
                 '}';
     }
 

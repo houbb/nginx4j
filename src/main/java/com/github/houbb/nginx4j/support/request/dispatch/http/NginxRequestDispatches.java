@@ -15,24 +15,15 @@ public final class NginxRequestDispatches {
         return new NginxRequestDispatch404();
     }
 
-    public static NginxRequestDispatch fileBig() {
-        return new NginxRequestDispatchFileBig();
+    public static NginxRequestDispatch file() {
+        return new NginxRequestDispatchFile();
     }
-
-    public static NginxRequestDispatch fileSmall() {
-        return new NginxRequestDispatchFileSmall();
-    }
-
     public static NginxRequestDispatch fileDir() {
         return new NginxRequestDispatchFileDir();
     }
 
     public static NginxRequestDispatch fileRange() {
         return new NginxRequestDispatchFileRange();
-    }
-
-    public static NginxRequestDispatch fileCompress() {
-        return new NginxRequestDispatchFileCompress();
     }
 
 }

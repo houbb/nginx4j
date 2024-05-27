@@ -22,4 +22,8 @@ public enum EnableStatusEnum {
         return desc;
     }
 
+    public static boolean isEnable(final String status) {
+        return ON.getCode().equalsIgnoreCase(status);
+    }
+
 }

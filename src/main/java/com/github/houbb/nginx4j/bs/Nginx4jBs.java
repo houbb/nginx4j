@@ -4,6 +4,7 @@ import com.github.houbb.heaven.util.common.ArgUtil;
 import com.github.houbb.nginx4j.api.INginxServer;
 import com.github.houbb.nginx4j.config.NginxConfig;
 import com.github.houbb.nginx4j.config.NginxGzipConfig;
+import com.github.houbb.nginx4j.config.NginxSendFileConfig;
 import com.github.houbb.nginx4j.exception.Nginx4jException;
 import com.github.houbb.nginx4j.support.index.NginxIndexFile;
 import com.github.houbb.nginx4j.support.index.NginxIndexFileDefault;
@@ -54,6 +55,21 @@ public class Nginx4jBs {
      * 压缩类别
      */
     private NginxGzipConfig nginxGzipConfig = new NginxGzipConfig();
+
+    /**
+     * @since 0.9.0
+     */
+    private NginxSendFileConfig nginxSendFileConfig = new NginxSendFileConfig();
+
+    public Nginx4jBs nginxIndexFile(NginxIndexFile nginxIndexFile) {
+        this.nginxIndexFile = nginxIndexFile;
+        return this;
+    }
+
+    public Nginx4jBs nginxSendFileConfig(NginxSendFileConfig nginxSendFileConfig) {
+        this.nginxSendFileConfig = nginxSendFileConfig;
+        return this;
+    }
 
     public Nginx4jBs nginxGzipConfig(NginxGzipConfig nginxGzipConfig) {
         this.nginxGzipConfig = nginxGzipConfig;
@@ -119,8 +135,9 @@ public class Nginx4jBs {
         nginxConfig.setHttpServerListen(httpServerListen);
         nginxConfig.setHttpServerIndexList(httpServerIndexList);
         nginxConfig.setNginxRequestDispatch(nginxRequestDispatch);
-        nginxConfig.setNginxIndexContent(nginxIndexFile);
         nginxConfig.setNginxGzipConfig(nginxGzipConfig);
+        nginxConfig.setNginxSendFileConfig(nginxSendFileConfig);
+        nginxConfig.setNginxIndexFile(nginxIndexFile);
 
         return this;
     }

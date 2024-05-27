@@ -1,4 +1,4 @@
-package com.github.houbb.nginx4j.support.request.dispatch.http;
+package com.github.houbb.nginx4j.support.request.dispatch.http.old;
 
 import com.github.houbb.heaven.util.io.FileUtil;
 import com.github.houbb.log.integration.core.Log;
@@ -6,6 +6,7 @@ import com.github.houbb.log.integration.core.LogFactory;
 import com.github.houbb.nginx4j.config.NginxConfig;
 import com.github.houbb.nginx4j.exception.Nginx4jException;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
+import com.github.houbb.nginx4j.support.request.dispatch.http.AbstractNginxRequestDispatchFullResp;
 import com.github.houbb.nginx4j.util.InnerMimeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -22,7 +23,8 @@ import java.util.zip.GZIPOutputStream;
  * @since 0.8.0
  * @author 老马啸西风
  */
-public class NginxRequestDispatchFileCompress extends AbstractNginxRequestDispatchFullResp {
+@Deprecated
+public class NginxRequestDispatchFileCompressOld extends AbstractNginxRequestDispatchFullResp {
 
     private static final Log logger = LogFactory.getLog(AbstractNginxRequestDispatchFullResp.class);
 

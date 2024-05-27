@@ -1,6 +1,7 @@
 package com.github.houbb.nginx4j.support.request.dispatch.http;
 
 import com.github.houbb.heaven.util.io.FileUtil;
+import com.github.houbb.heaven.util.util.ArrayUtil;
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
 import com.github.houbb.nginx4j.config.NginxConfig;
@@ -38,7 +39,7 @@ public class NginxRequestDispatchFileDir extends AbstractNginxRequestDispatchFul
             String html = generateFileListHTML(targetFile, request, nginxConfig);
 
             byte[] fileContent = html.getBytes(nginxConfig.getCharset());
-            FullHttpResponse response = InnerRespUtil.buildCommentResp(fileContent, HttpResponseStatus.OK, request, nginxConfig);
+            FullHttpResponse response = InnerRespUtil.buildCommonResp(fileContent, HttpResponseStatus.OK, request, nginxConfig);
             InnerRespUtil.setContentType(response, "text/html; charset=" + nginxConfig.getCharset());
             return response;
         } catch (Exception e) {
@@ -59,11 +60,12 @@ public class NginxRequestDispatchFileDir extends AbstractNginxRequestDispatchFul
         htmlBuilder.append("<ul>");
 
         File[] fileList = directory.listFiles();
-
-        for (File file : fileList) {
-            String fileName = file.getName();
-            String fileLink = getFileLink(file, request, nginxConfig);
-            htmlBuilder.append("<li><a href=\"").append(fileLink).append("\">").append(fileName).append("</a></li>");
+        if(ArrayUtil.isNotEmpty(fileList)) {
+            for (File file : fileList) {
+                String fileName = file.getName();
+                String fileLink = getFileLink(file, request, nginxConfig);
+                htmlBuilder.append("<li><a href=\"").append(fileLink).append("\">").append(fileName).append("</a></li>");
+            }
         }
 
         htmlBuilder.append("</ul></body></html>");
