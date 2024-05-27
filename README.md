@@ -149,9 +149,9 @@ Nginx4jBs.newInstance()
 - [x] 大文件的分段传输？chunk
 - [x] range 范围请求
 - [x] 请求的压缩 gzip 等常见压缩算法
-- [ ] sendFile 特性支持
-- [ ] 压缩更好的实现方式？
+- [x] sendFile 特性支持
 - [ ] range 的代码合并到 file
+- [ ] 压缩更好的实现方式？ zlib 算法 + 实现优化？
 - [ ] CORS
 - [ ] rewrite 请求头信息重写
 - [ ] ETag 和 Last-Modified
