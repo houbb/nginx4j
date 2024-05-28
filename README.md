@@ -56,6 +56,8 @@ nginx4j 是基于 netty 实现的 nginx 的java 版本。
 
 [从零手写实现 nginx-10-sendfile 零拷贝](https://houbb.github.io/2018/11/22/nginx-write-10-sendfile)
 
+[从零手写实现 nginx-11-file+range 合并](https://houbb.github.io/2018/11/22/nginx-write-11-rile-and-range-merge)
+
 # 变更日志
 
 > [变更日志](CHANGE_LOG.md)

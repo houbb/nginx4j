@@ -3,7 +3,6 @@ package com.github.houbb.nginx4j.support.request.dispatch;
 import com.github.houbb.nginx4j.config.NginxConfig;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.FullHttpResponse;
 
 import java.io.File;
 
@@ -20,6 +19,34 @@ public class NginxRequestDispatchContext {
     private NginxConfig nginxConfig;
 
     private File file;
+
+    /**
+     * 确切的文件长度
+     * @since 0.10.0
+     */
+    private long actualFileLength;
+
+    /**
+     * 确切的开始位置
+     * @since 0.10.0
+     */
+    private long actualStart;
+
+    public long getActualStart() {
+        return actualStart;
+    }
+
+    public void setActualStart(long actualStart) {
+        this.actualStart = actualStart;
+    }
+
+    public long getActualFileLength() {
+        return actualFileLength;
+    }
+
+    public void setActualFileLength(long actualFileLength) {
+        this.actualFileLength = actualFileLength;
+    }
 
     public File getFile() {
         return file;
