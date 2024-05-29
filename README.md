@@ -34,6 +34,8 @@ nginx4j 是基于 netty 实现的 nginx 的java 版本。
 
 - sendfile 零拷贝特性
 
+- http keep-alive 特性
+
 ## 拓展阅读
 
 [从零手写实现 nginx-01-为什么不能有 java 版本的 nginx?](https://houbb.github.io/2018/11/22/nginx-write-01-how-to)
@@ -70,7 +72,7 @@ nginx4j 是基于 netty 实现的 nginx 的java 版本。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>nginx4j</artifactId>
-    <version>0.9.0</version>
+    <version>0.11.0</version>
 </dependency>
 ```
 
@@ -152,7 +154,8 @@ Nginx4jBs.newInstance()
 - [x] range 范围请求
 - [x] 请求的压缩 gzip 等常见压缩算法
 - [x] sendFile 特性支持
-- [ ] range 的代码合并到 file
+- [x] range 的代码合并到 file
+- [x] http keep-alive
 - [ ] 压缩更好的实现方式？ zlib 算法 + 实现优化？
 - [ ] CORS
 - [ ] rewrite 请求头信息重写

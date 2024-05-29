@@ -17,6 +17,11 @@ import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.stream.ChunkedWriteHandler;
+import io.netty.handler.timeout.IdleStateHandler;
+import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.handler.timeout.WriteTimeoutHandler;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * netty 实现
@@ -62,6 +67,13 @@ public class NginxServerNetty implements INginxServer {
                             p.addLast(new HttpObjectAggregator(65536)); // 目的是将多个消息转换为单一的request或者response对象
                             p.addLast(new HttpResponseEncoder()); // 响应解码器
                             p.addLast(new ChunkedWriteHandler()); // 目的是支持异步大文件传输
+
+                            // 设置读写超时
+                            p.addLast(new ReadTimeoutHandler(30, TimeUnit.SECONDS));
+                            p.addLast(new WriteTimeoutHandler(30, TimeUnit.SECONDS));
+                            // 设置空闲检测
+                            p.addLast(new IdleStateHandler(60, 30, 0, TimeUnit.SECONDS));
+
                             // 业务逻辑
                             p.addLast(new NginxNettyServerHandler(nginxConfig));
                         }
