@@ -12,4 +12,18 @@ public class NginxConst {
      */
     public static final int CHUNK_SIZE = 1024 * 1024;
 
+    /**
+     * 默认 server
+     *
+     * @since 0.12.0
+     */
+    public static final String DEFAULT_SERVER = "default_server";
+
+    /**
+     * 头信息-host
+     *
+     * @since 0.12.0
+     */
+    public static final String HEADER_HOST = "Host";
+
 }

@@ -1,6 +1,7 @@
 package com.github.houbb.nginx4j.support.request.dispatch;
 
 import com.github.houbb.nginx4j.config.NginxConfig;
+import com.github.houbb.nginx4j.config.NginxUserServerConfig;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 
@@ -31,6 +32,20 @@ public class NginxRequestDispatchContext {
      * @since 0.10.0
      */
     private long actualStart;
+
+    /**
+     * 当前匹配的用户信息
+     * @since 0.12.0
+     */
+    private NginxUserServerConfig currentNginxUserServerConfig;
+
+    public NginxUserServerConfig getCurrentNginxUserServerConfig() {
+        return currentNginxUserServerConfig;
+    }
+
+    public void setCurrentNginxUserServerConfig(NginxUserServerConfig currentNginxUserServerConfig) {
+        this.currentNginxUserServerConfig = currentNginxUserServerConfig;
+    }
 
     public long getActualStart() {
         return actualStart;

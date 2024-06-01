@@ -156,10 +156,10 @@ Nginx4jBs.newInstance()
 - [x] sendFile 特性支持
 - [x] range 的代码合并到 file
 - [x] http keep-alive
-- [ ] 压缩更好的实现方式？ zlib 算法 + 实现优化？
 - [ ] CORS
 - [ ] rewrite 请求头信息重写
-- [ ] ETag 和 Last-Modified
+- [ ] ETag 和 Last-Modified + cache
+- [ ] 压缩更好的实现方式？ zlib 算法 + 实现优化？
 - [ ] http2
 - [ ] http3
 - [ ] ssl/https

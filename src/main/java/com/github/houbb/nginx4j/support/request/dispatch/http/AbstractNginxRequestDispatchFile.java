@@ -3,6 +3,8 @@ package com.github.houbb.nginx4j.support.request.dispatch.http;
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
 import com.github.houbb.nginx4j.config.NginxConfig;
+import com.github.houbb.nginx4j.config.NginxUserConfig;
+import com.github.houbb.nginx4j.config.NginxUserServerConfig;
 import com.github.houbb.nginx4j.constant.EnableStatusEnum;
 import com.github.houbb.nginx4j.constant.NginxConst;
 import com.github.houbb.nginx4j.exception.Nginx4jException;
@@ -79,7 +81,9 @@ public class AbstractNginxRequestDispatchFile extends AbstractNginxRequestDispat
         if (HttpUtil.isKeepAlive(request)) {
             response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
         }
-        response.headers().set(HttpHeaderNames.CONTENT_TYPE, InnerMimeUtil.getContentTypeWithCharset(targetFile, context.getNginxConfig().getCharset()));
+
+        final NginxUserServerConfig nginxUserServerConfig = context.getCurrentNginxUserServerConfig();
+        response.headers().set(HttpHeaderNames.CONTENT_TYPE, InnerMimeUtil.getContentTypeWithCharset(targetFile, nginxUserServerConfig.getCharset()));
         response.headers().set(HttpHeaderNames.CONTENT_LENGTH, fileLength);
     }
 
@@ -119,9 +123,9 @@ public class AbstractNginxRequestDispatchFile extends AbstractNginxRequestDispat
     }
 
     protected boolean isZeroCopyEnable(NginxRequestDispatchContext context) {
-        final NginxConfig nginxConfig = context.getNginxConfig();
+        final NginxUserServerConfig nginxUserServerConfig = context.getCurrentNginxUserServerConfig();
 
-        return EnableStatusEnum.isEnable(nginxConfig.getNginxSendFileConfig().getSendFile());
+        return EnableStatusEnum.isEnable(nginxUserServerConfig.getNginxSendFileConfig().getSendFile());
     }
 
     protected void writeAndFlushOnComplete(final ChannelHandlerContext ctx,

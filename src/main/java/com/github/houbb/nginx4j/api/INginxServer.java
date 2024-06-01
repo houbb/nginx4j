@@ -12,4 +12,10 @@ public interface INginxServer {
 
     void start();
 
+    /**
+     * 资源销毁
+     * @since 0.12.0
+     */
+    void destroy();
+
 }

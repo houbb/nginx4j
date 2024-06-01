@@ -15,12 +15,12 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
-import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -43,60 +43,71 @@ public class NginxServerNetty implements INginxServer {
 
     @Override
     public void start() {
-        // 服务器监听的端口号
-        String host = InnerNetUtil.getHost();
-        int port = nginxConfig.getHttpServerListen();
+        Set<Integer> httpServerPortSet = nginxConfig.getNginxUserConfig().getServerPortSet();
 
-        EventLoopGroup bossGroup = new NioEventLoopGroup();
-        //worker 线程池的数量默认为 CPU 核心数的两倍
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        // 需要验证这里是否支持多个？
+        for(Integer port : httpServerPortSet) {
+            log.info("[Server] 开始初始化 port={}", port);
 
-        try {
-            final String httpServerPrefix = String.format("http://%s:%s/", host, port);
-            nginxConfig.setHttpServerPrefix(httpServerPrefix);
+            // 服务器监听的端口号
+            String host = InnerNetUtil.getHost();
 
-            ServerBootstrap serverBootstrap = new ServerBootstrap();
-            serverBootstrap.group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class)
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel ch) throws Exception {
-                            ChannelPipeline p = ch.pipeline();
+            EventLoopGroup bossGroup = new NioEventLoopGroup();
+            //worker 线程池的数量默认为 CPU 核心数的两倍
+            EventLoopGroup workerGroup = new NioEventLoopGroup();
 
-                            p.addLast(new HttpRequestDecoder()); // 请求消息解码器
-                            p.addLast(new HttpObjectAggregator(65536)); // 目的是将多个消息转换为单一的request或者response对象
-                            p.addLast(new HttpResponseEncoder()); // 响应解码器
-                            p.addLast(new ChunkedWriteHandler()); // 目的是支持异步大文件传输
+            try {
+                final String httpServerPrefix = String.format("http://%s:%s/", host, port);
+                nginxConfig.setHttpServerPrefix(httpServerPrefix);
 
-                            // 设置读写超时
-                            p.addLast(new ReadTimeoutHandler(30, TimeUnit.SECONDS));
-                            p.addLast(new WriteTimeoutHandler(30, TimeUnit.SECONDS));
-                            // 设置空闲检测
-                            p.addLast(new IdleStateHandler(60, 30, 0, TimeUnit.SECONDS));
+                ServerBootstrap serverBootstrap = new ServerBootstrap();
+                serverBootstrap.group(bossGroup, workerGroup)
+                        .channel(NioServerSocketChannel.class)
+                        .childHandler(new ChannelInitializer<SocketChannel>() {
+                            @Override
+                            protected void initChannel(SocketChannel ch) throws Exception {
+                                ChannelPipeline p = ch.pipeline();
 
-                            // 业务逻辑
-                            p.addLast(new NginxNettyServerHandler(nginxConfig));
-                        }
-                    })
-                    .option(ChannelOption.SO_BACKLOG, 128)
-                    .childOption(ChannelOption.SO_KEEPALIVE, true);
+                                p.addLast(new HttpRequestDecoder()); // 请求消息解码器
+                                p.addLast(new HttpObjectAggregator(65536)); // 目的是将多个消息转换为单一的request或者response对象
+                                p.addLast(new HttpResponseEncoder()); // 响应解码器
+                                p.addLast(new ChunkedWriteHandler()); // 目的是支持异步大文件传输
 
-            // Bind and start to accept incoming connections.
-            ChannelFuture future = serverBootstrap.bind(port).sync();
+                                // 设置读写超时
+                                p.addLast(new ReadTimeoutHandler(30, TimeUnit.SECONDS));
+                                p.addLast(new WriteTimeoutHandler(30, TimeUnit.SECONDS));
+                                // 设置空闲检测
+                                p.addLast(new IdleStateHandler(60, 30, 0, TimeUnit.SECONDS));
 
-            log.info("[Nginx4j] listen on {}", httpServerPrefix);
+                                // 业务逻辑
+                                p.addLast(new NginxNettyServerHandler(nginxConfig));
+                            }
+                        })
+                        .option(ChannelOption.SO_BACKLOG, 128)
+                        .childOption(ChannelOption.SO_KEEPALIVE, true);
 
-            // Wait until the server socket is closed.
-            future.channel().closeFuture().sync();
-        } catch (InterruptedException e) {
-            log.error("[Nginx4j] start meet ex", e);
-            throw new Nginx4jException(e);
-        } finally {
-            workerGroup.shutdownGracefully();
-            bossGroup.shutdownGracefully();
+                // Bind and start to accept incoming connections.
+                ChannelFuture future = serverBootstrap.bind(port).sync();
 
-            log.info("[Nginx4j] shutdownGracefully", host, port);
+                log.info("[Nginx4j] listen on {}", httpServerPrefix);
+
+                // Wait until the server socket is closed.
+                future.channel().closeFuture().sync();
+            } catch (InterruptedException e) {
+                log.error("[Nginx4j] start meet ex", e);
+                throw new Nginx4jException(e);
+            } finally {
+                workerGroup.shutdownGracefully();
+                bossGroup.shutdownGracefully();
+
+                log.info("[Nginx4j] shutdownGracefully", host, port);
+            }
         }
+    }
+
+    @Override
+    public void destroy() {
+
     }
 
 }

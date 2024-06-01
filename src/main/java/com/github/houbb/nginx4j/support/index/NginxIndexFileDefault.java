@@ -1,13 +1,11 @@
 package com.github.houbb.nginx4j.support.index;
 
-import com.github.houbb.heaven.support.tuple.impl.Pair;
 import com.github.houbb.heaven.util.io.FileUtil;
 import com.github.houbb.heaven.util.io.ResourceUtil;
-import com.github.houbb.heaven.util.io.StreamUtil;
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
-import com.github.houbb.nginx4j.config.NginxConfig;
-import com.github.houbb.nginx4j.util.InnerMimeUtil;
+import com.github.houbb.nginx4j.config.NginxUserServerConfig;
+import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
 
 import java.io.File;
 import java.util.List;
@@ -17,14 +15,15 @@ public class NginxIndexFileDefault implements NginxIndexFile {
     private static final Log log = LogFactory.getLog(NginxIndexFileDefault.class);
 
     @Override
-    public File getIndexFile(NginxConfig nginxConfig) {
-        return getIndexContentBytes(nginxConfig);
+    public File getIndexFile(NginxRequestDispatchContext context) {
+        return getIndexContentBytes(context);
     }
 
-    public File getIndexContentBytes(NginxConfig nginxConfig) {
-        List<String> indexHtmlList = nginxConfig.getHttpServerIndexList();
+    public File getIndexContentBytes(NginxRequestDispatchContext context) {
+        final NginxUserServerConfig nginxUserServerConfig = context.getCurrentNginxUserServerConfig();
 
-        String basicPath = nginxConfig.getHttpServerRoot();
+        List<String> indexHtmlList = nginxUserServerConfig.getHttpServerIndexList();
+        String basicPath = nginxUserServerConfig.getHttpServerRoot();
         for(String indexHtml : indexHtmlList) {
             String fullPath = FileUtil.buildFullPath(basicPath, indexHtml);
 

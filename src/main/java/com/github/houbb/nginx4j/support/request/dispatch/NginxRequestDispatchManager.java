@@ -5,16 +5,11 @@ import com.github.houbb.heaven.util.lang.StringUtil;
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
 import com.github.houbb.nginx4j.config.NginxConfig;
-import com.github.houbb.nginx4j.config.NginxGzipConfig;
-import com.github.houbb.nginx4j.constant.EnableStatusEnum;
-import com.github.houbb.nginx4j.constant.NginxConst;
+import com.github.houbb.nginx4j.config.NginxUserServerConfig;
 import com.github.houbb.nginx4j.support.request.dispatch.http.NginxRequestDispatches;
-import com.github.houbb.nginx4j.support.server.NginxServerSocket;
-import com.github.houbb.nginx4j.util.InnerMimeUtil;
 import io.netty.handler.codec.http.FullHttpRequest;
 
 import java.io.File;
-import java.util.List;
 
 
 /**
@@ -24,7 +19,7 @@ import java.util.List;
  */
 public class NginxRequestDispatchManager implements NginxRequestDispatch {
 
-    private static final Log log = LogFactory.getLog(NginxServerSocket.class);
+    private static final Log log = LogFactory.getLog(NginxRequestDispatchManager.class);
 
     /**
      * 内容的分发处理
@@ -48,7 +43,7 @@ public class NginxRequestDispatchManager implements NginxRequestDispatch {
         }
 
         // 文件
-        File targetFile = getTargetFile(requestInfoBo, nginxConfig);
+        File targetFile = getTargetFile(requestInfoBo, context);
         // 是否存在
         if(targetFile.exists()) {
             // 设置文件
@@ -60,7 +55,7 @@ public class NginxRequestDispatchManager implements NginxRequestDispatch {
             }
 
             // range ?
-            boolean isRangeRequest = isRangeRequest(requestInfoBo, nginxConfig);
+            boolean isRangeRequest = isRangeRequest(requestInfoBo, context);
             if(isRangeRequest) {
                 return NginxRequestDispatches.fileRange();
             }
@@ -73,69 +68,30 @@ public class NginxRequestDispatchManager implements NginxRequestDispatch {
     }
 
     /**
-     * 是否需要压缩
-     *
-     *         gzip on;
-     *         gzip_vary on;
-     *         gzip_proxied any;
-     *         gzip_comp_level 5;
-     *         gzip_min_length 256;
-     *         gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
-     *
-     * @param request 请求
-     * @param nginxConfig 配置
-     * @return 结果
-     */
-    private boolean isNeedCompress(final File targetFile,
-                                   final FullHttpRequest request,
-                                   final NginxConfig nginxConfig) {
-        final NginxGzipConfig gzipConfig = nginxConfig.getNginxGzipConfig();
-
-        if(EnableStatusEnum.ON.getCode().equalsIgnoreCase(gzipConfig.getGzip())) {
-            // 大小
-            long configSize = gzipConfig.getGzipMinLength();
-            long fileLength = targetFile.length();
-            if(fileLength < configSize) {
-                return false;
-            }
-
-            // 文件类别
-            List<String> configContentTypeList = gzipConfig.getGzipTypes();
-            String contentType = InnerMimeUtil.getContentType(targetFile);
-            if(!configContentTypeList.contains(contentType)) {
-                return false;
-            }
-
-            // 真
-            return true;
-        }
-
-
-        return false;
-    }
-
-    /**
      * 是否为范围查询
      * @param request 请求
-     * @param nginxConfig 配置
+     * @param context 配置
      * @return 结果
      * @since 0.7.0
      */
-    protected boolean isRangeRequest(final FullHttpRequest request, final NginxConfig nginxConfig) {
+    protected boolean isRangeRequest(final FullHttpRequest request, NginxRequestDispatchContext context) {
         // 解析Range头
         String rangeHeader = request.headers().get("Range");
         return StringUtil.isNotEmpty(rangeHeader);
     }
 
-    protected File getTargetFile(final FullHttpRequest request, final NginxConfig nginxConfig) {
-        boolean isRootPath = isRootPath(request, nginxConfig);
+    protected File getTargetFile(final FullHttpRequest request, final NginxRequestDispatchContext context) {
+        final NginxUserServerConfig nginxUserServerConfig = context.getCurrentNginxUserServerConfig();
+        boolean isRootPath = isRootPath(request, context);
+        final NginxConfig nginxConfig = context.getNginxConfig();
+
         // 根路径
         if(isRootPath) {
             log.info("[Nginx] current req meet root path");
-            return nginxConfig.getNginxIndexFile().getIndexFile(nginxConfig);
+            return nginxConfig.getNginxIndexFile().getIndexFile(context);
         }
 
-        final String basicPath = nginxConfig.getHttpServerRoot();
+        final String basicPath = nginxUserServerConfig.getHttpServerRoot();
         final String path = request.uri();
 
         // other
@@ -143,7 +99,7 @@ public class NginxRequestDispatchManager implements NginxRequestDispatch {
         return new File(fullPath);
     }
 
-    protected boolean isRootPath(final FullHttpRequest request, final NginxConfig nginxConfig) {
+    protected boolean isRootPath(final FullHttpRequest request, final NginxRequestDispatchContext context) {
         final String path = request.uri();
 
         //root path

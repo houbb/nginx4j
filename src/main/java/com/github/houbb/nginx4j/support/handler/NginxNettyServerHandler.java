@@ -3,6 +3,8 @@ package com.github.houbb.nginx4j.support.handler;
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
 import com.github.houbb.nginx4j.config.NginxConfig;
+import com.github.houbb.nginx4j.config.NginxUserServerConfig;
+import com.github.houbb.nginx4j.constant.NginxConst;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatch;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
 import io.netty.channel.ChannelHandlerContext;
@@ -30,14 +32,28 @@ public class NginxNettyServerHandler extends SimpleChannelInboundHandler<FullHtt
         logger.info("[Nginx] channelRead writeAndFlush start request={}, id={}", request, id);
 
         // 分发
+        NginxUserServerConfig nginxUserServerConfig = getNginxUserServerConfig(request);
+
         final NginxRequestDispatch requestDispatch = nginxConfig.getNginxRequestDispatch();
         NginxRequestDispatchContext context = new NginxRequestDispatchContext();
         context.setCtx(ctx);
         context.setNginxConfig(nginxConfig);
         context.setRequest(request);
+        context.setCurrentNginxUserServerConfig(nginxUserServerConfig);
+
         requestDispatch.dispatch(context);
 
         logger.info("[Nginx] channelRead writeAndFlush DONE id={}", id);
+    }
+
+    private NginxUserServerConfig getNginxUserServerConfig(FullHttpRequest request) {
+        String hostName = getHostName(request);
+
+        return nginxConfig.getNginxUserConfig().getNginxUserServerConfig(hostName);
+    }
+
+    private String getHostName(FullHttpRequest request) {
+        return request.headers().get(NginxConst.HEADER_HOST);
     }
 
     @Override

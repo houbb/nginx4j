@@ -19,13 +19,11 @@ public class InnerRespUtil {
      * @param bytes 原始内容
      * @param status 结果枚举
      * @param request 请求内容
-     * @param nginxConfig 配置
      * @return 结果
      */
     public static FullHttpResponse buildCommonResp(byte[] bytes,
                                                    final HttpResponseStatus status,
-                                                   final FullHttpRequest request,
-                                                   final NginxConfig nginxConfig) {
+                                                   final FullHttpRequest request) {
         byte[] defaultContent = new byte[]{};
         if(ArrayPrimitiveUtil.isNotEmpty(bytes)) {
             defaultContent = bytes;

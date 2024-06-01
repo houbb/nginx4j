@@ -5,6 +5,8 @@ import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
 import com.github.houbb.nginx4j.config.NginxConfig;
 import com.github.houbb.nginx4j.config.NginxGzipConfig;
+import com.github.houbb.nginx4j.config.NginxUserConfig;
+import com.github.houbb.nginx4j.config.NginxUserServerConfig;
 import com.github.houbb.nginx4j.constant.EnableStatusEnum;
 import com.github.houbb.nginx4j.exception.Nginx4jException;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
@@ -36,14 +38,16 @@ public class InnerGzipUtil {
      *         gzip_min_length 256;
      *         gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
      *
+     * @param targetFile 目标文件
      * @param request 请求
-     * @param nginxConfig 配置
+     * @param context 上下文
      * @return 结果
      */
     private static boolean isNeedCompress(final File targetFile,
                                    final FullHttpRequest request,
-                                   final NginxConfig nginxConfig) {
-        final NginxGzipConfig gzipConfig = nginxConfig.getNginxGzipConfig();
+                                   final NginxRequestDispatchContext context) {
+        final NginxUserServerConfig nginxUserServerConfig = context.getCurrentNginxUserServerConfig();
+        final NginxGzipConfig gzipConfig = nginxUserServerConfig.getNginxGzipConfig();
 
         if(EnableStatusEnum.ON.getCode().equalsIgnoreCase(gzipConfig.getGzip())) {
             // 大小
@@ -76,10 +80,9 @@ public class InnerGzipUtil {
      */
     public static boolean isMatchGzip(NginxRequestDispatchContext context) {
         final FullHttpRequest request = context.getRequest();
-        final NginxConfig nginxConfig = context.getNginxConfig();
         final File targetFile = context.getFile();
 
-        return InnerReqUtil.isGzipSupport(request) && isNeedCompress(targetFile, request, nginxConfig);
+        return InnerReqUtil.isGzipSupport(request) && isNeedCompress(targetFile, request, context);
     }
 
     public static File prepareGzip(NginxRequestDispatchContext context,
