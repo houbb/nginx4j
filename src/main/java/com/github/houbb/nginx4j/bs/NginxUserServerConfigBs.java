@@ -1,11 +1,8 @@
 package com.github.houbb.nginx4j.bs;
 
-import com.github.houbb.nginx4j.config.NginxGzipConfig;
-import com.github.houbb.nginx4j.config.NginxSendFileConfig;
-import com.github.houbb.nginx4j.config.NginxUserConfig;
 import com.github.houbb.nginx4j.config.NginxUserServerConfig;
+import com.github.houbb.nginx4j.constant.NginxUserServerConfigDefaultConst;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -16,50 +13,56 @@ public class NginxUserServerConfigBs {
     /**
      * 文件编码
      */
-    private String charset = "UTF-8";
+    private String charset = NginxUserServerConfigDefaultConst.charset;
 
     /**
      * http 服务监听端口
      */
-    private int httpServerListen = 8080;
+    private int httpServerListen = NginxUserServerConfigDefaultConst.httpServerListen;
 
     /**
      * 监听的 header=host 的信息
      */
-    private String httpServerHost = "localhost";
+    private String httpServerName = NginxUserServerConfigDefaultConst.httpServerName;
 
     /**
      * 根路径
      * D:\github\nginx4j\nginx4j
      */
-    private String httpServerRoot = "D:\\data\\nginx4j";
+    private String httpServerRoot = NginxUserServerConfigDefaultConst.httpServerRoot;
 
     /**
      * 欢迎路径
      */
-    private List<String> httpServerIndexList = Arrays.asList("index.html", "index.html");
+    private List<String> httpServerIndexList = NginxUserServerConfigDefaultConst.httpServerIndexList;
 
     /**
-     * 压缩类别
+     * 是否启用
+     * on 启用
+     * @since 0.13.0
      */
-    private NginxGzipConfig nginxGzipConfig = new NginxGzipConfig();
+    private String sendFile = NginxUserServerConfigDefaultConst.sendFile;
 
     /**
-     * @since 0.9.0
+     * 是否启用
+     * on 启用
      */
-    private NginxSendFileConfig nginxSendFileConfig = new NginxSendFileConfig();
+    private String gzip = NginxUserServerConfigDefaultConst.gzip;
+
+    /**
+     * 最小长度
+     *
+     * 1mb
+     */
+    private long gzipMinLength = NginxUserServerConfigDefaultConst.gzipMinLength;
+
+    /**
+     * 压缩累呗
+     */
+    private List<String> gzipTypes = NginxUserServerConfigDefaultConst.gzipTypes;
 
     public static NginxUserServerConfigBs newInstance() {
         return new NginxUserServerConfigBs();
-    }
-
-    public String httpServerHost() {
-        return httpServerHost;
-    }
-
-    public NginxUserServerConfigBs httpServerHost(String httpServerHost) {
-        this.httpServerHost = httpServerHost;
-        return this;
     }
 
     public NginxUserServerConfigBs charset(String charset) {
@@ -69,6 +72,11 @@ public class NginxUserServerConfigBs {
 
     public NginxUserServerConfigBs httpServerListen(int httpServerListen) {
         this.httpServerListen = httpServerListen;
+        return this;
+    }
+
+    public NginxUserServerConfigBs httpServerName(String httpServerName) {
+        this.httpServerName = httpServerName;
         return this;
     }
 
@@ -82,25 +90,37 @@ public class NginxUserServerConfigBs {
         return this;
     }
 
-    public NginxUserServerConfigBs nginxGzipConfig(NginxGzipConfig nginxGzipConfig) {
-        this.nginxGzipConfig = nginxGzipConfig;
+    public NginxUserServerConfigBs sendFile(String sendFile) {
+        this.sendFile = sendFile;
         return this;
     }
 
-    public NginxUserServerConfigBs nginxSendFileConfig(NginxSendFileConfig nginxSendFileConfig) {
-        this.nginxSendFileConfig = nginxSendFileConfig;
+    public NginxUserServerConfigBs gzip(String gzip) {
+        this.gzip = gzip;
+        return this;
+    }
+
+    public NginxUserServerConfigBs gzipMinLength(long gzipMinLength) {
+        this.gzipMinLength = gzipMinLength;
+        return this;
+    }
+
+    public NginxUserServerConfigBs gzipTypes(List<String> gzipTypes) {
+        this.gzipTypes = gzipTypes;
         return this;
     }
 
     public NginxUserServerConfig build() {
         NginxUserServerConfig config = new NginxUserServerConfig();
         config.setCharset(charset);
-        config.setNginxGzipConfig(nginxGzipConfig);
-        config.setNginxSendFileConfig(nginxSendFileConfig);
         config.setHttpServerIndexList(httpServerIndexList);
         config.setHttpServerListen(httpServerListen);
         config.setHttpServerRoot(httpServerRoot);
-        config.setHttpServerHost(httpServerHost);
+        config.setHttpServerName(httpServerName);
+        config.setSendFile(sendFile);
+        config.setGzip(gzip);
+        config.setGzipMinLength(gzipMinLength);
+        config.setGzipTypes(gzipTypes);
 
         return config;
     }

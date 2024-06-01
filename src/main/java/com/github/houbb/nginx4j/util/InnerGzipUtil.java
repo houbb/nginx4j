@@ -3,9 +3,6 @@ package com.github.houbb.nginx4j.util;
 import com.github.houbb.heaven.util.io.FileUtil;
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
-import com.github.houbb.nginx4j.config.NginxConfig;
-import com.github.houbb.nginx4j.config.NginxGzipConfig;
-import com.github.houbb.nginx4j.config.NginxUserConfig;
 import com.github.houbb.nginx4j.config.NginxUserServerConfig;
 import com.github.houbb.nginx4j.constant.EnableStatusEnum;
 import com.github.houbb.nginx4j.exception.Nginx4jException;
@@ -47,18 +44,17 @@ public class InnerGzipUtil {
                                    final FullHttpRequest request,
                                    final NginxRequestDispatchContext context) {
         final NginxUserServerConfig nginxUserServerConfig = context.getCurrentNginxUserServerConfig();
-        final NginxGzipConfig gzipConfig = nginxUserServerConfig.getNginxGzipConfig();
 
-        if(EnableStatusEnum.ON.getCode().equalsIgnoreCase(gzipConfig.getGzip())) {
+        if(EnableStatusEnum.ON.getCode().equalsIgnoreCase(nginxUserServerConfig.getGzip())) {
             // 大小
-            long configSize = gzipConfig.getGzipMinLength();
+            long configSize = nginxUserServerConfig.getGzipMinLength();
             long fileLength = targetFile.length();
             if(fileLength < configSize) {
                 return false;
             }
 
             // 文件类别
-            List<String> configContentTypeList = gzipConfig.getGzipTypes();
+            List<String> configContentTypeList = nginxUserServerConfig.getGzipTypes();
             String contentType = InnerMimeUtil.getContentType(targetFile);
             if(!configContentTypeList.contains(contentType)) {
                 return false;

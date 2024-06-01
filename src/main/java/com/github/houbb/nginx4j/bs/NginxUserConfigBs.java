@@ -6,6 +6,7 @@ import com.github.houbb.log.integration.core.LogFactory;
 import com.github.houbb.nginx4j.config.NginxUserConfig;
 import com.github.houbb.nginx4j.config.NginxUserServerConfig;
 import com.github.houbb.nginx4j.constant.NginxConst;
+import com.github.houbb.nginx4j.constant.NginxUserConfigDefaultConst;
 import com.github.houbb.nginx4j.support.handler.NginxNettyServerHandler;
 
 import java.util.HashMap;
@@ -20,6 +21,9 @@ public class NginxUserConfigBs {
 
     private static final Log logger = LogFactory.getLog(NginxNettyServerHandler.class);
 
+    // 全局配置
+    private String httpPid = NginxUserConfigDefaultConst.HTTP_PID;
+
     public static NginxUserConfigBs newInstance() {
         return new NginxUserConfigBs();
     }
@@ -27,6 +31,11 @@ public class NginxUserConfigBs {
     private final Map<String, NginxUserServerConfig> serverConfigMap = new HashMap<>();
 
     private final Set<Integer> serverPortSet = new HashSet<>();
+
+    public NginxUserConfigBs httpPid(String httpPid) {
+        this.httpPid = httpPid;
+        return this;
+    }
 
     public NginxUserConfigBs addServerConfig(int port, String hostName, NginxUserServerConfig serverConfig) {
         ArgUtil.notEmpty(hostName, "hostName");
@@ -42,6 +51,7 @@ public class NginxUserConfigBs {
         prepareForServerConfig();
 
         NginxUserConfig config = new NginxUserConfig();
+        config.setHttpPid(httpPid);
         config.setServerConfigMap(serverConfigMap);
         config.setServerPortSet(serverPortSet);
 
@@ -53,7 +63,7 @@ public class NginxUserConfigBs {
         if(!hasUserDefaultServer) {
             NginxUserServerConfig config = NginxUserServerConfigBs.newInstance().build();
             logger.warn("不存在用户默认的 server, 系统自动添加默认的 server 如下={}", config);
-            this.addServerConfig(config.getHttpServerListen(), config.getHttpServerHost(), config);
+            this.addServerConfig(config.getHttpServerListen(), NginxConst.DEFAULT_SERVER, config);
         }
     }
 

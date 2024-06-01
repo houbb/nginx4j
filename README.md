@@ -72,14 +72,100 @@ nginx4j 是基于 netty 实现的 nginx 的java 版本。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>nginx4j</artifactId>
-    <version>0.11.0</version>
+    <version>0.13.0</version>
 </dependency>
 ```
 
 ## 启动测试
 
+### 配置文件
+
+```conf
+# nginx.conf
+
+# 定义运行Nginx的用户和组
+user nginx;
+
+# 主进程的PID文件存放位置
+pid /var/run/nginx.pid;
+
+# 事件模块配置
+events {
+    worker_connections 1024;  # 每个工作进程的最大连接数
+}
+
+# HTTP模块配置
+http {
+    include /etc/nginx/mime.types;  # MIME类型配置文件
+    default_type application/octet-stream;  # 默认的MIME类型
+
+    # 访问日志配置
+    access_log /var/log/nginx/access.log;  # 访问日志文件路径
+    # 错误日志配置
+    error_log /var/log/nginx/error.log;  # 错误日志文件路径
+
+    # 文件传输设置
+    sendfile on;  # 开启高效文件传输
+    tcp_nopush on;  # 防止网络拥塞
+
+    # Keepalive超时设置
+    keepalive_timeout 65;
+
+    # 定义服务器块
+    server {
+        listen 80;  # 监听80端口
+        server_name localhost;  # 服务器域名
+
+        # 单独为这个 server 启用 sendfile
+        sendfile on;
+
+        # 静态文件的根目录
+        root D:\data\nginx4j;  # 静态文件存放的根目录
+        index index.html index.htm;  # 默认首页
+
+        # 如果需要为这个 server 单独配置 gzip，可以覆盖全局配置
+        gzip on;
+        gzip_disable "msie6";
+        gzip_vary on;
+        gzip_proxied any;
+        gzip_comp_level 6;
+        gzip_buffers 16 8k;
+        gzip_http_version 1.1;
+        gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+
+        # 定义location块，处理对根目录的请求
+        location / {
+            try_files $uri $uri/ =404;  # 尝试提供请求的文件，如果不存在则404
+        }
+    }
+
+    server {
+        listen 443 ssl;
+        server_name  secure-example.com;
+
+        ssl_certificate     /etc/nginx/ssl/secure-example.com.crt;
+        ssl_certificate_key /etc/nginx/ssl/secure-example.com.key;
+
+        location / {
+            root   /var/www/secure-example.com;
+            index  index.html index.htm;
+        }
+    }
+
+}
+```
+
+
+### 启动代码
+
+
 ```java
-Nginx4jBs.newInstance().init().start();
+NginxUserConfig nginxUserConfig = NginxUserConfigLoaders.configFile("D:\\github\\nginx4j\\src\\main\\resources\\nginx.conf").load();
+
+Nginx4jBs.newInstance()
+.nginxUserConfig(nginxUserConfig)
+.init()
+.start();
 ```
 
 启动日志：
@@ -120,22 +206,12 @@ http://localhost:8080/asdfasdf
 ## gzip
 
 ```java
-NginxGzipConfig gzipConfig = new NginxGzipConfig();
-    gzipConfig.setGzip("on");
-    gzipConfig.setGzipMinLength(256);
-    gzipConfig.setGzipTypes(Arrays.asList(
-            "text/plain",
-            "text/css",
-            "text/javascript",
-            "application/json",
-            "application/javascript",
-            "application/xml+rss"
-    ));
+NginxUserConfig nginxUserConfig = NginxUserConfigLoaders.configFile("D:\\github\\nginx4j\\src\\main\\resources\\nginx.conf").load();
 
-Nginx4jBs.newInstance()
-                .nginxGzipConfig(gzipConfig)
-                .init()
-                .start();
+ Nginx4jBs.newInstance()
+ .nginxUserConfig(nginxUserConfig)
+ .init()
+ .start();
 ```
 
 可以开启 gzip 的处理。
@@ -156,6 +232,10 @@ Nginx4jBs.newInstance()
 - [x] sendFile 特性支持
 - [x] range 的代码合并到 file
 - [x] http keep-alive
+- [ ] 配置的标准 POJO
+- [ ] nginx.conf 的解析=》POJO
+- [ ] 更多文件格式的内置支持？
+- [ ] http 全局的默认配置属性
 - [ ] CORS
 - [ ] rewrite 请求头信息重写
 - [ ] ETag 和 Last-Modified + cache
@@ -176,3 +256,4 @@ Nginx4jBs.newInstance()
 - [ ] filter 过滤器
 - [ ] listener 监听器
 - [ ] rateLimit 限流
+- 

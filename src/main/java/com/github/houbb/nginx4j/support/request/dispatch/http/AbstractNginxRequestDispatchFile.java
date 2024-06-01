@@ -125,7 +125,7 @@ public class AbstractNginxRequestDispatchFile extends AbstractNginxRequestDispat
     protected boolean isZeroCopyEnable(NginxRequestDispatchContext context) {
         final NginxUserServerConfig nginxUserServerConfig = context.getCurrentNginxUserServerConfig();
 
-        return EnableStatusEnum.isEnable(nginxUserServerConfig.getNginxSendFileConfig().getSendFile());
+        return EnableStatusEnum.isEnable(nginxUserServerConfig.getSendFile());
     }
 
     protected void writeAndFlushOnComplete(final ChannelHandlerContext ctx,

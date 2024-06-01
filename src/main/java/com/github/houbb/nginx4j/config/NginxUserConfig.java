@@ -12,6 +12,10 @@ import java.util.Set;
  */
 public class NginxUserConfig {
 
+    // 全局配置
+    private String httpPid;
+
+
     /**
      * 全部的 server 配置列表
      *
@@ -50,5 +54,13 @@ public class NginxUserConfig {
 
     public void setServerConfigMap(Map<String, NginxUserServerConfig> serverConfigMap) {
         this.serverConfigMap = serverConfigMap;
+    }
+
+    public String getHttpPid() {
+        return httpPid;
+    }
+
+    public void setHttpPid(String httpPid) {
+        this.httpPid = httpPid;
     }
 }

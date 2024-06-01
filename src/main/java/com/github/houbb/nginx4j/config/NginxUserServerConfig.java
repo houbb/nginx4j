@@ -22,7 +22,7 @@ public class NginxUserServerConfig {
     /**
      * 监听的 header=host 的信息
      */
-    private String httpServerHost;
+    private String httpServerName;
 
     /**
      * 根路径
@@ -35,16 +35,29 @@ public class NginxUserServerConfig {
     private List<String> httpServerIndexList;
 
     /**
-     * @since 0.8.0
+     * 是否启用
+     * on 启用
+     * @since 0.13.0
      */
-    private NginxGzipConfig nginxGzipConfig;
+    private String sendFile;
 
     /**
-     * 零拷贝配置
-     *
-     * @since 0.9.0
+     * 是否启用
+     * on 启用
      */
-    private NginxSendFileConfig nginxSendFileConfig;
+    private String gzip;
+
+    /**
+     * 最小长度
+     *
+     * 1mb
+     */
+    private long gzipMinLength;
+
+    /**
+     * 压缩累呗
+     */
+    private List<String> gzipTypes;
 
     public String getCharset() {
         return charset;
@@ -54,12 +67,12 @@ public class NginxUserServerConfig {
         this.charset = charset;
     }
 
-    public String getHttpServerHost() {
-        return httpServerHost;
+    public String getHttpServerName() {
+        return httpServerName;
     }
 
-    public void setHttpServerHost(String httpServerHost) {
-        this.httpServerHost = httpServerHost;
+    public void setHttpServerName(String httpServerName) {
+        this.httpServerName = httpServerName;
     }
 
     public int getHttpServerListen() {
@@ -86,33 +99,35 @@ public class NginxUserServerConfig {
         this.httpServerIndexList = httpServerIndexList;
     }
 
-    public NginxGzipConfig getNginxGzipConfig() {
-        return nginxGzipConfig;
+    public String getSendFile() {
+        return sendFile;
     }
 
-    public void setNginxGzipConfig(NginxGzipConfig nginxGzipConfig) {
-        this.nginxGzipConfig = nginxGzipConfig;
+    public void setSendFile(String sendFile) {
+        this.sendFile = sendFile;
     }
 
-    public NginxSendFileConfig getNginxSendFileConfig() {
-        return nginxSendFileConfig;
+    public String getGzip() {
+        return gzip;
     }
 
-    public void setNginxSendFileConfig(NginxSendFileConfig nginxSendFileConfig) {
-        this.nginxSendFileConfig = nginxSendFileConfig;
+    public void setGzip(String gzip) {
+        this.gzip = gzip;
     }
 
-    @Override
-    public String toString() {
-        return "NginxUserServerConfig{" +
-                "charset='" + charset + '\'' +
-                ", httpServerListen=" + httpServerListen +
-                ", httpServerHost='" + httpServerHost + '\'' +
-                ", httpServerRoot='" + httpServerRoot + '\'' +
-                ", httpServerIndexList=" + httpServerIndexList +
-                ", nginxGzipConfig=" + nginxGzipConfig +
-                ", nginxSendFileConfig=" + nginxSendFileConfig +
-                '}';
+    public long getGzipMinLength() {
+        return gzipMinLength;
     }
 
+    public void setGzipMinLength(long gzipMinLength) {
+        this.gzipMinLength = gzipMinLength;
+    }
+
+    public List<String> getGzipTypes() {
+        return gzipTypes;
+    }
+
+    public void setGzipTypes(List<String> gzipTypes) {
+        this.gzipTypes = gzipTypes;
+    }
 }
