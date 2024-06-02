@@ -116,6 +116,12 @@ public  class NginxUserConfigLoaderConfigFile extends AbstractNginxUserConfigLoa
             return StringUtil.splitToList(param.getValue(), " ");
         }
 
+        // http 默认
+        NgxParam httpParam = conf.findParam("gzip_types");
+        if(httpParam != null) {
+            return StringUtil.splitToList(httpParam.getValue(), " ");
+        }
+
         return NginxUserServerConfigDefaultConst.gzipTypes;
     }
 
@@ -123,7 +129,13 @@ public  class NginxUserConfigLoaderConfigFile extends AbstractNginxUserConfigLoa
         // value
         NgxParam param = serverBlock.findParam("gzip_min_len");
         if(param != null) {
-            return Long.valueOf(param.getValue());
+            return Long.parseLong(param.getValue());
+        }
+
+        // http 默认
+        NgxParam httpParam = conf.findParam("gzip_min_len");
+        if(httpParam != null) {
+            return Long.parseLong(httpParam.getValue());
         }
 
         return NginxUserServerConfigDefaultConst.gzipMinLength;
@@ -136,6 +148,12 @@ public  class NginxUserConfigLoaderConfigFile extends AbstractNginxUserConfigLoa
             return param.getValue();
         }
 
+        // http 默认
+        NgxParam httpParam = conf.findParam("gzip");
+        if(httpParam != null) {
+            return httpParam.getValue();
+        }
+
         return NginxUserServerConfigDefaultConst.gzip;
     }
 
@@ -144,6 +162,12 @@ public  class NginxUserConfigLoaderConfigFile extends AbstractNginxUserConfigLoa
         NgxParam param = serverBlock.findParam("index");
         if(param != null) {
             return StringUtil.splitToList(param.getValue(), " ");
+        }
+
+        // http 默认
+        NgxParam httpParam = conf.findParam("index");
+        if(httpParam != null) {
+            return StringUtil.splitToList(httpParam.getValue(), " ");
         }
 
         return NginxUserServerConfigDefaultConst.httpServerIndexList;
@@ -156,6 +180,12 @@ public  class NginxUserConfigLoaderConfigFile extends AbstractNginxUserConfigLoa
             return param.getValue();
         }
 
+        // http 默认
+        NgxParam httpParam = conf.findParam("sendfile");
+        if(httpParam != null) {
+            return httpParam.getValue();
+        }
+
         return NginxUserServerConfigDefaultConst.sendFile;
     }
 
@@ -164,6 +194,12 @@ public  class NginxUserConfigLoaderConfigFile extends AbstractNginxUserConfigLoa
         NgxParam param = serverBlock.findParam("root");
         if(param != null) {
             return param.getValue();
+        }
+
+        // http 默认
+        NgxParam httpParam = conf.findParam("root");
+        if(httpParam != null) {
+            return httpParam.getValue();
         }
 
         return NginxUserServerConfigDefaultConst.httpServerRoot;
@@ -178,6 +214,14 @@ public  class NginxUserConfigLoaderConfigFile extends AbstractNginxUserConfigLoa
             return Integer.parseInt(valueList.get(0));
         }
 
+        // http 默认
+        NgxParam httpParam = conf.findParam("listen");
+        if(httpParam != null) {
+            String value = httpParam.getValue();
+            List<String> valueList = StringUtil.splitToList(value, " ");
+            return Integer.parseInt(valueList.get(0));
+        }
+
         return NginxUserServerConfigDefaultConst.httpServerListen;
     }
 
@@ -186,6 +230,12 @@ public  class NginxUserConfigLoaderConfigFile extends AbstractNginxUserConfigLoa
         NgxParam param = serverBlock.findParam("server_name");
         if(param != null) {
             return param.getValue();
+        }
+
+        // http 默认
+        NgxParam httpParam = conf.findParam("server_name");
+        if(httpParam != null) {
+            return httpParam.getValue();
         }
 
         return NginxUserServerConfigDefaultConst.httpServerName;

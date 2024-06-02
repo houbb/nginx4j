@@ -1,11 +1,5 @@
 # 项目简介
 
-```
- /\_/\  
-( o.o ) 
- > ^ <
-```
-
 nginx4j 是基于 netty 实现的 nginx 的java 版本。
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.houbb/nginx4j/badge.svg)](http://mvnrepository.com/artifact/com.github.houbb/nginx4j)
@@ -84,7 +78,7 @@ nginx4j 是基于 netty 实现的 nginx 的java 版本。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>nginx4j</artifactId>
-    <version>0.14.0</version>
+    <version>0.15.0</version>
 </dependency>
 ```
 
@@ -246,7 +240,7 @@ NginxUserConfig nginxUserConfig = NginxUserConfigLoaders.configFile("D:\\github\
 - [x] http keep-alive
 - [x] 配置的标准 POJO
 - [x] nginx.conf 的解析=》POJO
-- [ ] http 全局的默认配置属性
+- [x] http 全局的默认配置属性
 - [ ] CORS
 - [ ] rewrite 请求头信息重写
 - [ ] ETag 和 Last-Modified + cache
