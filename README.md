@@ -244,9 +244,8 @@ NginxUserConfig nginxUserConfig = NginxUserConfigLoaders.configFile("D:\\github\
 - [x] sendFile 特性支持
 - [x] range 的代码合并到 file
 - [x] http keep-alive
-- [ ] 配置的标准 POJO
-- [ ] nginx.conf 的解析=》POJO
-- [ ] 更多文件格式的内置支持？
+- [x] 配置的标准 POJO
+- [x] nginx.conf 的解析=》POJO
 - [ ] http 全局的默认配置属性
 - [ ] CORS
 - [ ] rewrite 请求头信息重写
@@ -256,6 +255,7 @@ NginxUserConfig nginxUserConfig = NginxUserConfigLoaders.configFile("D:\\github\
 - [ ] http3
 - [ ] ssl/https
 - [ ] 常见请求头/headers/cookie 的处理
+- [ ] 更多文件格式的内置支持？
 
 ## 反向代理
 
