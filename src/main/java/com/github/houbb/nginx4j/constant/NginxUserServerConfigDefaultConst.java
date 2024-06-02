@@ -33,7 +33,7 @@ public class NginxUserServerConfigDefaultConst {
     /**
      * 欢迎路径
      */
-    public static final List<String> httpServerIndexList = Arrays.asList("index.html", "index.html");
+    public static final List<String> httpServerIndexList = Arrays.asList("index.html", "index.htm");
 
     /**
      * 是否启用

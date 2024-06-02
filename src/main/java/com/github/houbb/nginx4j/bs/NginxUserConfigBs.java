@@ -9,10 +9,7 @@ import com.github.houbb.nginx4j.constant.NginxConst;
 import com.github.houbb.nginx4j.constant.NginxUserConfigDefaultConst;
 import com.github.houbb.nginx4j.support.handler.NginxNettyServerHandler;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @since 0.12.0
@@ -21,6 +18,12 @@ public class NginxUserConfigBs {
 
     private static final Log logger = LogFactory.getLog(NginxNettyServerHandler.class);
 
+    /**
+     * 默认用户的服务端配置
+     * @since 0.14.0
+     */
+    private NginxUserServerConfig defaultUserServerConfig = NginxUserServerConfigBs.newInstance().build();
+
     // 全局配置
     private String httpPid = NginxUserConfigDefaultConst.HTTP_PID;
 
@@ -28,7 +31,12 @@ public class NginxUserConfigBs {
         return new NginxUserConfigBs();
     }
 
-    private final Map<String, NginxUserServerConfig> serverConfigMap = new HashMap<>();
+    /**
+     * 全部的 server 配置列表
+     *
+     * @since 0.12.0
+     */
+    private final List<NginxUserServerConfig> serverConfigList = new ArrayList<>();
 
     private final Set<Integer> serverPortSet = new HashSet<>();
 
@@ -37,38 +45,26 @@ public class NginxUserConfigBs {
         return this;
     }
 
-    public NginxUserConfigBs addServerConfig(int port, String hostName, NginxUserServerConfig serverConfig) {
-        ArgUtil.notEmpty(hostName, "hostName");
-        ArgUtil.notNull(serverConfig, "serverConfig");
+    public NginxUserConfigBs defaultUserServerConfig(NginxUserServerConfig defaultUserServerConfig) {
+        this.defaultUserServerConfig = defaultUserServerConfig;
+        return this;
+    }
 
-        serverConfigMap.put(hostName, serverConfig);
-        serverPortSet.add(port);
+    public NginxUserConfigBs addServerConfig(NginxUserServerConfig serverConfig) {
+        serverConfigList.add(serverConfig);
+
+        serverPortSet.add(serverConfig.getHttpServerListen());
 
         return this;
     }
 
     public NginxUserConfig build() {
-        prepareForServerConfig();
-
         NginxUserConfig config = new NginxUserConfig();
         config.setHttpPid(httpPid);
-        config.setServerConfigMap(serverConfigMap);
         config.setServerPortSet(serverPortSet);
-
+        config.setServerConfigList(serverConfigList);
+        config.setDefaultUserServerConfig(defaultUserServerConfig);
         return config;
-    }
-
-    private void prepareForServerConfig() {
-        boolean hasUserDefaultServer = hasUserDefaultServer();
-        if(!hasUserDefaultServer) {
-            NginxUserServerConfig config = NginxUserServerConfigBs.newInstance().build();
-            logger.warn("不存在用户默认的 server, 系统自动添加默认的 server 如下={}", config);
-            this.addServerConfig(config.getHttpServerListen(), NginxConst.DEFAULT_SERVER, config);
-        }
-    }
-
-    private boolean hasUserDefaultServer() {
-        return serverConfigMap.containsKey(NginxConst.DEFAULT_SERVER);
     }
 
 }

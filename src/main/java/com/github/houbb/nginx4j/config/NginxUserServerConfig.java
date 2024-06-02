@@ -130,4 +130,20 @@ public class NginxUserServerConfig {
     public void setGzipTypes(List<String> gzipTypes) {
         this.gzipTypes = gzipTypes;
     }
+
+    @Override
+    public String toString() {
+        return "NginxUserServerConfig{" +
+                "charset='" + charset + '\'' +
+                ", httpServerListen=" + httpServerListen +
+                ", httpServerName='" + httpServerName + '\'' +
+                ", httpServerRoot='" + httpServerRoot + '\'' +
+                ", httpServerIndexList=" + httpServerIndexList +
+                ", sendFile='" + sendFile + '\'' +
+                ", gzip='" + gzip + '\'' +
+                ", gzipMinLength=" + gzipMinLength +
+                ", gzipTypes=" + gzipTypes +
+                '}';
+    }
+
 }

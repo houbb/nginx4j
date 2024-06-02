@@ -104,7 +104,7 @@ public  class NginxUserConfigLoaderConfigFile extends AbstractNginxUserConfigLoa
                         .gzipTypes(gzipTypes);
 
                 NginxUserServerConfig serverConfig = serverConfigBs.build();
-                configBs.addServerConfig(httpServerPort, httpServerName, serverConfig);
+                configBs.addServerConfig(serverConfig);
             }
         }
     }
