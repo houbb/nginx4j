@@ -27,6 +27,7 @@ public interface INginxParamHandle {
 
     /**
      * channel 写之前
+     * @param configParam 参数
      * @param ctx channel 上下文
      * @param object 对象
      * @param context 上下文

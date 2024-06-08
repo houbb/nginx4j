@@ -103,6 +103,7 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
      * @param object 对象
      * @param context 上下文
      * @since 0.16.0
+     * @return channel
      */
     protected ChannelFuture writeAndFlush(final ChannelHandlerContext ctx,
                                           final Object object,
@@ -139,6 +140,7 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
      * @param object 对象
      * @param context 上下文
      * @since 0.16.0
+     * @return channel
      */
     protected ChannelFuture write(final ChannelHandlerContext ctx,
                                           final Object object,
