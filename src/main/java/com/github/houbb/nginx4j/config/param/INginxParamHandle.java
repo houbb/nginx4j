@@ -13,12 +13,14 @@ public interface INginxParamHandle {
 
     /**
      * 开始分发前
+     * @param configParam 参数
      * @param context 上下文
      */
     void beforeDispatch(NginxUserConfigParam configParam, final NginxRequestDispatchContext context);
 
     /**
      * 分发后
+     * @param configParam 参数
      * @param context 上下文
      */
     void afterDispatch(NginxUserConfigParam configParam, final NginxRequestDispatchContext context);
@@ -36,6 +38,7 @@ public interface INginxParamHandle {
 
     /**
      * channel 写之后
+     * @param configParam 参数
      * @param ctx channel 上下文
      * @param object 对象
      * @param context 上下文

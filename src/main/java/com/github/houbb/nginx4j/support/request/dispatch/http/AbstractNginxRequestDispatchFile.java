@@ -62,6 +62,7 @@ public class AbstractNginxRequestDispatchFile extends AbstractNginxRequestDispat
     /**
      * 填充响应头
      * @param context 上下文
+     * @param request 请求
      * @param response 响应
      * @since 0.10.0
      */
