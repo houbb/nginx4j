@@ -2,6 +2,7 @@ package com.github.houbb.nginx4j.support.request.dispatch;
 
 import com.github.houbb.nginx4j.config.NginxConfig;
 import com.github.houbb.nginx4j.config.NginxUserServerConfig;
+import com.github.houbb.nginx4j.config.NginxUserServerLocationConfig;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 
@@ -38,6 +39,21 @@ public class NginxRequestDispatchContext {
      * @since 0.12.0
      */
     private NginxUserServerConfig currentNginxUserServerConfig;
+
+    /**
+     * 当前的配置信息
+     *
+     * @since 0.16.0
+     */
+    private NginxUserServerLocationConfig currentUserServerLocationConfig;
+
+    public NginxUserServerLocationConfig getCurrentUserServerLocationConfig() {
+        return currentUserServerLocationConfig;
+    }
+
+    public void setCurrentUserServerLocationConfig(NginxUserServerLocationConfig currentUserServerLocationConfig) {
+        this.currentUserServerLocationConfig = currentUserServerLocationConfig;
+    }
 
     public NginxUserServerConfig getCurrentNginxUserServerConfig() {
         return currentNginxUserServerConfig;
@@ -101,6 +117,11 @@ public class NginxRequestDispatchContext {
                 "ctx=" + ctx +
                 ", request=" + request +
                 ", nginxConfig=" + nginxConfig +
+                ", file=" + file +
+                ", actualFileLength=" + actualFileLength +
+                ", actualStart=" + actualStart +
+                ", currentNginxUserServerConfig=" + currentNginxUserServerConfig +
+                ", currentUserServerLocationConfig=" + currentUserServerLocationConfig +
                 '}';
     }
 

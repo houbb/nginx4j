@@ -4,8 +4,11 @@ import com.github.houbb.heaven.util.lang.StringUtil;
 import com.github.houbb.heaven.util.util.CollectionUtil;
 import com.github.houbb.nginx4j.bs.NginxUserConfigBs;
 import com.github.houbb.nginx4j.bs.NginxUserServerConfigBs;
+import com.github.houbb.nginx4j.config.NginxUserConfigParam;
 import com.github.houbb.nginx4j.config.NginxUserConfig;
 import com.github.houbb.nginx4j.config.NginxUserServerConfig;
+import com.github.houbb.nginx4j.config.NginxUserServerLocationConfig;
+import com.github.houbb.nginx4j.constant.NginxLocationPathTypeEnum;
 import com.github.houbb.nginx4j.constant.NginxUserConfigDefaultConst;
 import com.github.houbb.nginx4j.constant.NginxUserServerConfigDefaultConst;
 import com.github.odiszapc.nginxparser.NgxBlock;
@@ -14,7 +17,7 @@ import com.github.odiszapc.nginxparser.NgxEntry;
 import com.github.odiszapc.nginxparser.NgxParam;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.*;
 
 /**
  * @since 0.13.0
@@ -94,6 +97,10 @@ public  class NginxUserConfigLoaderConfigFile extends AbstractNginxUserConfigLoa
                 long gzipMinLen = getHttpServerGzipMinLen(conf, serverBlock);
                 List<String> gzipTypes = getHttpServerGzipTypes(conf, serverBlock);
 
+                // 添加 location
+                List<NginxUserServerLocationConfig> locationConfigList = getHttpServerLocationList(conf, serverBlock);
+                NginxUserServerLocationConfig defaultLocationConfig = getDefaultLocationConfig(locationConfigList);
+
                 serverConfigBs.httpServerName(httpServerName)
                         .httpServerListen(httpServerPort)
                         .httpServerRoot(httpServerRoot)
@@ -101,12 +108,27 @@ public  class NginxUserConfigLoaderConfigFile extends AbstractNginxUserConfigLoa
                         .sendFile(sendFile)
                         .gzip(gzip)
                         .gzipMinLength(gzipMinLen)
-                        .gzipTypes(gzipTypes);
+                        .gzipTypes(gzipTypes)
+                        .locationConfigList(locationConfigList)
+                        .defaultLocationConfig(defaultLocationConfig);
 
                 NginxUserServerConfig serverConfig = serverConfigBs.build();
                 configBs.addServerConfig(serverConfig);
             }
         }
+    }
+
+    public NginxUserServerLocationConfig getDefaultLocationConfig(List<NginxUserServerLocationConfig> locationConfigList) {
+        if(CollectionUtil.isNotEmpty(locationConfigList)) {
+            for(NginxUserServerLocationConfig config : locationConfigList) {
+                if(NginxLocationPathTypeEnum.DEFAULT.equals(config.getTypeEnum())) {
+                    return config;
+                }
+            }
+        }
+
+        //TODO: 全局的默认值？
+        return null;
     }
 
     private List<String> getHttpServerGzipTypes(final NgxConfig conf, final NgxBlock serverBlock) {
@@ -239,6 +261,60 @@ public  class NginxUserConfigLoaderConfigFile extends AbstractNginxUserConfigLoa
         }
 
         return NginxUserServerConfigDefaultConst.httpServerName;
+    }
+
+    private List<NginxUserServerLocationConfig> getHttpServerLocationList(final NgxConfig conf, final NgxBlock serverBlock) {
+        List<NginxUserServerLocationConfig> resultList = new ArrayList<>();
+        // value
+        List<NgxEntry> entryList = serverBlock.findAll(NgxBlock.class, "location");
+        if(CollectionUtil.isNotEmpty(entryList)) {
+            for(NgxEntry entry : entryList) {
+                NgxBlock ngxBlock = (NgxBlock) entry;
+                // 参数
+                NginxUserServerLocationConfig locationConfig = new NginxUserServerLocationConfig();
+                locationConfig.setName(ngxBlock.getName());
+                locationConfig.setValue(ngxBlock.getValue());
+                locationConfig.setValues(ngxBlock.getValues());
+
+                NginxLocationPathTypeEnum typeEnum = NginxLocationPathTypeEnum.getTypeEnum(locationConfig);
+                locationConfig.setTypeEnum(typeEnum);
+
+                // 参数
+                List<NginxUserConfigParam> paramList = new ArrayList<>();
+                List<NgxEntry> ngxEntries = ngxBlock.findAll(NgxParam.class);
+                if(CollectionUtil.isNotEmpty(ngxEntries)) {
+                    for(NgxEntry ngxEntry : ngxEntries) {
+                        NgxParam ngxParam = (NgxParam) ngxEntry;
+                        String name = ngxParam.getName();
+                        List<String> values = ngxParam.getValues();
+                        String value = ngxParam.getValue();
+
+                        NginxUserConfigParam nginxUserConfigParam = new NginxUserConfigParam();
+                        nginxUserConfigParam.setName(name);
+                        nginxUserConfigParam.setValue(value);
+                        nginxUserConfigParam.setValues(values);
+
+
+                        paramList.add(nginxUserConfigParam);
+                    }
+                }
+                locationConfig.setDirectives(paramList);
+
+                resultList.add(locationConfig);
+            }
+        }
+
+        // 排序。按照匹配的优先级，从高到底排序
+        if(CollectionUtil.isNotEmpty(resultList)) {
+            Collections.sort(resultList, new Comparator<NginxUserServerLocationConfig>() {
+                @Override
+                public int compare(NginxUserServerLocationConfig o1, NginxUserServerLocationConfig o2) {
+                    return o1.getTypeEnum().getOrder() - o2.getTypeEnum().getOrder();
+                }
+            });
+        }
+
+        return resultList;
     }
 
     @Override

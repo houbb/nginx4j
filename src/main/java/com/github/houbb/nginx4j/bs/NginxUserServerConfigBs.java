@@ -1,9 +1,13 @@
 package com.github.houbb.nginx4j.bs;
 
 import com.github.houbb.nginx4j.config.NginxUserServerConfig;
+import com.github.houbb.nginx4j.config.NginxUserServerLocationConfig;
 import com.github.houbb.nginx4j.constant.NginxUserServerConfigDefaultConst;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @since 0.12.0
@@ -61,8 +65,25 @@ public class NginxUserServerConfigBs {
      */
     private List<String> gzipTypes = NginxUserServerConfigDefaultConst.gzipTypes;
 
+    /**
+     * @since 0.16.0
+     */
+    private List<NginxUserServerLocationConfig> locationConfigList = new ArrayList<>();
+
+    /**
+     * 默认配置
+     * @since 0.16.0
+     */
+    private NginxUserServerLocationConfig defaultLocationConfig = new NginxUserServerLocationConfig();
+
+
     public static NginxUserServerConfigBs newInstance() {
         return new NginxUserServerConfigBs();
+    }
+
+    public NginxUserServerConfigBs locationConfigList(List<NginxUserServerLocationConfig> locationConfigList) {
+        this.locationConfigList = locationConfigList;
+        return this;
     }
 
     public NginxUserServerConfigBs charset(String charset) {
@@ -110,6 +131,11 @@ public class NginxUserServerConfigBs {
         return this;
     }
 
+    public NginxUserServerConfigBs defaultLocationConfig(NginxUserServerLocationConfig defaultLocationConfig) {
+        this.defaultLocationConfig = defaultLocationConfig;
+        return this;
+    }
+
     public NginxUserServerConfig build() {
         NginxUserServerConfig config = new NginxUserServerConfig();
         config.setCharset(charset);
@@ -121,6 +147,8 @@ public class NginxUserServerConfigBs {
         config.setGzip(gzip);
         config.setGzipMinLength(gzipMinLength);
         config.setGzipTypes(gzipTypes);
+        config.setLocationConfigList(locationConfigList);
+        config.setDefaultServerLocationConfig(defaultLocationConfig);
 
         return config;
     }

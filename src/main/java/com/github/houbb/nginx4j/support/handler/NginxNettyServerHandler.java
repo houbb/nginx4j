@@ -5,7 +5,10 @@ import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
 import com.github.houbb.nginx4j.config.NginxConfig;
 import com.github.houbb.nginx4j.config.NginxUserServerConfig;
+import com.github.houbb.nginx4j.config.NginxUserServerLocationConfig;
+import com.github.houbb.nginx4j.config.location.INginxLocationMatch;
 import com.github.houbb.nginx4j.constant.NginxConst;
+import com.github.houbb.nginx4j.constant.NginxLocationPathTypeEnum;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatch;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
 import io.netty.channel.ChannelHandlerContext;
@@ -37,6 +40,7 @@ public class NginxNettyServerHandler extends SimpleChannelInboundHandler<FullHtt
 
         // 分发
         NginxUserServerConfig nginxUserServerConfig = getNginxUserServerConfig(request);
+        NginxUserServerLocationConfig currentLocationConfig = getCurrentServerLocation(nginxUserServerConfig, request);
 
         final NginxRequestDispatch requestDispatch = nginxConfig.getNginxRequestDispatch();
         NginxRequestDispatchContext context = new NginxRequestDispatchContext();
@@ -44,6 +48,7 @@ public class NginxNettyServerHandler extends SimpleChannelInboundHandler<FullHtt
         context.setNginxConfig(nginxConfig);
         context.setRequest(request);
         context.setCurrentNginxUserServerConfig(nginxUserServerConfig);
+        context.setCurrentUserServerLocationConfig(currentLocationConfig);
 
         requestDispatch.dispatch(context);
 
@@ -54,6 +59,32 @@ public class NginxNettyServerHandler extends SimpleChannelInboundHandler<FullHtt
         String hostName = getHostName(request);
 
         return getNginxUserServerConfig(hostName);
+    }
+
+    /**
+     * 获取当前的服务端地址
+     * @param request 请求
+     * @param nginxUserServerConfig 配置
+     * @return 结果
+     * @since 0.16.0
+     */
+    private NginxUserServerLocationConfig getCurrentServerLocation(NginxUserServerConfig nginxUserServerConfig,
+                                                                   FullHttpRequest request) {
+        List<NginxUserServerLocationConfig> configList = nginxUserServerConfig.getLocationConfigList();
+        if(CollectionUtil.isNotEmpty(configList)) {
+            final INginxLocationMatch nginxLocationMatch = nginxConfig.getNginxLocationMatch();
+
+            for(NginxUserServerLocationConfig config : configList) {
+                // 是否匹配
+                if(nginxLocationMatch.matchConfig(config, request, nginxConfig)) {
+                    return config;
+                }
+            }
+        }
+
+        // 默认值
+        logger.info("未命中任何 location 配置，使用默认配置");
+        return nginxUserServerConfig.getDefaultServerLocationConfig();
     }
 
     /**
@@ -83,6 +114,22 @@ public class NginxNettyServerHandler extends SimpleChannelInboundHandler<FullHtt
         return nginxConfig.getNginxUserConfig().getDefaultUserServerConfig();
     }
 
+    /**
+     * 设置当前的 location 信息
+     * @param nginxUserServerConfig 配置
+     * @param request 请求
+     * @return 结果
+     * @since 0.16.0
+     */
+    public NginxUserServerConfig fillCurrentUserServerLocationConfig(NginxUserServerConfig nginxUserServerConfig,
+                                                                     FullHttpRequest request) {
+        // 请求
+        String requestUrl = request.getUri();
+        // 遍历，获取匹配的算法
+
+
+        return nginxUserServerConfig;
+    }
 
     private String getHostName(FullHttpRequest request) {
         return request.headers().get(NginxConst.HEADER_HOST);

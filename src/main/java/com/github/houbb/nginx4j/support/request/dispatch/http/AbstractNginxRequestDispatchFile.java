@@ -131,7 +131,7 @@ public class AbstractNginxRequestDispatchFile extends AbstractNginxRequestDispat
     protected void writeAndFlushOnComplete(final ChannelHandlerContext ctx,
                                            final NginxRequestDispatchContext context) {
         // 传输完毕，发送最后一个空内容，标志传输结束
-        ChannelFuture lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
+        ChannelFuture lastContentFuture = super.writeAndFlush(ctx, LastHttpContent.EMPTY_LAST_CONTENT, context);
         // 如果不支持keep-Alive，服务器端主动关闭请求
         if (!HttpUtil.isKeepAlive(context.getRequest())) {
             lastContentFuture.addListener(ChannelFutureListener.CLOSE);
@@ -162,7 +162,7 @@ public class AbstractNginxRequestDispatchFile extends AbstractNginxRequestDispat
             }
 
             // 写基本信息
-            ctx.write(response);
+            super.write(ctx, response, context);
 
             // 零拷贝
             boolean isZeroCopyEnable = isZeroCopyEnable(context);
@@ -200,7 +200,7 @@ public class AbstractNginxRequestDispatchFile extends AbstractNginxRequestDispat
 
             // 使用DefaultFileRegion进行零拷贝传输
             DefaultFileRegion fileRegion = new DefaultFileRegion(fileChannel, actualStart, actualFileLength);
-            ChannelFuture transferFuture = ctx.writeAndFlush(fileRegion);
+            ChannelFuture transferFuture = super.writeAndFlush(ctx, fileRegion, context);
 
             // 监听传输完成事件
             transferFuture.addListener(new ChannelFutureListener() {
@@ -267,7 +267,8 @@ public class AbstractNginxRequestDispatchFile extends AbstractNginxRequestDispat
                 buffer.limit(bytesRead);
 
                 // 写入分块数据
-                ctx.write(new DefaultHttpContent(Unpooled.wrappedBuffer(buffer)));
+                DefaultHttpContent defaultHttpContent = new DefaultHttpContent(Unpooled.wrappedBuffer(buffer));
+                super.write(ctx, defaultHttpContent, context);
                 buffer.clear(); // 清空缓冲区以供下次使用
 
                 // process 可以考虑加一个 listener

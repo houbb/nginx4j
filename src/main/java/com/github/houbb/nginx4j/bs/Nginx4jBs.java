@@ -3,6 +3,10 @@ package com.github.houbb.nginx4j.bs;
 import com.github.houbb.heaven.util.common.ArgUtil;
 import com.github.houbb.nginx4j.api.INginxServer;
 import com.github.houbb.nginx4j.config.*;
+import com.github.houbb.nginx4j.config.location.INginxLocationMatch;
+import com.github.houbb.nginx4j.config.location.NginxLocationMatchDefault;
+import com.github.houbb.nginx4j.config.param.INginxParamManager;
+import com.github.houbb.nginx4j.config.param.NginxParamManagerBase;
 import com.github.houbb.nginx4j.exception.Nginx4jException;
 import com.github.houbb.nginx4j.support.index.NginxIndexFile;
 import com.github.houbb.nginx4j.support.index.NginxIndexFileDefault;
@@ -32,7 +36,34 @@ public class Nginx4jBs {
      */
     private INginxServer nginxServer = new NginxServerNetty();
 
+    /**
+     * 默认匹配策略
+     * @since 0.16.0
+     */
+    private INginxLocationMatch nginxLocationMatch = new NginxLocationMatchDefault();
+
+    /**
+     * 默认的参数管理
+     *
+     * @since 0.16.0
+     */
+    private INginxParamManager nginxParamManager = new NginxParamManagerBase();
+
     private NginxConfig nginxConfig;
+
+    public Nginx4jBs nginxParamManager(INginxParamManager nginxParamManager) {
+        ArgUtil.notNull(nginxParamManager, "nginxParamManager");
+
+        this.nginxParamManager = nginxParamManager;
+        return this;
+    }
+
+    public Nginx4jBs nginxLocationMatch(INginxLocationMatch nginxLocationMatch) {
+        ArgUtil.notNull(nginxLocationMatch, "nginxLocationMatch");
+
+        this.nginxLocationMatch = nginxLocationMatch;
+        return this;
+    }
 
     public Nginx4jBs nginxIndexFile(NginxIndexFile nginxIndexFile) {
         this.nginxIndexFile = nginxIndexFile;
@@ -68,6 +99,8 @@ public class Nginx4jBs {
         nginxConfig.setNginxRequestDispatch(nginxRequestDispatch);
         nginxConfig.setNginxIndexFile(nginxIndexFile);
         nginxConfig.setNginxUserConfig(nginxUserConfig);
+        nginxConfig.setNginxLocationMatch(nginxLocationMatch);
+        nginxConfig.setNginxParamManager(nginxParamManager);
 
         return this;
     }

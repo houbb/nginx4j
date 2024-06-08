@@ -1,6 +1,7 @@
 package com.github.houbb.nginx4j.config;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户配置
@@ -58,6 +59,26 @@ public class NginxUserServerConfig {
      * 压缩累呗
      */
     private List<String> gzipTypes;
+
+    private List<NginxUserServerLocationConfig> locationConfigList;
+
+    private NginxUserServerLocationConfig defaultServerLocationConfig;
+
+    public NginxUserServerLocationConfig getDefaultServerLocationConfig() {
+        return defaultServerLocationConfig;
+    }
+
+    public void setDefaultServerLocationConfig(NginxUserServerLocationConfig defaultServerLocationConfig) {
+        this.defaultServerLocationConfig = defaultServerLocationConfig;
+    }
+
+    public List<NginxUserServerLocationConfig> getLocationConfigList() {
+        return locationConfigList;
+    }
+
+    public void setLocationConfigList(List<NginxUserServerLocationConfig> locationConfigList) {
+        this.locationConfigList = locationConfigList;
+    }
 
     public String getCharset() {
         return charset;
@@ -143,6 +164,8 @@ public class NginxUserServerConfig {
                 ", gzip='" + gzip + '\'' +
                 ", gzipMinLength=" + gzipMinLength +
                 ", gzipTypes=" + gzipTypes +
+                ", locationConfigList=" + locationConfigList +
+                ", defaultServerLocationConfig=" + defaultServerLocationConfig +
                 '}';
     }
 

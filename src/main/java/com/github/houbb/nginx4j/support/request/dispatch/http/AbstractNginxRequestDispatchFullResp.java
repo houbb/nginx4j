@@ -26,11 +26,10 @@ public abstract class AbstractNginxRequestDispatchFullResp extends AbstractNginx
         FullHttpResponse response = buildFullHttpResponse(request, nginxConfig, context);
         response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
 
-
         final ChannelHandlerContext ctx = context.getCtx();
 
         // 结果响应
-        ChannelFuture lastContentFuture = ctx.writeAndFlush(response);
+        ChannelFuture lastContentFuture = super.writeAndFlush(ctx, response, context);
         //如果不支持keep-Alive，服务器端主动关闭请求
         if (!HttpUtil.isKeepAlive(request)) {
             lastContentFuture.addListener(ChannelFutureListener.CLOSE);
