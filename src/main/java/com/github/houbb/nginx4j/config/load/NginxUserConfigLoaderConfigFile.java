@@ -281,9 +281,14 @@ public  class NginxUserConfigLoaderConfigFile extends AbstractNginxUserConfigLoa
 
                 // 参数
                 List<NginxUserConfigParam> paramList = new ArrayList<>();
-                List<NgxEntry> ngxEntries = ngxBlock.findAll(NgxParam.class);
+                Collection<NgxEntry> ngxEntries = ngxBlock.getEntries();
                 if(CollectionUtil.isNotEmpty(ngxEntries)) {
                     for(NgxEntry ngxEntry : ngxEntries) {
+                        // 暂时跳过一些注释之类的处理
+                        if(!(ngxEntry instanceof NgxParam)) {
+                            continue;
+                        }
+
                         NgxParam ngxParam = (NgxParam) ngxEntry;
                         String name = ngxParam.getName();
                         List<String> values = ngxParam.getValues();
@@ -293,7 +298,6 @@ public  class NginxUserConfigLoaderConfigFile extends AbstractNginxUserConfigLoa
                         nginxUserConfigParam.setName(name);
                         nginxUserConfigParam.setValue(value);
                         nginxUserConfigParam.setValues(values);
-
 
                         paramList.add(nginxUserConfigParam);
                     }

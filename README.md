@@ -32,6 +32,8 @@ nginx4j 是基于 netty 实现的 nginx 的java 版本。
 
 - 支持多 server 
 
+- 请求头的修改+响应头的修改
+
 ## 拓展阅读
 
 [从零手写实现 nginx-01-为什么不能有 java 版本的 nginx?](https://houbb.github.io/2018/11/22/nginx-write-01-how-to)
@@ -78,7 +80,7 @@ nginx4j 是基于 netty 实现的 nginx 的java 版本。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>nginx4j</artifactId>
-    <version>0.15.0</version>
+    <version>0.16.0</version>
 </dependency>
 ```
 
@@ -105,22 +107,15 @@ http {
     include /etc/nginx/mime.types;  # MIME类型配置文件
     default_type application/octet-stream;  # 默认的MIME类型
 
-    # 访问日志配置
-    access_log /var/log/nginx/access.log;  # 访问日志文件路径
-    # 错误日志配置
-    error_log /var/log/nginx/error.log;  # 错误日志文件路径
-
     # 文件传输设置
     sendfile on;  # 开启高效文件传输
-    tcp_nopush on;  # 防止网络拥塞
-
     # Keepalive超时设置
     keepalive_timeout 65;
 
     # 定义服务器块
     server {
-        listen 80;  # 监听80端口
-        server_name localhost;  # 服务器域名
+        listen 8080;
+        server_name 192.168.1.12:8080;  # 服务器域名
 
         # 单独为这个 server 启用 sendfile
         sendfile on;
@@ -131,30 +126,43 @@ http {
 
         # 如果需要为这个 server 单独配置 gzip，可以覆盖全局配置
         gzip on;
-        gzip_disable "msie6";
-        gzip_vary on;
-        gzip_proxied any;
-        gzip_comp_level 6;
-        gzip_buffers 16 8k;
-        gzip_http_version 1.1;
         gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
 
-        # 定义location块，处理对根目录的请求
+        # 默认匹配
         location / {
-            try_files $uri $uri/ =404;  # 尝试提供请求的文件，如果不存在则404
+            proxy_set_header X-DEFINE-PARAM myDefineParam;
+            proxy_set_header X-DEFINE-HOST 127.0.0.1;
+
+            # 增加或修改响应头 这里就提现了一些占位符的强大之处。下一次可以考虑支持
+            add_header X-Response-Time 2024-06-08;
+
+            # 删除响应头
+            proxy_hide_header X-Unwanted-Header;
         }
     }
 
+    # 定义服务器块2
     server {
-        listen 443 ssl;
-        server_name  secure-example.com;
+        listen 8081;
+        server_name 192.168.1.12:8081;  # 服务器域名
 
-        ssl_certificate     /etc/nginx/ssl/secure-example.com.crt;
-        ssl_certificate_key /etc/nginx/ssl/secure-example.com.key;
+        # 单独为这个 server 启用 sendfile
+        sendfile on;
 
+        # 静态文件的根目录
+        root D:\data\nginx4j;  # 静态文件存放的根目录
+        index index.txt; # 默认首页
+
+        # 默认匹配
         location / {
-            root   /var/www/secure-example.com;
-            index  index.html index.htm;
+            proxy_set_header X-DEFINE-PARAM myDefineParam;
+            proxy_set_header X-DEFINE-HOST 127.0.0.2;
+
+            # 增加或修改响应头 这里就提现了一些占位符的强大之处。下一次可以考虑支持
+            add_header X-Response-Time 2024-06-09;
+
+            # 删除响应头
+            proxy_hide_header X-Unwanted-Header;
         }
     }
 
@@ -241,8 +249,11 @@ NginxUserConfig nginxUserConfig = NginxUserConfigLoaders.configFile("D:\\github\
 - [x] 配置的标准 POJO
 - [x] nginx.conf 的解析=》POJO
 - [x] http 全局的默认配置属性
-- [ ] CORS
-- [ ] rewrite 请求头信息重写
+- [x] rewrite 请求头信息重写
+- [ ] $ 占位符的实现
+- [ ] 更多 directive 指令实现
+- [ ] CORS 这个还是让用户处理，不过可以单独写一篇文章
+- [ ] rewrite 请求其他信息的重新
 - [ ] ETag 和 Last-Modified + cache
 - [ ] 压缩更好的实现方式？ zlib 算法 + 实现优化？
 - [ ] http2

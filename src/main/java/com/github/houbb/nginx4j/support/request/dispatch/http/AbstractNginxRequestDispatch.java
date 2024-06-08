@@ -50,7 +50,7 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
         }
 
         List<NginxUserConfigParam> directives = locationConfig.getDirectives();
-        if(CollectionUtil.isNotEmpty(directives)) {
+        if(CollectionUtil.isEmpty(directives)) {
             return;
         }
 
@@ -81,7 +81,7 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
         }
 
         List<NginxUserConfigParam> directives = locationConfig.getDirectives();
-        if(CollectionUtil.isNotEmpty(directives)) {
+        if(CollectionUtil.isEmpty(directives)) {
             return;
         }
 
@@ -167,7 +167,7 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
         }
 
         List<NginxUserConfigParam> directives = locationConfig.getDirectives();
-        if(CollectionUtil.isNotEmpty(directives)) {
+        if(CollectionUtil.isEmpty(directives)) {
             return;
         }
 
@@ -195,7 +195,7 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
         }
 
         List<NginxUserConfigParam> directives = locationConfig.getDirectives();
-        if(CollectionUtil.isNotEmpty(directives)) {
+        if(CollectionUtil.isEmpty(directives)) {
             return;
         }
 

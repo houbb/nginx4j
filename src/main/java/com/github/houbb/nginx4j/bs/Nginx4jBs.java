@@ -7,6 +7,7 @@ import com.github.houbb.nginx4j.config.location.INginxLocationMatch;
 import com.github.houbb.nginx4j.config.location.NginxLocationMatchDefault;
 import com.github.houbb.nginx4j.config.param.INginxParamManager;
 import com.github.houbb.nginx4j.config.param.NginxParamManagerBase;
+import com.github.houbb.nginx4j.config.param.NginxParamManagerDefault;
 import com.github.houbb.nginx4j.exception.Nginx4jException;
 import com.github.houbb.nginx4j.support.index.NginxIndexFile;
 import com.github.houbb.nginx4j.support.index.NginxIndexFileDefault;
@@ -47,7 +48,7 @@ public class Nginx4jBs {
      *
      * @since 0.16.0
      */
-    private INginxParamManager nginxParamManager = new NginxParamManagerBase();
+    private INginxParamManager nginxParamManager = new NginxParamManagerDefault();
 
     private NginxConfig nginxConfig;
 
