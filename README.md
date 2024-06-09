@@ -12,7 +12,9 @@ nginx4j 是基于 netty 实现的 nginx 的java 版本。
 
 # 特性
 
-- 基于 netty 的 nio 高性能
+- 完全兼容 nginx.conf 的配置文件格式
+
+- 基于 netty 的 nio 高性能处理
 
 - 静态网资源支持
 
@@ -33,6 +35,8 @@ nginx4j 是基于 netty 实现的 nginx 的java 版本。
 - 支持多 server 
 
 - 请求头的修改+响应头的修改
+
+- 占位符 `$` 的支持
 
 ## 拓展阅读
 
@@ -80,7 +84,7 @@ nginx4j 是基于 netty 实现的 nginx 的java 版本。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>nginx4j</artifactId>
-    <version>0.16.0</version>
+    <version>0.17.0</version>
 </dependency>
 ```
 
@@ -138,6 +142,11 @@ http {
 
             # 删除响应头
             proxy_hide_header X-Unwanted-Header;
+
+            # 占位符测试 v0.17.0
+            set $myVal 1000;
+            add_header X-MY-VAL $myVal;
+            add_header X-MY-HOST $host;
         }
     }
 
@@ -172,8 +181,8 @@ http {
 
 ### 启动代码
 
-
 ```java
+// 指定配置文件的位置
 NginxUserConfig nginxUserConfig = NginxUserConfigLoaders.configFile("D:\\github\\nginx4j\\src\\main\\resources\\nginx.conf").load();
 
 Nginx4jBs.newInstance()
@@ -249,17 +258,18 @@ NginxUserConfig nginxUserConfig = NginxUserConfigLoaders.configFile("D:\\github\
 - [x] 配置的标准 POJO
 - [x] nginx.conf 的解析=》POJO
 - [x] http 全局的默认配置属性
-- [x] rewrite 请求头信息重写
-- [ ] $ 占位符的实现
-- [ ] 更多 directive 指令实现
-- [ ] CORS 这个还是让用户处理，不过可以单独写一篇文章
-- [ ] rewrite 请求其他信息的重新
+- [x] 请求头信息重写
+- [x] CORS 这个还是让用户处理，不过可以单独写一篇文章
+- [x] $ 占位符的实现
+- [ ] if 指令的支持
+- [ ] rewrite 指令，重写 URL
+- [ ] 更多 directive 如 return 指令实现
+- [ ] 常见请求头/headers/cookie 的处理
 - [ ] ETag 和 Last-Modified + cache
 - [ ] 压缩更好的实现方式？ zlib 算法 + 实现优化？
 - [ ] http2
 - [ ] http3
 - [ ] ssl/https
-- [ ] 常见请求头/headers/cookie 的处理
 - [ ] 更多文件格式的内置支持？
 
 ## 反向代理
@@ -270,7 +280,6 @@ NginxUserConfig nginxUserConfig = NginxUserConfigLoaders.configFile("D:\\github\
 ## system
 
 - [ ] cache
+- [ ] rateLimit 限流
 - [ ] filter 过滤器
 - [ ] listener 监听器
-- [ ] rateLimit 限流
-- 

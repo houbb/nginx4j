@@ -20,7 +20,12 @@ public abstract class AbstractNginxParamHandle implements INginxParamHandle {
 
     public abstract void doAfterWrite(NginxUserConfigParam configParam, ChannelHandlerContext ctx, Object object, NginxRequestDispatchContext context);
 
-    public abstract boolean doMatch(NginxUserConfigParam configParam, NginxRequestDispatchContext context);
+    protected abstract String getKey(NginxUserConfigParam configParam, NginxRequestDispatchContext context);
+
+    public boolean doMatch(NginxUserConfigParam configParam, NginxRequestDispatchContext context) {
+        String key = getKey(configParam, context);
+        return key.equalsIgnoreCase(configParam.getName());
+    }
 
     @Override
     public void beforeDispatch(NginxUserConfigParam configParam, NginxRequestDispatchContext context) {

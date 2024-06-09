@@ -7,6 +7,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 分发上下文
@@ -46,6 +48,35 @@ public class NginxRequestDispatchContext {
      * @since 0.16.0
      */
     private NginxUserServerLocationConfig currentUserServerLocationConfig;
+
+    /**
+     * 占位符的集合
+     *
+     * @since 0.17.0
+     */
+    private Map<String, Object> placeholderMap = new HashMap<>();
+
+    /**
+     * 全局的限流值
+     * @since 0.17.0
+     */
+    private long limitRate = 1000;
+
+    public long getLimitRate() {
+        return limitRate;
+    }
+
+    public void setLimitRate(long limitRate) {
+        this.limitRate = limitRate;
+    }
+
+    public Map<String, Object> getPlaceholderMap() {
+        return placeholderMap;
+    }
+
+    public void setPlaceholderMap(Map<String, Object> placeholderMap) {
+        this.placeholderMap = placeholderMap;
+    }
 
     public NginxUserServerLocationConfig getCurrentUserServerLocationConfig() {
         return currentUserServerLocationConfig;

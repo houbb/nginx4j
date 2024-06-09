@@ -1,9 +1,10 @@
-package com.github.houbb.nginx4j.config.param;
+package com.github.houbb.nginx4j.config.param.impl;
 
 import com.github.houbb.heaven.util.lang.StringUtil;
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
 import com.github.houbb.nginx4j.config.NginxUserConfigParam;
+import com.github.houbb.nginx4j.config.param.AbstractNginxParamHandle;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -73,8 +74,8 @@ public class NginxParamHandleProxySetHeader extends AbstractNginxParamHandle {
     }
 
     @Override
-    public boolean doMatch(NginxUserConfigParam configParam, NginxRequestDispatchContext context) {
-        return "proxy_set_header".equalsIgnoreCase(configParam.getName());
+    protected String getKey(NginxUserConfigParam configParam, NginxRequestDispatchContext context) {
+        return "proxy_set_header";
     }
 
 }

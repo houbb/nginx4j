@@ -11,6 +11,8 @@ import com.github.houbb.nginx4j.config.param.NginxParamManagerDefault;
 import com.github.houbb.nginx4j.exception.Nginx4jException;
 import com.github.houbb.nginx4j.support.index.NginxIndexFile;
 import com.github.houbb.nginx4j.support.index.NginxIndexFileDefault;
+import com.github.houbb.nginx4j.support.placeholder.INginxPlaceholderManager;
+import com.github.houbb.nginx4j.support.placeholder.NginxPlaceholderManagerDefault;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatch;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchManager;
 import com.github.houbb.nginx4j.support.server.NginxServerNetty;
@@ -50,7 +52,20 @@ public class Nginx4jBs {
      */
     private INginxParamManager nginxParamManager = new NginxParamManagerDefault();
 
+    /**
+     * 占位符管理类
+     * @since 0.17.0
+     */
+    private INginxPlaceholderManager nginxPlaceholderManager = new NginxPlaceholderManagerDefault();
+
     private NginxConfig nginxConfig;
+
+    public Nginx4jBs nginxPlaceholderManager(INginxPlaceholderManager nginxPlaceholderManager) {
+        ArgUtil.notNull(nginxPlaceholderManager, "nginxPlaceholderManager");
+
+        this.nginxPlaceholderManager = nginxPlaceholderManager;
+        return this;
+    }
 
     public Nginx4jBs nginxParamManager(INginxParamManager nginxParamManager) {
         ArgUtil.notNull(nginxParamManager, "nginxParamManager");
@@ -102,6 +117,7 @@ public class Nginx4jBs {
         nginxConfig.setNginxUserConfig(nginxUserConfig);
         nginxConfig.setNginxLocationMatch(nginxLocationMatch);
         nginxConfig.setNginxParamManager(nginxParamManager);
+        nginxConfig.setNginxPlaceholderManager(nginxPlaceholderManager);
 
         return this;
     }

@@ -26,4 +26,11 @@ public class NginxConst {
      */
     public static final String HEADER_HOST = "Host";
 
+    /**
+     * 占位符前缀
+     *
+     * @since 0.17.0
+     */
+    public static final String PLACEHOLDER_PREFIX = "$";
+
 }

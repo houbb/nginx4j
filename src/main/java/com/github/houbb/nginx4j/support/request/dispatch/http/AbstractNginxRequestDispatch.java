@@ -1,10 +1,16 @@
 package com.github.houbb.nginx4j.support.request.dispatch.http;
 
 import com.github.houbb.heaven.util.util.CollectionUtil;
+import com.github.houbb.log.integration.core.Log;
+import com.github.houbb.log.integration.core.LogFactory;
 import com.github.houbb.nginx4j.config.NginxUserConfigParam;
 import com.github.houbb.nginx4j.config.NginxUserServerLocationConfig;
 import com.github.houbb.nginx4j.config.param.INginxParamHandle;
 import com.github.houbb.nginx4j.config.param.INginxParamManager;
+import com.github.houbb.nginx4j.constant.NginxConst;
+import com.github.houbb.nginx4j.exception.Nginx4jException;
+import com.github.houbb.nginx4j.support.placeholder.AbstractNginxPlaceholder;
+import com.github.houbb.nginx4j.support.placeholder.INginxPlaceholderManager;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatch;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
 import io.netty.channel.ChannelFuture;
@@ -16,6 +22,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public abstract class AbstractNginxRequestDispatch implements NginxRequestDispatch {
+
+    private static final Log logger = LogFactory.getLog(AbstractNginxRequestDispatch.class);
 
     public abstract void doDispatch(final NginxRequestDispatchContext context);
 
@@ -74,6 +82,12 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
         // 参数管理类
         final INginxParamManager paramManager = context.getNginxConfig().getNginxParamManager();
 
+        // v0.17.0 占位符管理类
+        final INginxPlaceholderManager placeholderManager = context.getNginxConfig().getNginxPlaceholderManager();
+        // 提前处理内置的各种参数
+        placeholderManager.init(context);
+
+
         //1. 当前的配置
         NginxUserServerLocationConfig locationConfig = context.getCurrentUserServerLocationConfig();
         if(locationConfig == null) {
@@ -87,6 +101,9 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
 
         // 处理
         for(NginxUserConfigParam configParam : directives) {
+            // 占位符处理
+            placeholderHandle(configParam, placeholderManager, context);
+
             List<INginxParamHandle> handleList = paramManager.paramHandleList(configParam, context);
             if(CollectionUtil.isNotEmpty(handleList)) {
                 for(INginxParamHandle paramHandle : handleList) {
@@ -94,6 +111,75 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
                 }
             }
         }
+    }
+
+    /**
+     * 占位符处理
+     *
+     * SET 问题，这个是按顺序处理的，所以暂时不用特别考虑
+     *
+     * @param configParam 配置指令
+     * @param placeholderManager 占位符管理类
+     * @param context 上下文
+     * @since 0.17.0
+     */
+    protected void placeholderHandle(NginxUserConfigParam configParam,
+                                     final INginxPlaceholderManager placeholderManager,
+                                     final NginxRequestDispatchContext context) {
+        String name = configParam.getName();
+        if(name.equals("set")) {
+            logger.warn("暂时不处理 set 指令对应的操作符替换，后续可考虑改进。");
+            return;
+        }
+
+        // name 暂时不添加 $ 处理
+
+        // value
+        String value = configParam.getValue();
+        String actualValue = getPlaceholderStr(value, placeholderManager, context);
+        configParam.setValue(actualValue);
+
+        // list
+        List<String> valueList = configParam.getValues();
+        List<String> newValueList = new ArrayList<>();
+        if(CollectionUtil.isNotEmpty(valueList)) {
+            for(String valueItem : valueList) {
+                String actualValueItem = getPlaceholderStr(valueItem, placeholderManager, context);
+                newValueList.add(actualValueItem);
+            }
+
+            configParam.setValues(newValueList);
+        }
+
+        // 结束
+    }
+
+    /**
+     * 获取占位符对应的值
+     * @param value 原始值
+     * @param placeholderManager 管理类
+     * @param context 上下文
+     * @return 结果
+     */
+    protected String getPlaceholderStr(String value,
+                                       final INginxPlaceholderManager placeholderManager,
+                                       final NginxRequestDispatchContext context) {
+        // value
+        if(value.startsWith(NginxConst.PLACEHOLDER_PREFIX)) {
+            Object actualValue = placeholderManager.getValue(context, value);
+            if(actualValue == null) {
+                logger.error("占位符未初始化 value={}", value);
+                throw new Nginx4jException("占位符未初始化" + value);
+            }
+
+            // 设置值
+            String actualValueStr = actualValue.toString();
+            logger.debug("占位符替换 value={}, actualValueStr={}", value, actualValueStr);
+            return actualValueStr;
+        }
+
+        // 原始值
+        return value;
     }
 
     /**

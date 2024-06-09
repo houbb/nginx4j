@@ -3,6 +3,7 @@ package com.github.houbb.nginx4j.config;
 import com.github.houbb.nginx4j.config.location.INginxLocationMatch;
 import com.github.houbb.nginx4j.config.param.INginxParamManager;
 import com.github.houbb.nginx4j.support.index.NginxIndexFile;
+import com.github.houbb.nginx4j.support.placeholder.INginxPlaceholderManager;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatch;
 
 public class NginxConfig {
@@ -33,6 +34,20 @@ public class NginxConfig {
      * @since 0.16.0
      */
     private INginxParamManager nginxParamManager;
+
+    /**
+     * 占位符管理类
+     * @since 0.17.0
+     */
+    private INginxPlaceholderManager nginxPlaceholderManager;
+
+    public INginxPlaceholderManager getNginxPlaceholderManager() {
+        return nginxPlaceholderManager;
+    }
+
+    public void setNginxPlaceholderManager(INginxPlaceholderManager nginxPlaceholderManager) {
+        this.nginxPlaceholderManager = nginxPlaceholderManager;
+    }
 
     public INginxParamManager getNginxParamManager() {
         return nginxParamManager;

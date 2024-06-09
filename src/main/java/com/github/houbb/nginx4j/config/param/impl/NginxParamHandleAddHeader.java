@@ -1,9 +1,10 @@
-package com.github.houbb.nginx4j.config.param;
+package com.github.houbb.nginx4j.config.param.impl;
 
 import com.github.houbb.heaven.util.lang.StringUtil;
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
 import com.github.houbb.nginx4j.config.NginxUserConfigParam;
+import com.github.houbb.nginx4j.config.param.AbstractNginxParamHandle;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -77,10 +78,8 @@ public class NginxParamHandleAddHeader extends AbstractNginxParamHandle {
     }
 
     @Override
-    public boolean doMatch(NginxUserConfigParam configParam, NginxRequestDispatchContext context) {
-//        # 增加或修改响应头
-//        add_header X-Response-Time $request_time;
-        return "add_header".equalsIgnoreCase(configParam.getName());
+    protected String getKey(NginxUserConfigParam configParam, NginxRequestDispatchContext context) {
+        return "add_header";
     }
 
 }
