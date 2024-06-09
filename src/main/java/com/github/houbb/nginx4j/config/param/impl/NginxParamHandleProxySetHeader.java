@@ -3,7 +3,7 @@ package com.github.houbb.nginx4j.config.param.impl;
 import com.github.houbb.heaven.util.lang.StringUtil;
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
-import com.github.houbb.nginx4j.config.NginxUserConfigParam;
+import com.github.houbb.nginx4j.config.NginxCommonConfigParam;
 import com.github.houbb.nginx4j.config.param.AbstractNginxParamHandle;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
 import io.netty.channel.ChannelHandlerContext;
@@ -31,7 +31,7 @@ public class NginxParamHandleProxySetHeader extends AbstractNginxParamHandle {
      * @param context     上下文
      */
     @Override
-    public void doBeforeDispatch(NginxUserConfigParam configParam, NginxRequestDispatchContext context) {
+    public void doBeforeDispatch(NginxCommonConfigParam configParam, NginxRequestDispatchContext context) {
         List<String> values = configParam.getValues();
 
         // $ 占位符号后续处理
@@ -59,22 +59,22 @@ public class NginxParamHandleProxySetHeader extends AbstractNginxParamHandle {
     }
 
     @Override
-    public void doAfterDispatch(NginxUserConfigParam configParam, NginxRequestDispatchContext context) {
+    public void doAfterDispatch(NginxCommonConfigParam configParam, NginxRequestDispatchContext context) {
 
     }
 
     @Override
-    public void doBeforeWrite(NginxUserConfigParam configParam, ChannelHandlerContext ctx, Object object, NginxRequestDispatchContext context) {
+    public void doBeforeWrite(NginxCommonConfigParam configParam, ChannelHandlerContext ctx, Object object, NginxRequestDispatchContext context) {
 
     }
 
     @Override
-    public void doAfterWrite(NginxUserConfigParam configParam, ChannelHandlerContext ctx, Object object, NginxRequestDispatchContext context) {
+    public void doAfterWrite(NginxCommonConfigParam configParam, ChannelHandlerContext ctx, Object object, NginxRequestDispatchContext context) {
 
     }
 
     @Override
-    protected String getKey(NginxUserConfigParam configParam, NginxRequestDispatchContext context) {
+    protected String getKey(NginxCommonConfigParam configParam, NginxRequestDispatchContext context) {
         return "proxy_set_header";
     }
 

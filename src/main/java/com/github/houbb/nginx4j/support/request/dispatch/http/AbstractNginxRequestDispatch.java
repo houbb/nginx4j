@@ -3,13 +3,12 @@ package com.github.houbb.nginx4j.support.request.dispatch.http;
 import com.github.houbb.heaven.util.util.CollectionUtil;
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
-import com.github.houbb.nginx4j.config.NginxUserConfigParam;
+import com.github.houbb.nginx4j.config.NginxCommonConfigParam;
 import com.github.houbb.nginx4j.config.NginxUserServerLocationConfig;
 import com.github.houbb.nginx4j.config.param.INginxParamHandle;
 import com.github.houbb.nginx4j.config.param.INginxParamManager;
 import com.github.houbb.nginx4j.constant.NginxConst;
 import com.github.houbb.nginx4j.exception.Nginx4jException;
-import com.github.houbb.nginx4j.support.placeholder.AbstractNginxPlaceholder;
 import com.github.houbb.nginx4j.support.placeholder.INginxPlaceholderManager;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatch;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
@@ -18,8 +17,6 @@ import io.netty.channel.ChannelHandlerContext;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 public abstract class AbstractNginxRequestDispatch implements NginxRequestDispatch {
 
@@ -57,13 +54,13 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
             return;
         }
 
-        List<NginxUserConfigParam> directives = locationConfig.getDirectives();
+        List<NginxCommonConfigParam> directives = locationConfig.getDirectives();
         if(CollectionUtil.isEmpty(directives)) {
             return;
         }
 
         // 处理
-        for(NginxUserConfigParam configParam : directives) {
+        for(NginxCommonConfigParam configParam : directives) {
             List<INginxParamHandle> handleList = paramManager.paramHandleList(configParam, context);
             if(CollectionUtil.isNotEmpty(handleList)) {
                 for(INginxParamHandle paramHandle : handleList) {
@@ -94,13 +91,13 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
             return;
         }
 
-        List<NginxUserConfigParam> directives = locationConfig.getDirectives();
+        List<NginxCommonConfigParam> directives = locationConfig.getDirectives();
         if(CollectionUtil.isEmpty(directives)) {
             return;
         }
 
         // 处理
-        for(NginxUserConfigParam configParam : directives) {
+        for(NginxCommonConfigParam configParam : directives) {
             // 占位符处理
             placeholderHandle(configParam, placeholderManager, context);
 
@@ -123,7 +120,7 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
      * @param context 上下文
      * @since 0.17.0
      */
-    protected void placeholderHandle(NginxUserConfigParam configParam,
+    protected void placeholderHandle(NginxCommonConfigParam configParam,
                                      final INginxPlaceholderManager placeholderManager,
                                      final NginxRequestDispatchContext context) {
         String name = configParam.getName();
@@ -254,13 +251,13 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
             return;
         }
 
-        List<NginxUserConfigParam> directives = locationConfig.getDirectives();
+        List<NginxCommonConfigParam> directives = locationConfig.getDirectives();
         if(CollectionUtil.isEmpty(directives)) {
             return;
         }
 
         // 处理
-        for(NginxUserConfigParam configParam : directives) {
+        for(NginxCommonConfigParam configParam : directives) {
             List<INginxParamHandle> handleList = paramManager.paramHandleList(configParam, context);
             if(CollectionUtil.isNotEmpty(handleList)) {
                 for(INginxParamHandle paramHandle : handleList) {
@@ -282,13 +279,13 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
             return;
         }
 
-        List<NginxUserConfigParam> directives = locationConfig.getDirectives();
+        List<NginxCommonConfigParam> directives = locationConfig.getDirectives();
         if(CollectionUtil.isEmpty(directives)) {
             return;
         }
 
         // 处理
-        for(NginxUserConfigParam configParam : directives) {
+        for(NginxCommonConfigParam configParam : directives) {
             List<INginxParamHandle> handleList = paramManager.paramHandleList(configParam, context);
             if(CollectionUtil.isNotEmpty(handleList)) {
                 for(INginxParamHandle paramHandle : handleList) {

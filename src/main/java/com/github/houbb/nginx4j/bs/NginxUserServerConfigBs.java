@@ -5,9 +5,7 @@ import com.github.houbb.nginx4j.config.NginxUserServerLocationConfig;
 import com.github.houbb.nginx4j.constant.NginxUserServerConfigDefaultConst;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @since 0.12.0
@@ -139,16 +137,16 @@ public class NginxUserServerConfigBs {
     public NginxUserServerConfig build() {
         NginxUserServerConfig config = new NginxUserServerConfig();
         config.setCharset(charset);
-        config.setHttpServerIndexList(httpServerIndexList);
-        config.setHttpServerListen(httpServerListen);
-        config.setHttpServerRoot(httpServerRoot);
-        config.setHttpServerName(httpServerName);
+        config.setIndexList(httpServerIndexList);
+        config.setListen(httpServerListen);
+        config.setRoot(httpServerRoot);
+        config.setName(httpServerName);
         config.setSendFile(sendFile);
         config.setGzip(gzip);
         config.setGzipMinLength(gzipMinLength);
         config.setGzipTypes(gzipTypes);
-        config.setLocationConfigList(locationConfigList);
-        config.setDefaultServerLocationConfig(defaultLocationConfig);
+        config.setLocations(locationConfigList);
+        config.setDefaultLocation(defaultLocationConfig);
 
         return config;
     }

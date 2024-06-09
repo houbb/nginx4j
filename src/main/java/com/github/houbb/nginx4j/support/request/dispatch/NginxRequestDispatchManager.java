@@ -91,7 +91,7 @@ public class NginxRequestDispatchManager implements NginxRequestDispatch {
             return nginxConfig.getNginxIndexFile().getIndexFile(context);
         }
 
-        final String basicPath = nginxUserServerConfig.getHttpServerRoot();
+        final String basicPath = nginxUserServerConfig.getRoot();
         final String path = request.uri();
 
         // other

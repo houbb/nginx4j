@@ -1,122 +1,71 @@
-package com.github.houbb.nginx4j.config.load;
+package com.github.houbb.nginx4j.config.load.component.impl;
 
 import com.github.houbb.heaven.util.lang.StringUtil;
 import com.github.houbb.heaven.util.util.CollectionUtil;
-import com.github.houbb.nginx4j.bs.NginxUserConfigBs;
 import com.github.houbb.nginx4j.bs.NginxUserServerConfigBs;
 import com.github.houbb.nginx4j.config.NginxCommonConfigParam;
-import com.github.houbb.nginx4j.config.NginxUserConfig;
 import com.github.houbb.nginx4j.config.NginxUserServerConfig;
 import com.github.houbb.nginx4j.config.NginxUserServerLocationConfig;
+import com.github.houbb.nginx4j.config.load.component.INginxUserServerConfigLoad;
+import com.github.houbb.nginx4j.config.load.component.INginxUserServerLocationConfigLoad;
 import com.github.houbb.nginx4j.constant.NginxLocationPathTypeEnum;
-import com.github.houbb.nginx4j.constant.NginxUserConfigDefaultConst;
 import com.github.houbb.nginx4j.constant.NginxUserServerConfigDefaultConst;
 import com.github.odiszapc.nginxparser.NgxBlock;
 import com.github.odiszapc.nginxparser.NgxConfig;
 import com.github.odiszapc.nginxparser.NgxEntry;
 import com.github.odiszapc.nginxparser.NgxParam;
 
-import java.io.IOException;
 import java.util.*;
 
 /**
- * @since 0.13.0
+ * @since 0.18.0
  */
-@Deprecated
-public  class NginxUserConfigLoaderConfigFile extends AbstractNginxUserConfigLoader {
+public class NginxUserServerConfigLoadFile implements INginxUserServerConfigLoad {
 
-    private final String filePath;
+    private final NgxConfig conf;
 
-    public NginxUserConfigLoaderConfigFile(String filePath) {
-        this.filePath = filePath;
+    private final NgxBlock serverBlock;
+
+
+    public NginxUserServerConfigLoadFile(NgxConfig conf, NgxBlock serverBlock) {
+        this.conf = conf;
+        this.serverBlock = serverBlock;
     }
 
+    @Override
+    public NginxUserServerConfig load() {
+        NginxUserServerConfigBs serverConfigBs = NginxUserServerConfigBs.newInstance();
+        String name = serverBlock.getName();
 
-    protected void fillBasicInfo(final NginxUserConfigBs configBs,
-                                 final NgxConfig conf) {
-        // 基本信息
-//        configBs.httpPid(getHttpPid(conf));
-    }
+        int httpServerPort = getHttpServerListen(conf, serverBlock);
+        String httpServerName = getHttpServerName(conf, serverBlock);
+        String httpServerRoot = getHttpServerRoot(conf, serverBlock);
+        List<String> httpIndexList = getHttpServerIndexList(conf, serverBlock);
 
-    private String getHttpPid(final NgxConfig conf) {
-        // 基本信息
-        NgxParam pidParam = conf.findParam("pid");
-        if(pidParam != null) {
-            return pidParam.getValue();
-        }
+        // sendfile on;
+        String sendFile = getHttpServerSendFile(conf, serverBlock);
 
+        //gzip
+        String gzip = getHttpServerGzip(conf, serverBlock);
+        long gzipMinLen = getHttpServerGzipMinLen(conf, serverBlock);
+        List<String> gzipTypes = getHttpServerGzipTypes(conf, serverBlock);
 
-        return NginxUserConfigDefaultConst.HTTP_PID;
-    }
+        // 添加 location
+        List<NginxUserServerLocationConfig> locationConfigList = getHttpServerLocationList(conf, serverBlock);
+        NginxUserServerLocationConfig defaultLocationConfig = getDefaultLocationConfig(locationConfigList);
 
-    /**
-     * <pre>
-     *         listen 80;  # 监听80端口
-     *         server_name example.com;  # 服务器域名
-     *
-     *         # 单独为这个 server 启用 sendfile
-     *         sendfile on;
-     *
-     *         # 静态文件的根目录
-     *         root /usr/share/nginx/html;  # 静态文件存放的根目录
-     *         index index.html index.htm;  # 默认首页
-     *
-     *         # 如果需要为这个 server 单独配置 gzip，可以覆盖全局配置
-     *         gzip on;
-     *         gzip_disable "msie6";
-     *         gzip_vary on;
-     *         gzip_proxied any;
-     *         gzip_comp_level 6;
-     *         gzip_buffers 16 8k;
-     *         gzip_http_version 1.1;
-     *         gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
-     *
-     * </pre>
-     * @param configBs 配置
-     * @param conf 文件信息
-     */
-    protected void fillServerInfo(final NginxUserConfigBs configBs,
-                                 final NgxConfig conf) {
-        // 首先获取 block
-        List<NgxEntry> servers = conf.findAll(NgxConfig.BLOCK, "http", "server"); // 示例3
-        if(CollectionUtil.isNotEmpty(servers)) {
-            for (NgxEntry entry : servers) {
-                NginxUserServerConfigBs serverConfigBs = NginxUserServerConfigBs.newInstance();
-                NgxBlock serverBlock = (NgxBlock) entry;
-                String name = serverBlock.getName();
+        serverConfigBs.httpServerName(httpServerName)
+                .httpServerListen(httpServerPort)
+                .httpServerRoot(httpServerRoot)
+                .httpServerIndexList(httpIndexList)
+                .sendFile(sendFile)
+                .gzip(gzip)
+                .gzipMinLength(gzipMinLen)
+                .gzipTypes(gzipTypes)
+                .locationConfigList(locationConfigList)
+                .defaultLocationConfig(defaultLocationConfig);
 
-                int httpServerPort = getHttpServerListen(conf, serverBlock);
-                String httpServerName = getHttpServerName(conf, serverBlock);
-                String httpServerRoot = getHttpServerRoot(conf, serverBlock);
-                List<String> httpIndexList = getHttpServerIndexList(conf, serverBlock);
-
-                // sendfile on;
-                String sendFile = getHttpServerSendFile(conf, serverBlock);
-
-                //gzip
-                String gzip = getHttpServerGzip(conf, serverBlock);
-                long gzipMinLen = getHttpServerGzipMinLen(conf, serverBlock);
-                List<String> gzipTypes = getHttpServerGzipTypes(conf, serverBlock);
-
-                // 添加 location
-                List<NginxUserServerLocationConfig> locationConfigList = getHttpServerLocationList(conf, serverBlock);
-                NginxUserServerLocationConfig defaultLocationConfig = getDefaultLocationConfig(locationConfigList);
-
-                serverConfigBs.httpServerName(httpServerName)
-                        .httpServerListen(httpServerPort)
-                        .httpServerRoot(httpServerRoot)
-                        .httpServerIndexList(httpIndexList)
-                        .sendFile(sendFile)
-                        .gzip(gzip)
-                        .gzipMinLength(gzipMinLen)
-                        .gzipTypes(gzipTypes)
-                        .locationConfigList(locationConfigList)
-                        .defaultLocationConfig(defaultLocationConfig);
-
-                NginxUserServerConfig serverConfig = serverConfigBs.build();
-                configBs.addServerConfig(serverConfig);
-            }
-        }
+        return serverConfigBs.build();
     }
 
     public NginxUserServerLocationConfig getDefaultLocationConfig(List<NginxUserServerLocationConfig> locationConfigList) {
@@ -272,39 +221,10 @@ public  class NginxUserConfigLoaderConfigFile extends AbstractNginxUserConfigLoa
             for(NgxEntry entry : entryList) {
                 NgxBlock ngxBlock = (NgxBlock) entry;
                 // 参数
-                NginxUserServerLocationConfig locationConfig = new NginxUserServerLocationConfig();
-                locationConfig.setName(ngxBlock.getName());
-                locationConfig.setValue(ngxBlock.getValue());
-                locationConfig.setValues(ngxBlock.getValues());
 
-                NginxLocationPathTypeEnum typeEnum = NginxLocationPathTypeEnum.getTypeEnum(locationConfig);
-                locationConfig.setTypeEnum(typeEnum);
-
-                // 参数
-                List<NginxCommonConfigParam> paramList = new ArrayList<>();
-                Collection<NgxEntry> ngxEntries = ngxBlock.getEntries();
-                if(CollectionUtil.isNotEmpty(ngxEntries)) {
-                    for(NgxEntry ngxEntry : ngxEntries) {
-                        // 暂时跳过一些注释之类的处理
-                        if(!(ngxEntry instanceof NgxParam)) {
-                            continue;
-                        }
-
-                        NgxParam ngxParam = (NgxParam) ngxEntry;
-                        String name = ngxParam.getName();
-                        List<String> values = ngxParam.getValues();
-                        String value = ngxParam.getValue();
-
-                        NginxCommonConfigParam nginxCommonConfigParam = new NginxCommonConfigParam();
-                        nginxCommonConfigParam.setName(name);
-                        nginxCommonConfigParam.setValue(value);
-                        nginxCommonConfigParam.setValues(values);
-
-                        paramList.add(nginxCommonConfigParam);
-                    }
-                }
-                locationConfig.setDirectives(paramList);
-
+                // location 的处理
+                final INginxUserServerLocationConfigLoad locationConfigLoad = new NginxUserServerLocationConfigLoadFile(conf, ngxBlock);
+                NginxUserServerLocationConfig locationConfig = locationConfigLoad.load();
                 resultList.add(locationConfig);
             }
         }
@@ -320,26 +240,6 @@ public  class NginxUserConfigLoaderConfigFile extends AbstractNginxUserConfigLoa
         }
 
         return resultList;
-    }
-
-    @Override
-    protected NginxUserConfig doLoad() {
-        NgxConfig conf = null;
-        try {
-            NginxUserConfigBs configBs = NginxUserConfigBs.newInstance();
-            conf = NgxConfig.read(filePath);
-
-            //1. basic
-            fillBasicInfo(configBs, conf);
-
-            //2. server 信息
-            fillServerInfo(configBs, conf);
-
-            // 返回
-            return configBs.build();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }

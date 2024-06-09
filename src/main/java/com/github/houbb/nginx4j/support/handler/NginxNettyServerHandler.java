@@ -8,7 +8,6 @@ import com.github.houbb.nginx4j.config.NginxUserServerConfig;
 import com.github.houbb.nginx4j.config.NginxUserServerLocationConfig;
 import com.github.houbb.nginx4j.config.location.INginxLocationMatch;
 import com.github.houbb.nginx4j.constant.NginxConst;
-import com.github.houbb.nginx4j.constant.NginxLocationPathTypeEnum;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatch;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
 import io.netty.channel.ChannelHandlerContext;
@@ -70,7 +69,7 @@ public class NginxNettyServerHandler extends SimpleChannelInboundHandler<FullHtt
      */
     private NginxUserServerLocationConfig getCurrentServerLocation(NginxUserServerConfig nginxUserServerConfig,
                                                                    FullHttpRequest request) {
-        List<NginxUserServerLocationConfig> configList = nginxUserServerConfig.getLocationConfigList();
+        List<NginxUserServerLocationConfig> configList = nginxUserServerConfig.getLocations();
         if(CollectionUtil.isNotEmpty(configList)) {
             final INginxLocationMatch nginxLocationMatch = nginxConfig.getNginxLocationMatch();
 
@@ -84,7 +83,7 @@ public class NginxNettyServerHandler extends SimpleChannelInboundHandler<FullHtt
 
         // 默认值
         logger.info("未命中任何 location 配置，使用默认配置");
-        return nginxUserServerConfig.getDefaultServerLocationConfig();
+        return nginxUserServerConfig.getDefaultLocation();
     }
 
     /**
@@ -111,7 +110,7 @@ public class NginxNettyServerHandler extends SimpleChannelInboundHandler<FullHtt
         }
 
         // 全局默认
-        return nginxConfig.getNginxUserConfig().getDefaultUserServerConfig();
+        return nginxConfig.getNginxUserConfig().getDefaultServerConfig();
     }
 
     /**

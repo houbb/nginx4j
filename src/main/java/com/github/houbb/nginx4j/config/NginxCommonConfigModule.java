@@ -2,13 +2,18 @@ package com.github.houbb.nginx4j.config;
 
 import java.util.List;
 
-public class NginxUserConfigParam {
+public class NginxCommonConfigModule {
 
     private String name;
 
     private String value;
 
     private List<String> values;
+
+    /**
+     * 指令列表
+     */
+    private List<NginxCommonConfigParam> directives;
 
     public String getName() {
         return name;
@@ -34,13 +39,11 @@ public class NginxUserConfigParam {
         this.values = values;
     }
 
-    @Override
-    public String toString() {
-        return "NginxHttpServerLocationParam{" +
-                "name='" + name + '\'' +
-                ", value='" + value + '\'' +
-                ", values=" + values +
-                '}';
+    public List<NginxCommonConfigParam> getDirectives() {
+        return directives;
     }
 
+    public void setDirectives(List<NginxCommonConfigParam> directives) {
+        this.directives = directives;
+    }
 }

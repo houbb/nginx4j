@@ -1,7 +1,5 @@
 package com.github.houbb.nginx4j.config;
 
-import com.github.houbb.nginx4j.constant.NginxConst;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -11,18 +9,27 @@ import java.util.Set;
  *
  * @since 0.12.0
  */
-public class NginxUserConfig {
+public class NginxUserConfig extends NginxCommonUserConfig {
 
-    // 全局配置
-    private String httpPid;
+    /**
+     * 主配置
+     * @since 0.18.0
+     */
+    private NginxUserMainConfig mainConfig;
 
+
+    /**
+     * events 配置
+     * @since 0.18.0
+     */
+    private NginxUserEventsConfig eventsConfig;
 
     /**
      * 全部的 server 配置列表
      *
      * @since 0.12.0
      */
-    private List<NginxUserServerConfig> serverConfigList;
+    private List<NginxUserServerConfig> serverConfigs;
 
     /**
      * 服务器端口
@@ -43,7 +50,23 @@ public class NginxUserConfig {
      * 默认的服务配置
      * @since 0.14.0
      */
-    private NginxUserServerConfig defaultUserServerConfig;
+    private NginxUserServerConfig defaultServerConfig;
+
+    public NginxUserMainConfig getMainConfig() {
+        return mainConfig;
+    }
+
+    public void setMainConfig(NginxUserMainConfig mainConfig) {
+        this.mainConfig = mainConfig;
+    }
+
+    public NginxUserEventsConfig getEventsConfig() {
+        return eventsConfig;
+    }
+
+    public void setEventsConfig(NginxUserEventsConfig eventsConfig) {
+        this.eventsConfig = eventsConfig;
+    }
 
     public Map<String, List<NginxUserServerConfig>> getCurrentServerConfigMap() {
         return currentServerConfigMap;
@@ -61,20 +84,20 @@ public class NginxUserConfig {
         this.currentServerPort = currentServerPort;
     }
 
-    public List<NginxUserServerConfig> getServerConfigList() {
-        return serverConfigList;
+    public List<NginxUserServerConfig> getServerConfigs() {
+        return serverConfigs;
     }
 
-    public void setServerConfigList(List<NginxUserServerConfig> serverConfigList) {
-        this.serverConfigList = serverConfigList;
+    public void setServerConfigs(List<NginxUserServerConfig> serverConfigs) {
+        this.serverConfigs = serverConfigs;
     }
 
-    public NginxUserServerConfig getDefaultUserServerConfig() {
-        return defaultUserServerConfig;
+    public NginxUserServerConfig getDefaultServerConfig() {
+        return defaultServerConfig;
     }
 
-    public void setDefaultUserServerConfig(NginxUserServerConfig defaultUserServerConfig) {
-        this.defaultUserServerConfig = defaultUserServerConfig;
+    public void setDefaultServerConfig(NginxUserServerConfig defaultServerConfig) {
+        this.defaultServerConfig = defaultServerConfig;
     }
 
 
@@ -86,11 +109,4 @@ public class NginxUserConfig {
         this.serverPortSet = serverPortSet;
     }
 
-    public String getHttpPid() {
-        return httpPid;
-    }
-
-    public void setHttpPid(String httpPid) {
-        this.httpPid = httpPid;
-    }
 }

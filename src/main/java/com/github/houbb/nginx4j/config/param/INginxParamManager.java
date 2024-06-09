@@ -1,6 +1,6 @@
 package com.github.houbb.nginx4j.config.param;
 
-import com.github.houbb.nginx4j.config.NginxUserConfigParam;
+import com.github.houbb.nginx4j.config.NginxCommonConfigParam;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
 
 import java.util.List;
@@ -29,6 +29,6 @@ public interface INginxParamManager {
      * @param context 上下文
      * @return 结果列表
      */
-    List<INginxParamHandle> paramHandleList(final NginxUserConfigParam configParam, final NginxRequestDispatchContext context);
+    List<INginxParamHandle> paramHandleList(final NginxCommonConfigParam configParam, final NginxRequestDispatchContext context);
 
 }

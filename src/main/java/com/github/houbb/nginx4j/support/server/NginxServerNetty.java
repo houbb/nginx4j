@@ -142,20 +142,20 @@ public class NginxServerNetty implements INginxServer {
         // 当前的端口过滤
         NginxUserConfig originalUserConfig = nginxConfig.getNginxUserConfig();
         NginxUserConfig currentUserConfig = new NginxUserConfig();
-        currentUserConfig.setHttpPid(originalUserConfig.getHttpPid());
+//        currentUserConfig.setHttpPid(originalUserConfig.getHttpPid());
         currentUserConfig.setServerPortSet(originalUserConfig.getServerPortSet());
-        currentUserConfig.setDefaultUserServerConfig(originalUserConfig.getDefaultUserServerConfig());
+        currentUserConfig.setDefaultServerConfig(originalUserConfig.getDefaultServerConfig());
         currentUserConfig.setCurrentServerPort(port);
 
         // 按照端口号过滤
-        List<NginxUserServerConfig> userServerConfigs = nginxConfig.getNginxUserConfig().getServerConfigList();
+        List<NginxUserServerConfig> userServerConfigs = nginxConfig.getNginxUserConfig().getServerConfigs();
         // 过滤出 port 的列表并按 hostName 分组
         Map<String, List<NginxUserServerConfig>> groupedByHostName = new HashMap<>();
 
         if (CollectionUtil.isNotEmpty(userServerConfigs)) {
             groupedByHostName = userServerConfigs.stream()
-                    .filter(userConfig -> userConfig.getHttpServerListen() == port)
-                    .collect(Collectors.groupingBy(NginxUserServerConfig::getHttpServerName));
+                    .filter(userConfig -> userConfig.getListen() == port)
+                    .collect(Collectors.groupingBy(NginxUserServerConfig::getName));
         }
         currentUserConfig.setCurrentServerConfigMap(groupedByHostName);
 

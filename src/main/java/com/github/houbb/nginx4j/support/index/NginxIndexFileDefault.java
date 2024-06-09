@@ -1,7 +1,6 @@
 package com.github.houbb.nginx4j.support.index;
 
 import com.github.houbb.heaven.util.io.FileUtil;
-import com.github.houbb.heaven.util.io.ResourceUtil;
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
 import com.github.houbb.nginx4j.config.NginxUserServerConfig;
@@ -23,8 +22,8 @@ public class NginxIndexFileDefault implements NginxIndexFile {
     public File getIndexContentBytes(NginxRequestDispatchContext context) {
         final NginxUserServerConfig nginxUserServerConfig = context.getCurrentNginxUserServerConfig();
 
-        List<String> indexHtmlList = nginxUserServerConfig.getHttpServerIndexList();
-        String basicPath = nginxUserServerConfig.getHttpServerRoot();
+        List<String> indexHtmlList = nginxUserServerConfig.getIndexList();
+        String basicPath = nginxUserServerConfig.getRoot();
         for(String indexHtml : indexHtmlList) {
             String fullPath = FileUtil.buildFullPath(basicPath, indexHtml);
 

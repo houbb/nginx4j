@@ -6,4 +6,8 @@ public class NginxUserConfigLoaders {
         return new NginxUserConfigLoaderConfigFile(file);
     }
 
+    public static INginxUserConfigLoader configComponentFile(final String file) {
+        return new NginxUserConfigLoaderConfigComponentFile(file);
+    }
+
 }
