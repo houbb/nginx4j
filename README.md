@@ -38,6 +38,8 @@ nginx4j 是基于 netty 实现的 nginx 的java 版本。
 
 - 常见占位符 `$` 的内置支持
 
+- cookie 的操作处理 proxy_cookie_domain/proxy_cookie_flags/proxy_cookie_path 内置支持 
+
 ## 拓展阅读
 
 [从零手写实现 nginx-01-为什么不能有 java 版本的 nginx?](https://houbb.github.io/2018/11/22/nginx-write-01-how-to)
@@ -269,13 +271,13 @@ NginxUserConfig nginxUserConfig = NginxUserConfigLoaders.configFile("D:\\github\
 - [x] 请求头信息重写
 - [x] CORS 这个还是让用户处理，不过可以单独写一篇文章
 - [x] $ 占位符的实现
+- [x] 常见 cookie 的处理
 - [ ] if 指令的支持
 - [ ] rewrite 指令，重写 URL
 - [ ] try_files 文件处理指令
 - [ ] return 返回指令
 - [ ] error_page 自定义错误页面
 - [ ] 更多 directive 指令实现
-- [ ] 常见请求头/headers/cookie 的处理
 - [ ] 更多文件格式的内置支持？
 - [ ] ETag 和 Last-Modified + cache 相关
 - [ ] 压缩更好的实现方式？ zlib 算法 + 实现优化？
