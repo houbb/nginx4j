@@ -179,6 +179,9 @@ public class AbstractNginxRequestDispatchFile extends AbstractNginxRequestDispat
             if(zipFlag) {
                 afterZip(context, response);
             }
+
+            // 完成
+            super.beforeComplete(ctx, response, context);
         }
     }
 

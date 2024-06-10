@@ -5,27 +5,27 @@ import com.github.houbb.log.integration.core.LogFactory;
 import com.github.houbb.nginx4j.support.placeholder.AbstractNginxPlaceholderRequest;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaderNames;
 
 /**
- * 占位符处理类
- * @since 0.17.0
+ * 客户端的 User-Agent 头。
  *
  * @author 老马啸西风
+ * @since 0.19.0
  */
-public class NginxPlaceholderSchema extends AbstractNginxPlaceholderRequest {
+public class NginxPlaceholderHttpUserAgent extends AbstractNginxPlaceholderRequest {
 
-    private static final Log logger = LogFactory.getLog(NginxPlaceholderSchema.class);
+    private static final Log logger = LogFactory.getLog(NginxPlaceholderHttpUserAgent.class);
 
 
     @Override
     protected Object extractBeforeDispatch(FullHttpRequest request, NginxRequestDispatchContext context) {
-        //TODO: 这个要判断当前的 SSL 是否启用，暂时默认 http
-        return "http";
+        return request.headers().get(HttpHeaderNames.USER_AGENT);
     }
 
     @Override
     protected String getKeyBeforeDispatch(FullHttpRequest request, NginxRequestDispatchContext context) {
-        return "$schema";
+        return "$http_user_agent";
     }
 
 }

@@ -14,7 +14,19 @@ public interface INginxPlaceholderManager {
      * 初始化
      * @param context 上下文
      */
-    void init(final NginxRequestDispatchContext context);
+    void beforeDispatch(final NginxRequestDispatchContext context);
+
+    /**
+     * 初始化
+     * @param context 上下文
+     */
+    void beforeWrite(final NginxRequestDispatchContext context);
+
+    /**
+     * 初始化
+     * @param context 上下文
+     */
+    void beforeComplete(final NginxRequestDispatchContext context);
 
     /**
      * 获取值

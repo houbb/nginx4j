@@ -1,47 +1,54 @@
 package com.github.houbb.nginx4j.config.param;
 
-import com.github.houbb.heaven.util.common.ArgUtil;
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
-import com.github.houbb.nginx4j.config.NginxCommonConfigParam;
-import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 基础实现
+ * @since 0.19.0
+ */
 public class NginxParamManagerBase implements INginxParamManager {
 
     private static final Log logger = LogFactory.getLog(NginxParamManagerBase.class);
 
-    protected static final List<INginxParamHandle> NGINX_PARAM_HANDLES = new ArrayList<>();
+    private final List<INginxParamLifecycleComplete> completeList = new ArrayList<>();
+    private final List<INginxParamLifecycleDispatch> dispatchList = new ArrayList<>();
+    private final List<INginxParamLifecycleWrite> writeList = new ArrayList<>();
 
     @Override
-    public INginxParamManager register(INginxParamHandle nginxParamHandle) {
-        ArgUtil.notNull(nginxParamHandle, "nginxParamHandle");
-
-        NGINX_PARAM_HANDLES.add(nginxParamHandle);
-
-        logger.info("NginxParamManagerBase register={}", nginxParamHandle.getClass().getName());
-
+    public INginxParamManager registerDispatch(INginxParamLifecycleDispatch dispatch) {
+        dispatchList.add(dispatch);
         return this;
     }
 
-    public List<INginxParamHandle> paramHandleList() {
-        return NGINX_PARAM_HANDLES;
+    @Override
+    public INginxParamManager registerComplete(INginxParamLifecycleComplete complete) {
+        completeList.add(complete);
+        return this;
     }
 
     @Override
-    public List<INginxParamHandle> paramHandleList(NginxCommonConfigParam configParam, NginxRequestDispatchContext context) {
-        List<INginxParamHandle> resultList = new ArrayList<>();
+    public INginxParamManager registerWrite(INginxParamLifecycleWrite write) {
+        writeList.add(write);
+        return this;
+    }
 
-        //CACHE 可以以 key 为准
-        for(INginxParamHandle paramHandle : NGINX_PARAM_HANDLES) {
-            if(paramHandle.match(configParam, context)) {
-                resultList.add(paramHandle);
-            }
-        }
+    @Override
+    public List<INginxParamLifecycleComplete> getCompleteList() {
+        return completeList;
+    }
 
-        return resultList;
+    @Override
+    public List<INginxParamLifecycleDispatch> getDispatchList() {
+        return dispatchList;
+    }
+
+    @Override
+    public List<INginxParamLifecycleWrite> getWriteList() {
+        return writeList;
     }
 
 }

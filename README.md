@@ -36,7 +36,7 @@ nginx4j 是基于 netty 实现的 nginx 的java 版本。
 
 - 请求头的修改+响应头的修改
 
-- 占位符 `$` 的支持
+- 常见占位符 `$` 的内置支持
 
 ## 拓展阅读
 
@@ -92,7 +92,7 @@ nginx4j 是基于 netty 实现的 nginx 的java 版本。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>nginx4j</artifactId>
-    <version>0.18.0</version>
+    <version>0.19.0</version>
 </dependency>
 ```
 
@@ -271,14 +271,18 @@ NginxUserConfig nginxUserConfig = NginxUserConfigLoaders.configFile("D:\\github\
 - [x] $ 占位符的实现
 - [ ] if 指令的支持
 - [ ] rewrite 指令，重写 URL
-- [ ] 更多 directive 如 return 指令实现
+- [ ] try_files 文件处理指令
+- [ ] return 返回指令
+- [ ] error_page 自定义错误页面
+- [ ] 更多 directive 指令实现
 - [ ] 常见请求头/headers/cookie 的处理
-- [ ] ETag 和 Last-Modified + cache
+- [ ] 更多文件格式的内置支持？
+- [ ] ETag 和 Last-Modified + cache 相关
 - [ ] 压缩更好的实现方式？ zlib 算法 + 实现优化？
 - [ ] http2
 - [ ] http3
 - [ ] ssl/https
-- [ ] 更多文件格式的内置支持？
+- [ ] 安全 访问限制
 
 ## 反向代理
 

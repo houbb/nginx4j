@@ -1,13 +1,12 @@
-package com.github.houbb.nginx4j.config.param.impl;
+package com.github.houbb.nginx4j.config.param.impl.dispatch;
 
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
 import com.github.houbb.nginx4j.config.NginxCommonConfigParam;
-import com.github.houbb.nginx4j.config.param.AbstractNginxParamHandle;
+import com.github.houbb.nginx4j.config.param.AbstractNginxParamLifecycleDispatch;
 import com.github.houbb.nginx4j.constant.NginxConst;
 import com.github.houbb.nginx4j.exception.Nginx4jException;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
-import io.netty.channel.ChannelHandlerContext;
 
 import java.util.List;
 import java.util.Map;
@@ -18,7 +17,7 @@ import java.util.Map;
  * @since 0.17.0
  * @author 老马啸西风
  */
-public class NginxParamHandleSet extends AbstractNginxParamHandle {
+public class NginxParamHandleSet extends AbstractNginxParamLifecycleDispatch {
 
     private static final Log logger = LogFactory.getLog(NginxParamHandleSet.class);
 
@@ -49,15 +48,6 @@ public class NginxParamHandleSet extends AbstractNginxParamHandle {
 
     @Override
     public void doAfterDispatch(NginxCommonConfigParam configParam, NginxRequestDispatchContext context) {
-
-    }
-
-    @Override
-    public void doBeforeWrite(NginxCommonConfigParam configParam, ChannelHandlerContext ctx, Object object, NginxRequestDispatchContext context) {
-    }
-
-    @Override
-    public void doAfterWrite(NginxCommonConfigParam configParam, ChannelHandlerContext ctx, Object object, NginxRequestDispatchContext context) {
     }
 
     @Override

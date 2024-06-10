@@ -1,10 +1,10 @@
-package com.github.houbb.nginx4j.config.param.impl;
+package com.github.houbb.nginx4j.config.param.impl.write;
 
 import com.github.houbb.heaven.util.lang.StringUtil;
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
 import com.github.houbb.nginx4j.config.NginxCommonConfigParam;
-import com.github.houbb.nginx4j.config.param.AbstractNginxParamHandle;
+import com.github.houbb.nginx4j.config.param.AbstractNginxParamLifecycleWrite;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -15,30 +15,12 @@ import java.util.List;
 /**
  * 参数处理类 响应头处理
  *
- * @since 0.16.0
+ * @since 0.19.0
  */
-public class NginxParamHandleAddHeader extends AbstractNginxParamHandle {
+public class NginxParamHandleAddHeader extends AbstractNginxParamLifecycleWrite {
 
     private static final Log logger = LogFactory.getLog(NginxParamHandleAddHeader.class);
 
-    /**
-     * # 增加或修改请求头
-     * proxy_set_header X-Real-IP $remote_addr;
-     * # 删除请求头
-     * proxy_set_header X-Unwanted-Header "";
-     *
-     * @param configParam 参数
-     * @param context     上下文
-     */
-    @Override
-    public void doBeforeDispatch(NginxCommonConfigParam configParam, NginxRequestDispatchContext context) {
-
-    }
-
-    @Override
-    public void doAfterDispatch(NginxCommonConfigParam configParam, NginxRequestDispatchContext context) {
-
-    }
 
     @Override
     public void doBeforeWrite(NginxCommonConfigParam configParam, ChannelHandlerContext ctx, Object object, NginxRequestDispatchContext context) {
@@ -78,7 +60,7 @@ public class NginxParamHandleAddHeader extends AbstractNginxParamHandle {
     }
 
     @Override
-    protected String getKey(NginxCommonConfigParam configParam, NginxRequestDispatchContext context) {
+    protected String getKey(NginxCommonConfigParam configParam, ChannelHandlerContext ctx, Object object, NginxRequestDispatchContext context) {
         return "add_header";
     }
 

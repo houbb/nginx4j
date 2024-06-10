@@ -11,11 +11,14 @@ import com.github.houbb.nginx4j.constant.NginxConst;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatch;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelId;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * netty 处理类
@@ -28,8 +31,27 @@ public class NginxNettyServerHandler extends SimpleChannelInboundHandler<FullHtt
 
     private final NginxConfig nginxConfig;
 
+    /**
+     * @since 0.19.0
+     */
+    private static final Map<ChannelId, AtomicInteger> connectionRequestCount = new ConcurrentHashMap<>();
+
     public NginxNettyServerHandler(NginxConfig nginxConfig) {
         this.nginxConfig = nginxConfig;
+    }
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        // 初始化连接请求计数
+        connectionRequestCount.put(ctx.channel().id(), new AtomicInteger(0));
+        super.channelActive(ctx);
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        // 清理连接请求计数
+        connectionRequestCount.remove(ctx.channel().id());
+        super.channelInactive(ctx);
     }
 
     @Override
@@ -48,6 +70,7 @@ public class NginxNettyServerHandler extends SimpleChannelInboundHandler<FullHtt
         context.setRequest(request);
         context.setCurrentNginxUserServerConfig(nginxUserServerConfig);
         context.setCurrentUserServerLocationConfig(currentLocationConfig);
+        context.setConnectionRequestCount(connectionRequestCount);
 
         requestDispatch.dispatch(context);
 
@@ -111,23 +134,6 @@ public class NginxNettyServerHandler extends SimpleChannelInboundHandler<FullHtt
 
         // 全局默认
         return nginxConfig.getNginxUserConfig().getDefaultServerConfig();
-    }
-
-    /**
-     * 设置当前的 location 信息
-     * @param nginxUserServerConfig 配置
-     * @param request 请求
-     * @return 结果
-     * @since 0.16.0
-     */
-    public NginxUserServerConfig fillCurrentUserServerLocationConfig(NginxUserServerConfig nginxUserServerConfig,
-                                                                     FullHttpRequest request) {
-        // 请求
-        String requestUrl = request.getUri();
-        // 遍历，获取匹配的算法
-
-
-        return nginxUserServerConfig;
     }
 
     private String getHostName(FullHttpRequest request) {

@@ -12,20 +12,21 @@ import io.netty.handler.codec.http.FullHttpRequest;
  *
  * @author 老马啸西风
  */
-public class NginxPlaceholderSchema extends AbstractNginxPlaceholderRequest {
+public class NginxPlaceholderRequestEndTime extends AbstractNginxPlaceholderRequest {
 
-    private static final Log logger = LogFactory.getLog(NginxPlaceholderSchema.class);
+    private static final Log logger = LogFactory.getLog(NginxPlaceholderRequestEndTime.class);
 
 
     @Override
-    protected Object extractBeforeDispatch(FullHttpRequest request, NginxRequestDispatchContext context) {
-        //TODO: 这个要判断当前的 SSL 是否启用，暂时默认 http
-        return "http";
+    protected Object extractBeforeComplete(NginxRequestDispatchContext context) {
+        long time = System.currentTimeMillis();
+        context.setRequestEndTime(time);
+        return time;
     }
 
     @Override
-    protected String getKeyBeforeDispatch(FullHttpRequest request, NginxRequestDispatchContext context) {
-        return "$schema";
+    protected String getKeyBeforeComplete(NginxRequestDispatchContext context) {
+        return "$request_end_time";
     }
 
 }

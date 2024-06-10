@@ -2,7 +2,7 @@ package com.github.houbb.nginx4j.support.placeholder.impl;
 
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
-import com.github.houbb.nginx4j.support.placeholder.AbstractNginxPlaceholder;
+import com.github.houbb.nginx4j.support.placeholder.AbstractNginxPlaceholderRequest;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -17,13 +17,13 @@ import java.util.Set;
  *
  * @author 老马啸西风
  */
-public class NginxPlaceholderHttpCookie extends AbstractNginxPlaceholder {
+public class NginxPlaceholderHttpCookie extends AbstractNginxPlaceholderRequest {
 
     private static final Log logger = LogFactory.getLog(NginxPlaceholderHttpCookie.class);
 
 
     @Override
-    protected Object extract(FullHttpRequest request, NginxRequestDispatchContext context) {
+    protected Object extractBeforeDispatch(FullHttpRequest request, NginxRequestDispatchContext context) {
         String cookieHeader = request.headers().get(HttpHeaderNames.COOKIE);
         if (cookieHeader != null) {
             Set<Cookie> cookies = ServerCookieDecoder.LAX.decode(cookieHeader);
@@ -40,7 +40,7 @@ public class NginxPlaceholderHttpCookie extends AbstractNginxPlaceholder {
     }
 
     @Override
-    protected String getKey(FullHttpRequest request, NginxRequestDispatchContext context) {
+    protected String getKeyBeforeDispatch(FullHttpRequest request, NginxRequestDispatchContext context) {
         return "$http_cookie";
     }
 

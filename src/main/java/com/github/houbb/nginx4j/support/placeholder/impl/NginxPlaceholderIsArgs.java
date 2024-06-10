@@ -5,27 +5,31 @@ import com.github.houbb.log.integration.core.LogFactory;
 import com.github.houbb.nginx4j.support.placeholder.AbstractNginxPlaceholderRequest;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.QueryStringDecoder;
 
 /**
- * 占位符处理类
- * @since 0.17.0
+ * 同 `$args`。
+ *
  *
  * @author 老马啸西风
+ * @since 0.19.0
  */
-public class NginxPlaceholderSchema extends AbstractNginxPlaceholderRequest {
+public class NginxPlaceholderIsArgs extends AbstractNginxPlaceholderRequest {
 
-    private static final Log logger = LogFactory.getLog(NginxPlaceholderSchema.class);
-
+    private static final Log logger = LogFactory.getLog(NginxPlaceholderIsArgs.class);
 
     @Override
     protected Object extractBeforeDispatch(FullHttpRequest request, NginxRequestDispatchContext context) {
-        //TODO: 这个要判断当前的 SSL 是否启用，暂时默认 http
-        return "http";
+        String uri = request.uri();
+
+        // 解析 URI 以确定是否包含参数
+        QueryStringDecoder queryStringDecoder = new QueryStringDecoder(uri);
+        return queryStringDecoder.parameters().isEmpty() ? "" : "?";
     }
 
     @Override
     protected String getKeyBeforeDispatch(FullHttpRequest request, NginxRequestDispatchContext context) {
-        return "$schema";
+        return "$is_args";
     }
 
 }

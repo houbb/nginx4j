@@ -4,11 +4,16 @@ import com.github.houbb.nginx4j.config.NginxConfig;
 import com.github.houbb.nginx4j.config.NginxUserServerConfig;
 import com.github.houbb.nginx4j.config.NginxUserServerLocationConfig;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelId;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpMessage;
+import io.netty.handler.codec.http.HttpResponse;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 分发上下文
@@ -61,6 +66,62 @@ public class NginxRequestDispatchContext {
      * @since 0.17.0
      */
     private long limitRate = 1000;
+
+    /**
+     * 响应头
+     * @since 0.19.0
+     */
+    private HttpResponse httpResponse;
+
+    /**
+     * 总数
+     * @since 0.19.0
+     */
+    private Map<ChannelId, AtomicInteger> connectionRequestCount;
+
+    /**
+     * 请求开始时间
+     * @since 0.19.0
+     */
+    private long requestStartTime;
+
+    /**
+     * 请求完成时间
+     * @since 0.19.0
+     */
+    private long requestEndTime;
+
+    public long getRequestStartTime() {
+        return requestStartTime;
+    }
+
+    public void setRequestStartTime(long requestStartTime) {
+        this.requestStartTime = requestStartTime;
+    }
+
+    public long getRequestEndTime() {
+        return requestEndTime;
+    }
+
+    public void setRequestEndTime(long requestEndTime) {
+        this.requestEndTime = requestEndTime;
+    }
+
+    public Map<ChannelId, AtomicInteger> getConnectionRequestCount() {
+        return connectionRequestCount;
+    }
+
+    public void setConnectionRequestCount(Map<ChannelId, AtomicInteger> connectionRequestCount) {
+        this.connectionRequestCount = connectionRequestCount;
+    }
+
+    public HttpResponse getHttpResponse() {
+        return httpResponse;
+    }
+
+    public void setHttpResponse(HttpResponse httpResponse) {
+        this.httpResponse = httpResponse;
+    }
 
     public long getLimitRate() {
         return limitRate;

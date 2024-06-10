@@ -34,6 +34,9 @@ public abstract class AbstractNginxRequestDispatchFullResp extends AbstractNginx
         if (!HttpUtil.isKeepAlive(request)) {
             lastContentFuture.addListener(ChannelFutureListener.CLOSE);
         }
+
+        // 完成
+        super.beforeComplete(ctx, response, context);
         logger.info("[Nginx] channelRead writeAndFlush DONE response={}", response);
     }
 

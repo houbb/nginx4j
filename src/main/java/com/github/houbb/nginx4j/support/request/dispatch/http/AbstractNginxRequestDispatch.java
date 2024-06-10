@@ -5,7 +5,9 @@ import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
 import com.github.houbb.nginx4j.config.NginxCommonConfigParam;
 import com.github.houbb.nginx4j.config.NginxUserServerLocationConfig;
-import com.github.houbb.nginx4j.config.param.INginxParamHandle;
+import com.github.houbb.nginx4j.config.param.INginxParamLifecycleComplete;
+import com.github.houbb.nginx4j.config.param.INginxParamLifecycleDispatch;
+import com.github.houbb.nginx4j.config.param.INginxParamLifecycleWrite;
 import com.github.houbb.nginx4j.config.param.INginxParamManager;
 import com.github.houbb.nginx4j.constant.NginxConst;
 import com.github.houbb.nginx4j.exception.Nginx4jException;
@@ -14,6 +16,7 @@ import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatch;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.HttpResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,10 +64,10 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
 
         // 处理
         for(NginxCommonConfigParam configParam : directives) {
-            List<INginxParamHandle> handleList = paramManager.paramHandleList(configParam, context);
+            List<INginxParamLifecycleDispatch> handleList = paramManager.getDispatchList();
             if(CollectionUtil.isNotEmpty(handleList)) {
-                for(INginxParamHandle paramHandle : handleList) {
-                    paramHandle.afterDispatch(configParam, context);
+                for(INginxParamLifecycleDispatch dispatch : handleList) {
+                    dispatch.afterDispatch(configParam, context);
                 }
             }
         }
@@ -82,7 +85,7 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
         // v0.17.0 占位符管理类
         final INginxPlaceholderManager placeholderManager = context.getNginxConfig().getNginxPlaceholderManager();
         // 提前处理内置的各种参数
-        placeholderManager.init(context);
+        placeholderManager.beforeDispatch(context);
 
 
         //1. 当前的配置
@@ -101,10 +104,12 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
             // 占位符处理
             placeholderHandle(configParam, placeholderManager, context);
 
-            List<INginxParamHandle> handleList = paramManager.paramHandleList(configParam, context);
+            List<INginxParamLifecycleDispatch> handleList = paramManager.getDispatchList();
             if(CollectionUtil.isNotEmpty(handleList)) {
-                for(INginxParamHandle paramHandle : handleList) {
-                    paramHandle.beforeDispatch(configParam, context);
+                for(INginxParamLifecycleDispatch dispatch : handleList) {
+                    if(dispatch.match(configParam, context)) {
+                        dispatch.beforeDispatch(configParam, context);
+                    }
                 }
             }
         }
@@ -228,6 +233,12 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
     protected ChannelFuture write(final ChannelHandlerContext ctx,
                                           final Object object,
                                           final NginxRequestDispatchContext context) {
+        // 设置响应
+        if(object instanceof HttpResponse) {
+            HttpResponse httpResponse = (HttpResponse) object;
+            context.setHttpResponse(httpResponse);
+        }
+
         beforeWrite(ctx, object, context);
 
         // 基本处理逻辑
@@ -239,11 +250,17 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
     }
 
 
+
     protected void beforeWrite(final ChannelHandlerContext ctx,
                                        final Object object,
                                        final NginxRequestDispatchContext context) {
         // 参数管理类
         final INginxParamManager paramManager = context.getNginxConfig().getNginxParamManager();
+
+        // v0.19.0 占位符管理类
+        final INginxPlaceholderManager placeholderManager = context.getNginxConfig().getNginxPlaceholderManager();
+        // 提前处理内置的各种参数
+        placeholderManager.beforeWrite(context);
 
         //1. 当前的配置
         NginxUserServerLocationConfig locationConfig = context.getCurrentUserServerLocationConfig();
@@ -258,10 +275,12 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
 
         // 处理
         for(NginxCommonConfigParam configParam : directives) {
-            List<INginxParamHandle> handleList = paramManager.paramHandleList(configParam, context);
+            List<INginxParamLifecycleWrite> handleList = paramManager.getWriteList();
             if(CollectionUtil.isNotEmpty(handleList)) {
-                for(INginxParamHandle paramHandle : handleList) {
-                    paramHandle.beforeWrite(configParam, ctx, object, context);
+                for(INginxParamLifecycleWrite write: handleList) {
+                    if(write.match(configParam, ctx, object, context)) {
+                        write.beforeWrite(configParam, ctx, object, context);
+                    }
                 }
             }
         }
@@ -286,13 +305,98 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
 
         // 处理
         for(NginxCommonConfigParam configParam : directives) {
-            List<INginxParamHandle> handleList = paramManager.paramHandleList(configParam, context);
+            List<INginxParamLifecycleWrite> handleList = paramManager.getWriteList();
             if(CollectionUtil.isNotEmpty(handleList)) {
-                for(INginxParamHandle paramHandle : handleList) {
-                    paramHandle.afterWrite(configParam, ctx, object, context);
+                for(INginxParamLifecycleWrite write: handleList) {
+                    write.afterWrite(configParam, ctx, object, context);
                 }
             }
         }
     }
+
+
+    /**
+     * 完成处理
+     *
+     * @param ctx   channel 上下文
+     * @param object 对象
+     * @param context 上下文
+     * @since 0.19.0
+     * @return channel
+     */
+    protected void complete(final ChannelHandlerContext ctx,
+                                     final Object object,
+                                     final NginxRequestDispatchContext context) {
+        beforeComplete(ctx, object, context);
+
+        // 基本处理逻辑
+//        ChannelFuture lastContentFuture = ctx.writeAndFlush(object);
+
+        afterComplete(ctx, object, context);
+    }
+
+    protected void beforeComplete(final ChannelHandlerContext ctx,
+                               final Object object,
+                               final NginxRequestDispatchContext context) {
+        // 参数管理类
+        final INginxParamManager paramManager = context.getNginxConfig().getNginxParamManager();
+
+        // v0.19.0 占位符管理类
+        final INginxPlaceholderManager placeholderManager = context.getNginxConfig().getNginxPlaceholderManager();
+        // 提前处理内置的各种参数
+        placeholderManager.beforeComplete(context);
+
+        //1. 当前的配置
+        NginxUserServerLocationConfig locationConfig = context.getCurrentUserServerLocationConfig();
+        if(locationConfig == null) {
+            return;
+        }
+
+        List<NginxCommonConfigParam> directives = locationConfig.getDirectives();
+        if(CollectionUtil.isEmpty(directives)) {
+            return;
+        }
+
+        // 处理
+        for(NginxCommonConfigParam configParam : directives) {
+            List<INginxParamLifecycleComplete> handleList = paramManager.getCompleteList();
+            if(CollectionUtil.isNotEmpty(handleList)) {
+                for(INginxParamLifecycleComplete complete: handleList) {
+                    if(complete.match(configParam, ctx, object, context)) {
+                        complete.beforeComplete(configParam, ctx, object, context);
+                    }
+                }
+            }
+        }
+    }
+
+    protected void afterComplete(final ChannelHandlerContext ctx,
+                              final Object object,
+                              final NginxRequestDispatchContext context) {
+        // 参数管理类
+        final INginxParamManager paramManager = context.getNginxConfig().getNginxParamManager();
+
+        //1. 当前的配置
+        NginxUserServerLocationConfig locationConfig = context.getCurrentUserServerLocationConfig();
+        if(locationConfig == null) {
+            return;
+        }
+
+        List<NginxCommonConfigParam> directives = locationConfig.getDirectives();
+        if(CollectionUtil.isEmpty(directives)) {
+            return;
+        }
+
+        // 处理
+        for(NginxCommonConfigParam configParam : directives) {
+            List<INginxParamLifecycleComplete> handleList = paramManager.getCompleteList();
+            if(CollectionUtil.isNotEmpty(handleList)) {
+                for(INginxParamLifecycleComplete complete: handleList) {
+                    complete.afterComplete(configParam, ctx, object, context);
+                }
+            }
+        }
+    }
+
 
 }
