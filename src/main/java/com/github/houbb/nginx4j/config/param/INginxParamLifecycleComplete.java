@@ -42,6 +42,7 @@ public interface INginxParamLifecycleComplete {
      * @param ctx channel 上下文
      * @param object 对象
      * @param context 上下文
+     * @return 是否匹配
      */
     boolean match(NginxCommonConfigParam configParam,
                   final ChannelHandlerContext ctx,

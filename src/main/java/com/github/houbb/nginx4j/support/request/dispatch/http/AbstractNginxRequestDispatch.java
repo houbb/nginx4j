@@ -322,7 +322,6 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
      * @param object 对象
      * @param context 上下文
      * @since 0.19.0
-     * @return channel
      */
     protected void complete(final ChannelHandlerContext ctx,
                                      final Object object,
