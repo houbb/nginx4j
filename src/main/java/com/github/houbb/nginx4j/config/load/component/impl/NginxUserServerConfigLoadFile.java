@@ -3,17 +3,15 @@ package com.github.houbb.nginx4j.config.load.component.impl;
 import com.github.houbb.heaven.util.lang.StringUtil;
 import com.github.houbb.heaven.util.util.CollectionUtil;
 import com.github.houbb.nginx4j.bs.NginxUserServerConfigBs;
-import com.github.houbb.nginx4j.config.NginxCommonConfigParam;
+import com.github.houbb.nginx4j.config.NginxCommonConfigEntry;
 import com.github.houbb.nginx4j.config.NginxUserServerConfig;
 import com.github.houbb.nginx4j.config.NginxUserServerLocationConfig;
 import com.github.houbb.nginx4j.config.load.component.INginxUserServerConfigLoad;
 import com.github.houbb.nginx4j.config.load.component.INginxUserServerLocationConfigLoad;
 import com.github.houbb.nginx4j.constant.NginxLocationPathTypeEnum;
 import com.github.houbb.nginx4j.constant.NginxUserServerConfigDefaultConst;
-import com.github.odiszapc.nginxparser.NgxBlock;
-import com.github.odiszapc.nginxparser.NgxConfig;
-import com.github.odiszapc.nginxparser.NgxEntry;
-import com.github.odiszapc.nginxparser.NgxParam;
+import com.github.houbb.nginx4j.util.InnerConfigEntryUtil;
+import com.github.odiszapc.nginxparser.*;
 
 import java.util.*;
 
@@ -53,6 +51,21 @@ public class NginxUserServerConfigLoadFile implements INginxUserServerConfigLoad
         // 添加 location
         List<NginxUserServerLocationConfig> locationConfigList = getHttpServerLocationList(conf, serverBlock);
         NginxUserServerLocationConfig defaultLocationConfig = getDefaultLocationConfig(locationConfigList);
+
+        //4. 基础的指令+if 模块
+        List<NginxCommonConfigEntry> configEntryList = new ArrayList<>();
+        Collection<NgxEntry> entryList = serverBlock.getEntries();
+        if(CollectionUtil.isNotEmpty(entryList)) {
+            for(NgxEntry ngxEntry : entryList) {
+                if(ngxEntry instanceof NgxParam) {
+                    configEntryList.add(InnerConfigEntryUtil.buildConfigEntry((NgxParam) ngxEntry));
+                }
+                if(ngxEntry instanceof NgxIfBlock) {
+                    configEntryList.add(InnerConfigEntryUtil.buildConfigEntry((NgxIfBlock) ngxEntry));
+                }
+            }
+        }
+        serverConfigBs.configEntryList(configEntryList);
 
         serverConfigBs.httpServerName(httpServerName)
                 .httpServerListen(httpServerPort)

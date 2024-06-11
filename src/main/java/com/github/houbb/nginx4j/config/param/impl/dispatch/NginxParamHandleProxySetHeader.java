@@ -3,7 +3,7 @@ package com.github.houbb.nginx4j.config.param.impl.dispatch;
 import com.github.houbb.heaven.util.lang.StringUtil;
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
-import com.github.houbb.nginx4j.config.NginxCommonConfigParam;
+import com.github.houbb.nginx4j.config.NginxCommonConfigEntry;
 import com.github.houbb.nginx4j.config.param.AbstractNginxParamLifecycleDispatch;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -30,7 +30,7 @@ public class NginxParamHandleProxySetHeader extends AbstractNginxParamLifecycleD
      * @param context     上下文
      */
     @Override
-    public void doBeforeDispatch(NginxCommonConfigParam configParam, NginxRequestDispatchContext context) {
+    public void doBeforeDispatch(NginxCommonConfigEntry configParam, NginxRequestDispatchContext context) {
         List<String> values = configParam.getValues();
 
         // $ 占位符号后续处理
@@ -58,11 +58,11 @@ public class NginxParamHandleProxySetHeader extends AbstractNginxParamLifecycleD
     }
 
     @Override
-    public void doAfterDispatch(NginxCommonConfigParam configParam, NginxRequestDispatchContext context) {
+    public void doAfterDispatch(NginxCommonConfigEntry configParam, NginxRequestDispatchContext context) {
     }
 
     @Override
-    protected String getKey(NginxCommonConfigParam configParam, NginxRequestDispatchContext context) {
+    protected String getKey(NginxCommonConfigEntry configParam, NginxRequestDispatchContext context) {
         return "proxy_set_header";
     }
 

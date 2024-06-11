@@ -1,8 +1,5 @@
 package com.github.houbb.nginx4j.config.param;
 
-import com.github.houbb.nginx4j.config.NginxCommonConfigParam;
-import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
-
 import java.util.List;
 
 /**

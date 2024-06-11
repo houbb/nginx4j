@@ -1,14 +1,12 @@
 package com.github.houbb.nginx4j.config.load.component.impl;
 
 import com.github.houbb.heaven.util.util.CollectionUtil;
-import com.github.houbb.nginx4j.config.NginxCommonConfigParam;
+import com.github.houbb.nginx4j.config.NginxCommonConfigEntry;
 import com.github.houbb.nginx4j.config.NginxUserServerLocationConfig;
 import com.github.houbb.nginx4j.config.load.component.INginxUserServerLocationConfigLoad;
 import com.github.houbb.nginx4j.constant.NginxLocationPathTypeEnum;
-import com.github.odiszapc.nginxparser.NgxBlock;
-import com.github.odiszapc.nginxparser.NgxConfig;
-import com.github.odiszapc.nginxparser.NgxEntry;
-import com.github.odiszapc.nginxparser.NgxParam;
+import com.github.houbb.nginx4j.util.InnerConfigEntryUtil;
+import com.github.odiszapc.nginxparser.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,8 +17,14 @@ import java.util.List;
  */
 public class NginxUserServerLocationConfigLoadFile implements INginxUserServerLocationConfigLoad {
 
+    /**
+     * 全局配置
+     */
     private final NgxConfig conf;
 
+    /**
+     * 当前模块
+     */
     private final NgxBlock ngxBlock;
 
     public NginxUserServerLocationConfigLoadFile(NgxConfig conf, NgxBlock ngxBlockLocation) {
@@ -39,30 +43,20 @@ public class NginxUserServerLocationConfigLoadFile implements INginxUserServerLo
         NginxLocationPathTypeEnum typeEnum = NginxLocationPathTypeEnum.getTypeEnum(locationConfig);
         locationConfig.setTypeEnum(typeEnum);
 
-        // 参数
-        List<NginxCommonConfigParam> paramList = new ArrayList<>();
-        Collection<NgxEntry> ngxEntries = ngxBlock.getEntries();
-        if (CollectionUtil.isNotEmpty(ngxEntries)) {
-            for (NgxEntry ngxEntry : ngxEntries) {
-                // 暂时跳过一些注释之类的处理
-                if (!(ngxEntry instanceof NgxParam)) {
-                    continue;
+        //4. 基础的指令+if 模块
+        List<NginxCommonConfigEntry> configEntryList = new ArrayList<>();
+        Collection<NgxEntry> entryList = ngxBlock.getEntries();
+        if(CollectionUtil.isNotEmpty(entryList)) {
+            for(NgxEntry ngxEntry : entryList) {
+                if(ngxEntry instanceof NgxParam) {
+                    configEntryList.add(InnerConfigEntryUtil.buildConfigEntry((NgxParam) ngxEntry));
                 }
-
-                NgxParam ngxParam = (NgxParam) ngxEntry;
-                String name = ngxParam.getName();
-                List<String> values = ngxParam.getValues();
-                String value = ngxParam.getValue();
-
-                NginxCommonConfigParam nginxCommonConfigParam = new NginxCommonConfigParam();
-                nginxCommonConfigParam.setName(name);
-                nginxCommonConfigParam.setValue(value);
-                nginxCommonConfigParam.setValues(values);
-
-                paramList.add(nginxCommonConfigParam);
+                if(ngxEntry instanceof NgxIfBlock) {
+                    configEntryList.add(InnerConfigEntryUtil.buildConfigEntry((NgxIfBlock) ngxEntry));
+                }
             }
         }
-        locationConfig.setDirectives(paramList);
+        locationConfig.setConfigEntryList(configEntryList);
 
         return locationConfig;
     }

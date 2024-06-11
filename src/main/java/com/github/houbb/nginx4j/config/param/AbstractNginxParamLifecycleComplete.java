@@ -1,6 +1,6 @@
 package com.github.houbb.nginx4j.config.param;
 
-import com.github.houbb.nginx4j.config.NginxCommonConfigParam;
+import com.github.houbb.nginx4j.config.NginxCommonConfigEntry;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
 import io.netty.channel.ChannelHandlerContext;
 
@@ -11,34 +11,31 @@ import io.netty.channel.ChannelHandlerContext;
  */
 public abstract class AbstractNginxParamLifecycleComplete implements INginxParamLifecycleComplete {
 
-    public abstract void doBeforeComplete(NginxCommonConfigParam configParam, ChannelHandlerContext ctx, Object object, NginxRequestDispatchContext context);
+    public abstract void doBeforeComplete(NginxCommonConfigEntry configParam, ChannelHandlerContext ctx, Object object, NginxRequestDispatchContext context);
 
-    public abstract void doAfterComplete(NginxCommonConfigParam configParam, ChannelHandlerContext ctx, Object object, NginxRequestDispatchContext context);
+    public abstract void doAfterComplete(NginxCommonConfigEntry configParam, ChannelHandlerContext ctx, Object object, NginxRequestDispatchContext context);
 
     @Override
-    public void beforeComplete(NginxCommonConfigParam configParam, ChannelHandlerContext ctx, Object object, NginxRequestDispatchContext context) {
-        this.doBeforeComplete(configParam, ctx, object, context);
+    public void beforeComplete(LifecycleCompleteContext context) {
+        this.doBeforeComplete(context.getConfigParam(), context.getCtx(), context.getObject(), context.getContext());
     }
 
     @Override
-    public void afterComplete(NginxCommonConfigParam configParam, ChannelHandlerContext ctx, Object object, NginxRequestDispatchContext context) {
-        this.doAfterComplete(configParam, ctx, object, context);
+    public void afterComplete(LifecycleCompleteContext context) {
+        this.doAfterComplete(context.getConfigParam(), context.getCtx(), context.getObject(), context.getContext());
     }
 
     @Override
-    public boolean match(NginxCommonConfigParam configParam,
-                         ChannelHandlerContext ctx,
-                         Object object,
-                         NginxRequestDispatchContext context) {
-        return doMatch(configParam, ctx, object, context);
+    public boolean match(LifecycleCompleteContext context) {
+        return doMatch(context.getConfigParam(), context.getCtx(), context.getObject(), context.getContext());
     }
 
-    protected abstract String getKey(NginxCommonConfigParam configParam,
+    protected abstract String getKey(NginxCommonConfigEntry configParam,
                                      ChannelHandlerContext ctx,
                                      Object object,
                                      NginxRequestDispatchContext context);
 
-    public boolean doMatch(NginxCommonConfigParam configParam,
+    public boolean doMatch(NginxCommonConfigEntry configParam,
                            ChannelHandlerContext ctx,
                            Object object,
                            NginxRequestDispatchContext context) {

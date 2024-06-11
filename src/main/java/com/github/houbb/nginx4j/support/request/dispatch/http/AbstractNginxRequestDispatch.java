@@ -3,14 +3,14 @@ package com.github.houbb.nginx4j.support.request.dispatch.http;
 import com.github.houbb.heaven.util.util.CollectionUtil;
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
-import com.github.houbb.nginx4j.config.NginxCommonConfigParam;
+import com.github.houbb.nginx4j.config.NginxCommonConfigEntry;
+import com.github.houbb.nginx4j.config.NginxUserConfig;
 import com.github.houbb.nginx4j.config.NginxUserServerLocationConfig;
-import com.github.houbb.nginx4j.config.param.INginxParamLifecycleComplete;
-import com.github.houbb.nginx4j.config.param.INginxParamLifecycleDispatch;
-import com.github.houbb.nginx4j.config.param.INginxParamLifecycleWrite;
-import com.github.houbb.nginx4j.config.param.INginxParamManager;
+import com.github.houbb.nginx4j.config.param.*;
+import com.github.houbb.nginx4j.constant.NginxConfigTypeEnum;
 import com.github.houbb.nginx4j.constant.NginxConst;
 import com.github.houbb.nginx4j.exception.Nginx4jException;
+import com.github.houbb.nginx4j.support.condition.NginxIf;
 import com.github.houbb.nginx4j.support.placeholder.INginxPlaceholderManager;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatch;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
@@ -20,6 +20,7 @@ import io.netty.handler.codec.http.HttpResponse;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public abstract class AbstractNginxRequestDispatch implements NginxRequestDispatch {
 
@@ -48,28 +49,38 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
     }
 
     protected void afterDispatch(final NginxRequestDispatchContext context) {
-        // 参数管理类
-        final INginxParamManager paramManager = context.getNginxConfig().getNginxParamManager();
-
         //1. 当前的配置
         NginxUserServerLocationConfig locationConfig = context.getCurrentUserServerLocationConfig();
         if(locationConfig == null) {
             return;
         }
 
-        List<NginxCommonConfigParam> directives = locationConfig.getDirectives();
+        List<NginxCommonConfigEntry> directives = getAllDirectives(context);
         if(CollectionUtil.isEmpty(directives)) {
             return;
         }
 
         // 处理
-        for(NginxCommonConfigParam configParam : directives) {
-            List<INginxParamLifecycleDispatch> handleList = paramManager.getDispatchList();
-            if(CollectionUtil.isNotEmpty(handleList)) {
-                for(INginxParamLifecycleDispatch dispatch : handleList) {
-                    dispatch.afterDispatch(configParam, context);
+        for(NginxCommonConfigEntry configParam : directives) {
+            LifecycleDispatchContext baseContext = new LifecycleDispatchContext();
+            baseContext.setContext(context);
+            baseContext.setConfigParam(configParam);
+
+            processNginxCommonConfigEntry(configParam, context, baseContext, new Consumer<LifecycleBaseContext>() {
+                @Override
+                public void accept(LifecycleBaseContext baseContext) {
+                    final INginxParamManager paramManager = context.getNginxConfig().getNginxParamManager();
+                    List<INginxParamLifecycleDispatch> dispatchList = paramManager.getDispatchList();
+                    if(CollectionUtil.isNotEmpty(dispatchList)) {
+                        for(INginxParamLifecycleDispatch dispatch : dispatchList) {
+                            LifecycleDispatchContext dispatchContext = (LifecycleDispatchContext) baseContext;
+                            if(dispatch.match(dispatchContext)) {
+                                dispatch.afterDispatch(dispatchContext);
+                            }
+                        }
+                    }
                 }
-            }
+            });
         }
     }
 
@@ -79,9 +90,6 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
      * @param context 上下文
      */
     protected void beforeDispatch(final NginxRequestDispatchContext context) {
-        // 参数管理类
-        final INginxParamManager paramManager = context.getNginxConfig().getNginxParamManager();
-
         // v0.17.0 占位符管理类
         final INginxPlaceholderManager placeholderManager = context.getNginxConfig().getNginxPlaceholderManager();
         // 提前处理内置的各种参数
@@ -94,22 +102,86 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
             return;
         }
 
-        List<NginxCommonConfigParam> directives = locationConfig.getDirectives();
+
+        // 基础变量
+
+        List<NginxCommonConfigEntry> directives = getAllDirectives(context);
         if(CollectionUtil.isEmpty(directives)) {
             return;
         }
 
         // 处理
-        for(NginxCommonConfigParam configParam : directives) {
-            // 占位符处理
-            placeholderHandle(configParam, placeholderManager, context);
+        for(NginxCommonConfigEntry configParam : directives) {
+            LifecycleDispatchContext baseContext = new LifecycleDispatchContext();
+            baseContext.setContext(context);
+            baseContext.setConfigParam(configParam);
 
-            List<INginxParamLifecycleDispatch> handleList = paramManager.getDispatchList();
-            if(CollectionUtil.isNotEmpty(handleList)) {
-                for(INginxParamLifecycleDispatch dispatch : handleList) {
-                    if(dispatch.match(configParam, context)) {
-                        dispatch.beforeDispatch(configParam, context);
+            processNginxCommonConfigEntry(configParam, context, baseContext, new Consumer<LifecycleBaseContext>() {
+                @Override
+                public void accept(LifecycleBaseContext baseContext) {
+                    final INginxParamManager paramManager = context.getNginxConfig().getNginxParamManager();
+                    List<INginxParamLifecycleDispatch> dispatchList = paramManager.getDispatchList();
+                    if(CollectionUtil.isNotEmpty(dispatchList)) {
+                        for(INginxParamLifecycleDispatch dispatch : dispatchList) {
+                            LifecycleDispatchContext dispatchContext = (LifecycleDispatchContext) baseContext;
+                            if(dispatch.match(dispatchContext)) {
+                                dispatch.beforeDispatch(dispatchContext);
+                            }
+                        }
                     }
+                }
+            });
+        }
+    }
+
+    private List<NginxCommonConfigEntry> getAllDirectives(final NginxRequestDispatchContext context) {
+        List<NginxCommonConfigEntry> resultList = new ArrayList<>();
+
+        NginxUserConfig nginxUserConfig = context.getNginxConfig().getNginxUserConfig();
+
+        // 基础
+        if(CollectionUtil.isNotEmpty((nginxUserConfig.getConfigEntryList()))) {
+            resultList.addAll(nginxUserConfig.getConfigEntryList());
+        }
+
+        //server
+        if(CollectionUtil.isNotEmpty((context.getCurrentNginxUserServerConfig().getConfigEntryList()))) {
+            resultList.addAll(context.getCurrentNginxUserServerConfig().getConfigEntryList());
+        }
+
+
+        //location
+        NginxUserServerLocationConfig locationConfig = context.getCurrentUserServerLocationConfig();
+        List<NginxCommonConfigEntry> directives = locationConfig.getConfigEntryList();
+        if(CollectionUtil.isNotEmpty(directives)) {
+            resultList.addAll(directives);
+        }
+
+        return resultList;
+    }
+
+    private void processNginxCommonConfigEntry(final NginxCommonConfigEntry configParam,
+                                               final NginxRequestDispatchContext context,
+                                               final LifecycleBaseContext baseContext,
+                                               Consumer<LifecycleBaseContext> consumer) {
+        // 参数管理类
+        final INginxPlaceholderManager placeholderManager = context.getNginxConfig().getNginxPlaceholderManager();
+
+        // 占位符处理
+        placeholderHandle(configParam, placeholderManager, context);
+
+        final NginxConfigTypeEnum configTypeEnum = configParam.getType();
+        if(NginxConfigTypeEnum.PARAM.equals(configTypeEnum)) {
+            consumer.accept(baseContext);
+        } else if(NginxConfigTypeEnum.IF.equals(configTypeEnum)){
+            // 判断是否满足条件
+            final NginxIf nginxIf = context.getNginxConfig().getNginxIf();
+            if(nginxIf.match(configParam, context)) {
+                List<NginxCommonConfigEntry> configEntryList = configParam.getChildren();
+                for(NginxCommonConfigEntry configEntryChild : configEntryList) {
+                    // 递归
+                    baseContext.setConfigParam(configEntryChild);
+                    this.processNginxCommonConfigEntry(configEntryChild, context, baseContext, consumer);
                 }
             }
         }
@@ -125,7 +197,7 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
      * @param context 上下文
      * @since 0.17.0
      */
-    protected void placeholderHandle(NginxCommonConfigParam configParam,
+    protected void placeholderHandle(NginxCommonConfigEntry configParam,
                                      final INginxPlaceholderManager placeholderManager,
                                      final NginxRequestDispatchContext context) {
         String name = configParam.getName();
@@ -268,49 +340,74 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
             return;
         }
 
-        List<NginxCommonConfigParam> directives = locationConfig.getDirectives();
+        List<NginxCommonConfigEntry> directives = getAllDirectives(context);
         if(CollectionUtil.isEmpty(directives)) {
             return;
         }
 
         // 处理
-        for(NginxCommonConfigParam configParam : directives) {
-            List<INginxParamLifecycleWrite> handleList = paramManager.getWriteList();
-            if(CollectionUtil.isNotEmpty(handleList)) {
-                for(INginxParamLifecycleWrite write: handleList) {
-                    if(write.match(configParam, ctx, object, context)) {
-                        write.beforeWrite(configParam, ctx, object, context);
+        for(NginxCommonConfigEntry configParam : directives) {
+            LifecycleWriteContext baseContext = new LifecycleWriteContext();
+            baseContext.setContext(context);
+            baseContext.setConfigParam(configParam);
+            baseContext.setCtx(ctx);
+            baseContext.setObject(object);
+
+            processNginxCommonConfigEntry(configParam, context, baseContext, new Consumer<LifecycleBaseContext>() {
+                @Override
+                public void accept(LifecycleBaseContext baseContext) {
+                    final INginxParamManager paramManager = context.getNginxConfig().getNginxParamManager();
+                    List<INginxParamLifecycleWrite> writeList = paramManager.getWriteList();
+                    if(CollectionUtil.isNotEmpty(writeList)) {
+                        for(INginxParamLifecycleWrite write : writeList) {
+                            LifecycleWriteContext writeContext = (LifecycleWriteContext) baseContext;
+                            if(write.match(writeContext)) {
+                                write.beforeWrite(writeContext);
+                            }
+                        }
                     }
                 }
-            }
+            });
         }
     }
 
     protected void afterWrite(final ChannelHandlerContext ctx,
                                       final Object object,
                                       final NginxRequestDispatchContext context) {
-        // 参数管理类
-        final INginxParamManager paramManager = context.getNginxConfig().getNginxParamManager();
-
         //1. 当前的配置
         NginxUserServerLocationConfig locationConfig = context.getCurrentUserServerLocationConfig();
-        if(locationConfig == null) {
+        if (locationConfig == null) {
             return;
         }
 
-        List<NginxCommonConfigParam> directives = locationConfig.getDirectives();
-        if(CollectionUtil.isEmpty(directives)) {
+        List<NginxCommonConfigEntry> directives = getAllDirectives(context);
+        if (CollectionUtil.isEmpty(directives)) {
             return;
         }
 
         // 处理
-        for(NginxCommonConfigParam configParam : directives) {
-            List<INginxParamLifecycleWrite> handleList = paramManager.getWriteList();
-            if(CollectionUtil.isNotEmpty(handleList)) {
-                for(INginxParamLifecycleWrite write: handleList) {
-                    write.afterWrite(configParam, ctx, object, context);
+        for (NginxCommonConfigEntry configParam : directives) {
+            LifecycleWriteContext baseContext = new LifecycleWriteContext();
+            baseContext.setContext(context);
+            baseContext.setConfigParam(configParam);
+            baseContext.setCtx(ctx);
+            baseContext.setObject(object);
+
+            processNginxCommonConfigEntry(configParam, context, baseContext, new Consumer<LifecycleBaseContext>() {
+                @Override
+                public void accept(LifecycleBaseContext baseContext) {
+                    final INginxParamManager paramManager = context.getNginxConfig().getNginxParamManager();
+                    List<INginxParamLifecycleWrite> writeList = paramManager.getWriteList();
+                    if (CollectionUtil.isNotEmpty(writeList)) {
+                        for (INginxParamLifecycleWrite write : writeList) {
+                            LifecycleWriteContext writeContext = (LifecycleWriteContext) baseContext;
+                            if(write.match(writeContext)) {
+                                write.beforeWrite(writeContext);
+                            }
+                        }
+                    }
                 }
-            }
+            });
         }
     }
 
@@ -351,21 +448,34 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
             return;
         }
 
-        List<NginxCommonConfigParam> directives = locationConfig.getDirectives();
+        List<NginxCommonConfigEntry> directives = getAllDirectives(context);
         if(CollectionUtil.isEmpty(directives)) {
             return;
         }
 
         // 处理
-        for(NginxCommonConfigParam configParam : directives) {
-            List<INginxParamLifecycleComplete> handleList = paramManager.getCompleteList();
-            if(CollectionUtil.isNotEmpty(handleList)) {
-                for(INginxParamLifecycleComplete complete: handleList) {
-                    if(complete.match(configParam, ctx, object, context)) {
-                        complete.beforeComplete(configParam, ctx, object, context);
+        for (NginxCommonConfigEntry configParam : directives) {
+            LifecycleCompleteContext baseContext = new LifecycleCompleteContext();
+            baseContext.setContext(context);
+            baseContext.setConfigParam(configParam);
+            baseContext.setCtx(ctx);
+            baseContext.setObject(object);
+
+            processNginxCommonConfigEntry(configParam, context, baseContext, new Consumer<LifecycleBaseContext>() {
+                @Override
+                public void accept(LifecycleBaseContext baseContext) {
+                    final INginxParamManager paramManager = context.getNginxConfig().getNginxParamManager();
+                    List<INginxParamLifecycleComplete> completeList = paramManager.getCompleteList();
+                    if (CollectionUtil.isNotEmpty(completeList)) {
+                        for (INginxParamLifecycleComplete complete : completeList) {
+                            LifecycleCompleteContext completeContext = (LifecycleCompleteContext) baseContext;
+                            if(complete.match(completeContext)) {
+                                complete.beforeComplete(completeContext);
+                            }
+                        }
                     }
                 }
-            }
+            });
         }
     }
 
@@ -381,21 +491,35 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
             return;
         }
 
-        List<NginxCommonConfigParam> directives = locationConfig.getDirectives();
+        List<NginxCommonConfigEntry> directives = getAllDirectives(context);
         if(CollectionUtil.isEmpty(directives)) {
             return;
         }
 
         // 处理
-        for(NginxCommonConfigParam configParam : directives) {
-            List<INginxParamLifecycleComplete> handleList = paramManager.getCompleteList();
-            if(CollectionUtil.isNotEmpty(handleList)) {
-                for(INginxParamLifecycleComplete complete: handleList) {
-                    complete.afterComplete(configParam, ctx, object, context);
+        for (NginxCommonConfigEntry configParam : directives) {
+            LifecycleCompleteContext baseContext = new LifecycleCompleteContext();
+            baseContext.setContext(context);
+            baseContext.setConfigParam(configParam);
+            baseContext.setCtx(ctx);
+            baseContext.setObject(object);
+
+            processNginxCommonConfigEntry(configParam, context, baseContext, new Consumer<LifecycleBaseContext>() {
+                @Override
+                public void accept(LifecycleBaseContext baseContext) {
+                    final INginxParamManager paramManager = context.getNginxConfig().getNginxParamManager();
+                    List<INginxParamLifecycleComplete> completeList = paramManager.getCompleteList();
+                    if (CollectionUtil.isNotEmpty(completeList)) {
+                        for (INginxParamLifecycleComplete complete : completeList) {
+                            LifecycleCompleteContext completeContext = (LifecycleCompleteContext) baseContext;
+                            if(complete.match(completeContext)) {
+                                complete.beforeComplete(completeContext);
+                            }
+                        }
+                    }
                 }
-            }
+            });
         }
     }
-
 
 }

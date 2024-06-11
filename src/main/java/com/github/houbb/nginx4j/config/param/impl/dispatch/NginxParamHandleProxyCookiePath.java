@@ -3,20 +3,13 @@ package com.github.houbb.nginx4j.config.param.impl.dispatch;
 import com.github.houbb.heaven.util.util.CollectionUtil;
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
-import com.github.houbb.nginx4j.config.NginxCommonConfigParam;
+import com.github.houbb.nginx4j.config.NginxCommonConfigEntry;
 import com.github.houbb.nginx4j.config.param.AbstractNginxParamLifecycleDispatch;
 import com.github.houbb.nginx4j.exception.Nginx4jException;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
-import io.netty.handler.codec.http.cookie.Cookie;
-import io.netty.handler.codec.http.cookie.DefaultCookie;
-import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
-import io.netty.handler.codec.http.cookie.ServerCookieEncoder;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * 参数处理类 响应头处理
@@ -30,7 +23,7 @@ public class NginxParamHandleProxyCookiePath extends AbstractNginxParamLifecycle
 
 
     @Override
-    public void doBeforeDispatch(NginxCommonConfigParam configParam, NginxRequestDispatchContext context) {
+    public void doBeforeDispatch(NginxCommonConfigEntry configParam, NginxRequestDispatchContext context) {
 
         List<String> values = configParam.getValues();
         if(CollectionUtil.isEmpty(values) || values.size() < 2) {
@@ -54,12 +47,12 @@ public class NginxParamHandleProxyCookiePath extends AbstractNginxParamLifecycle
     }
 
     @Override
-    public void doAfterDispatch(NginxCommonConfigParam configParam, NginxRequestDispatchContext context) {
+    public void doAfterDispatch(NginxCommonConfigEntry configParam, NginxRequestDispatchContext context) {
 
     }
 
     @Override
-    protected String getKey(NginxCommonConfigParam configParam, NginxRequestDispatchContext context) {
+    protected String getKey(NginxCommonConfigEntry configParam, NginxRequestDispatchContext context) {
         return "proxy_cookie_path";
     }
 }

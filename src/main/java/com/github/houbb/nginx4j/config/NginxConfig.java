@@ -2,11 +2,17 @@ package com.github.houbb.nginx4j.config;
 
 import com.github.houbb.nginx4j.config.location.INginxLocationMatch;
 import com.github.houbb.nginx4j.config.param.INginxParamManager;
+import com.github.houbb.nginx4j.support.condition.NginxIf;
 import com.github.houbb.nginx4j.support.index.NginxIndexFile;
 import com.github.houbb.nginx4j.support.placeholder.INginxPlaceholderManager;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatch;
 
 public class NginxConfig {
+
+    /**
+     * if 策略
+     */
+    private NginxIf nginxIf;
 
     /**
      * 前缀请求
@@ -40,6 +46,14 @@ public class NginxConfig {
      * @since 0.17.0
      */
     private INginxPlaceholderManager nginxPlaceholderManager;
+
+    public NginxIf getNginxIf() {
+        return nginxIf;
+    }
+
+    public void setNginxIf(NginxIf nginxIf) {
+        this.nginxIf = nginxIf;
+    }
 
     public INginxPlaceholderManager getNginxPlaceholderManager() {
         return nginxPlaceholderManager;

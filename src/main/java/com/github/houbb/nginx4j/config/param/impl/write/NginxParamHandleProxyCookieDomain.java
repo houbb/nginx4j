@@ -3,7 +3,7 @@ package com.github.houbb.nginx4j.config.param.impl.write;
 import com.github.houbb.heaven.util.util.CollectionUtil;
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
-import com.github.houbb.nginx4j.config.NginxCommonConfigParam;
+import com.github.houbb.nginx4j.config.NginxCommonConfigEntry;
 import com.github.houbb.nginx4j.config.param.AbstractNginxParamLifecycleWrite;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
 import io.netty.channel.ChannelHandlerContext;
@@ -30,7 +30,7 @@ public class NginxParamHandleProxyCookieDomain extends AbstractNginxParamLifecyc
     private static final Log logger = LogFactory.getLog(NginxParamHandleProxyCookieDomain.class);
 
     @Override
-    public void doBeforeWrite(NginxCommonConfigParam configParam, ChannelHandlerContext ctx, Object object, NginxRequestDispatchContext context) {
+    public void doBeforeWrite(NginxCommonConfigEntry configParam, ChannelHandlerContext ctx, Object object, NginxRequestDispatchContext context) {
         if(!(object instanceof HttpResponse)) {
             return;
         }
@@ -75,12 +75,12 @@ public class NginxParamHandleProxyCookieDomain extends AbstractNginxParamLifecyc
     }
 
     @Override
-    public void doAfterWrite(NginxCommonConfigParam configParam, ChannelHandlerContext ctx, Object object, NginxRequestDispatchContext context) {
+    public void doAfterWrite(NginxCommonConfigEntry configParam, ChannelHandlerContext ctx, Object object, NginxRequestDispatchContext context) {
 
     }
 
     @Override
-    protected String getKey(NginxCommonConfigParam configParam, ChannelHandlerContext ctx, Object object, NginxRequestDispatchContext context) {
+    protected String getKey(NginxCommonConfigEntry configParam, ChannelHandlerContext ctx, Object object, NginxRequestDispatchContext context) {
         return "proxy_cookie_domain";
     }
 

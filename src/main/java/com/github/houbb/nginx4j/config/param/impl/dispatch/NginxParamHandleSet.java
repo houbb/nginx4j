@@ -2,7 +2,7 @@ package com.github.houbb.nginx4j.config.param.impl.dispatch;
 
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
-import com.github.houbb.nginx4j.config.NginxCommonConfigParam;
+import com.github.houbb.nginx4j.config.NginxCommonConfigEntry;
 import com.github.houbb.nginx4j.config.param.AbstractNginxParamLifecycleDispatch;
 import com.github.houbb.nginx4j.constant.NginxConst;
 import com.github.houbb.nginx4j.exception.Nginx4jException;
@@ -30,7 +30,7 @@ public class NginxParamHandleSet extends AbstractNginxParamLifecycleDispatch {
      * @param context     上下文
      */
     @Override
-    public void doBeforeDispatch(NginxCommonConfigParam configParam, NginxRequestDispatchContext context) {
+    public void doBeforeDispatch(NginxCommonConfigEntry configParam, NginxRequestDispatchContext context) {
         Map<String, Object> placeholderMap = context.getPlaceholderMap();
 
         // 处理
@@ -47,11 +47,11 @@ public class NginxParamHandleSet extends AbstractNginxParamLifecycleDispatch {
     }
 
     @Override
-    public void doAfterDispatch(NginxCommonConfigParam configParam, NginxRequestDispatchContext context) {
+    public void doAfterDispatch(NginxCommonConfigEntry configParam, NginxRequestDispatchContext context) {
     }
 
     @Override
-    protected String getKey(NginxCommonConfigParam configParam, NginxRequestDispatchContext context) {
+    protected String getKey(NginxCommonConfigEntry configParam, NginxRequestDispatchContext context) {
         return "set";
     }
 

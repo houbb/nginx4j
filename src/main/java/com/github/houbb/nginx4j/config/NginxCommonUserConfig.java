@@ -7,61 +7,27 @@ import java.util.List;
  *
  * @since 0.12.0
  */
-public class NginxCommonUserConfig {
-
-    private List<String> values;
-
-    private String name;
-
-    private String value;
+public class NginxCommonUserConfig extends NginxCommonConfigEntry {
 
     /**
-     * 指令
+     * 配置列表
+     * @since 0.21.0
      */
-    private List<NginxCommonConfigParam> directives;
+    private List<NginxCommonConfigEntry> configEntryList;
 
-    /**
-     * 模块
-     */
-    private List<NginxCommonConfigModule> modules;
-
-    public List<NginxCommonConfigParam> getDirectives() {
-        return directives;
+    public List<NginxCommonConfigEntry> getConfigEntryList() {
+        return configEntryList;
     }
 
-    public void setDirectives(List<NginxCommonConfigParam> directives) {
-        this.directives = directives;
+    public void setConfigEntryList(List<NginxCommonConfigEntry> configEntryList) {
+        this.configEntryList = configEntryList;
     }
 
-    public List<NginxCommonConfigModule> getModules() {
-        return modules;
+    @Override
+    public String toString() {
+        return "NginxCommonUserConfig{" +
+                "configEntryList=" + configEntryList +
+                '}';
     }
 
-    public void setModules(List<NginxCommonConfigModule> modules) {
-        this.modules = modules;
-    }
-
-    public List<String> getValues() {
-        return values;
-    }
-
-    public void setValues(List<String> values) {
-        this.values = values;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
 }

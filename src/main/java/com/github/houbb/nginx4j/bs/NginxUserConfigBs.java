@@ -2,10 +2,7 @@ package com.github.houbb.nginx4j.bs;
 
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
-import com.github.houbb.nginx4j.config.NginxUserConfig;
-import com.github.houbb.nginx4j.config.NginxUserEventsConfig;
-import com.github.houbb.nginx4j.config.NginxUserMainConfig;
-import com.github.houbb.nginx4j.config.NginxUserServerConfig;
+import com.github.houbb.nginx4j.config.*;
 import com.github.houbb.nginx4j.constant.NginxUserConfigDefaultConst;
 import com.github.houbb.nginx4j.support.handler.NginxNettyServerHandler;
 
@@ -23,6 +20,12 @@ public class NginxUserConfigBs {
      * @since 0.14.0
      */
     private NginxUserServerConfig defaultUserServerConfig = NginxUserServerConfigBs.newInstance().build();
+
+    /**
+     * 配置列表
+     * @since 0.21.0
+     */
+    private List<NginxCommonConfigEntry> configEntryList = new ArrayList<>();
 
     public static NginxUserConfigBs newInstance() {
         return new NginxUserConfigBs();
@@ -70,6 +73,11 @@ public class NginxUserConfigBs {
         return this;
     }
 
+    public NginxUserConfigBs configEntryList(List<NginxCommonConfigEntry> configEntryList) {
+        this.configEntryList = configEntryList;
+        return this;
+    }
+
     public NginxUserConfig build() {
         NginxUserConfig config = new NginxUserConfig();
         config.setServerPortSet(serverPortSet);
@@ -77,6 +85,7 @@ public class NginxUserConfigBs {
         config.setDefaultServerConfig(defaultUserServerConfig);
         config.setMainConfig(mainConfig);
         config.setEventsConfig(eventsConfig);
+        config.setConfigEntryList(configEntryList);
         return config;
     }
 

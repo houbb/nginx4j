@@ -13,7 +13,7 @@ public class NginxCommonConfigModule {
     /**
      * 指令列表
      */
-    private List<NginxCommonConfigParam> directives;
+    private List<NginxCommonConfigEntry> directives;
 
     public String getName() {
         return name;
@@ -39,11 +39,11 @@ public class NginxCommonConfigModule {
         this.values = values;
     }
 
-    public List<NginxCommonConfigParam> getDirectives() {
+    public List<NginxCommonConfigEntry> getDirectives() {
         return directives;
     }
 
-    public void setDirectives(List<NginxCommonConfigParam> directives) {
+    public void setDirectives(List<NginxCommonConfigEntry> directives) {
         this.directives = directives;
     }
 }

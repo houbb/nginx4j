@@ -2,21 +2,20 @@ package com.github.houbb.nginx4j.config.load;
 
 import com.github.houbb.heaven.util.util.CollectionUtil;
 import com.github.houbb.nginx4j.bs.NginxUserConfigBs;
-import com.github.houbb.nginx4j.config.NginxUserConfig;
-import com.github.houbb.nginx4j.config.NginxUserEventsConfig;
-import com.github.houbb.nginx4j.config.NginxUserMainConfig;
-import com.github.houbb.nginx4j.config.NginxUserServerConfig;
+import com.github.houbb.nginx4j.config.*;
 import com.github.houbb.nginx4j.config.load.component.INginxUserEventsConfigLoad;
 import com.github.houbb.nginx4j.config.load.component.INginxUserMainConfigLoad;
 import com.github.houbb.nginx4j.config.load.component.INginxUserServerConfigLoad;
 import com.github.houbb.nginx4j.config.load.component.impl.NginxUserEventsConfigLoadFile;
 import com.github.houbb.nginx4j.config.load.component.impl.NginxUserMainConfigLoadFile;
 import com.github.houbb.nginx4j.config.load.component.impl.NginxUserServerConfigLoadFile;
-import com.github.odiszapc.nginxparser.NgxBlock;
-import com.github.odiszapc.nginxparser.NgxConfig;
-import com.github.odiszapc.nginxparser.NgxEntry;
+import com.github.houbb.nginx4j.constant.NginxConfigTypeEnum;
+import com.github.houbb.nginx4j.util.InnerConfigEntryUtil;
+import com.github.odiszapc.nginxparser.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -48,7 +47,7 @@ public  class NginxUserConfigLoaderConfigComponentFile extends AbstractNginxUser
 
             //2. events
             INginxUserEventsConfigLoad eventsConfigLoad = new NginxUserEventsConfigLoadFile(conf);
-            NginxUserEventsConfig eventsConfig = new NginxUserEventsConfig();
+            NginxUserEventsConfig eventsConfig = eventsConfigLoad.load();
             configBs.eventsConfig(eventsConfig);
 
             //3. server 信息
@@ -65,11 +64,31 @@ public  class NginxUserConfigLoaderConfigComponentFile extends AbstractNginxUser
                 }
             }
 
+            // TODO... http 模块的基本属性
+
+
+            //4. 基础的指令+if 模块
+            List<NginxCommonConfigEntry> configEntryList = new ArrayList<>();
+            Collection<NgxEntry> entryList = conf.getEntries();
+            if(CollectionUtil.isNotEmpty(entryList)) {
+                for(NgxEntry ngxEntry : entryList) {
+                    if(ngxEntry instanceof NgxParam) {
+                        configEntryList.add(InnerConfigEntryUtil.buildConfigEntry((NgxParam) ngxEntry));
+                    }
+                    if(ngxEntry instanceof NgxIfBlock) {
+                        configEntryList.add(InnerConfigEntryUtil.buildConfigEntry((NgxIfBlock) ngxEntry));
+                    }
+                }
+            }
+            configBs.configEntryList(configEntryList);
+
             // 返回
             return configBs.build();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
+
 
 }

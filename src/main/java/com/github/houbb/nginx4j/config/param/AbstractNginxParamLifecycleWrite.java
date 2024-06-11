@@ -1,6 +1,6 @@
 package com.github.houbb.nginx4j.config.param;
 
-import com.github.houbb.nginx4j.config.NginxCommonConfigParam;
+import com.github.houbb.nginx4j.config.NginxCommonConfigEntry;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
 import io.netty.channel.ChannelHandlerContext;
 
@@ -11,34 +11,31 @@ import io.netty.channel.ChannelHandlerContext;
  */
 public abstract class AbstractNginxParamLifecycleWrite implements INginxParamLifecycleWrite {
 
-    public abstract void doBeforeWrite(NginxCommonConfigParam configParam, ChannelHandlerContext ctx, Object object, NginxRequestDispatchContext context);
+    public abstract void doBeforeWrite(NginxCommonConfigEntry configParam, ChannelHandlerContext ctx, Object object, NginxRequestDispatchContext context);
 
-    public abstract void doAfterWrite(NginxCommonConfigParam configParam, ChannelHandlerContext ctx, Object object, NginxRequestDispatchContext context);
+    public abstract void doAfterWrite(NginxCommonConfigEntry configParam, ChannelHandlerContext ctx, Object object, NginxRequestDispatchContext context);
 
     @Override
-    public void beforeWrite(NginxCommonConfigParam configParam, ChannelHandlerContext ctx, Object object, NginxRequestDispatchContext context) {
-        this.doBeforeWrite(configParam, ctx, object, context);
+    public void beforeWrite(LifecycleWriteContext context) {
+        this.doBeforeWrite(context.getConfigParam(), context.getCtx(), context.getObject(), context.getContext());
     }
 
     @Override
-    public void afterWrite(NginxCommonConfigParam configParam, ChannelHandlerContext ctx, Object object, NginxRequestDispatchContext context) {
-        this.doAfterWrite(configParam, ctx, object, context);
+    public void afterWrite(LifecycleWriteContext context) {
+        this.doAfterWrite(context.getConfigParam(), context.getCtx(), context.getObject(), context.getContext());
     }
 
     @Override
-    public boolean match(NginxCommonConfigParam configParam,
-                         ChannelHandlerContext ctx,
-                         Object object,
-                         NginxRequestDispatchContext context) {
-        return doMatch(configParam, ctx, object, context);
+    public boolean match(LifecycleWriteContext context) {
+        return doMatch(context.getConfigParam(), context.getCtx(), context.getObject(), context.getContext());
     }
 
-    protected abstract String getKey(NginxCommonConfigParam configParam,
+    protected abstract String getKey(NginxCommonConfigEntry configParam,
                                      ChannelHandlerContext ctx,
                                      Object object,
                                      NginxRequestDispatchContext context);
 
-    public boolean doMatch(NginxCommonConfigParam configParam,
+    public boolean doMatch(NginxCommonConfigEntry configParam,
                            ChannelHandlerContext ctx,
                            Object object,
                            NginxRequestDispatchContext context) {

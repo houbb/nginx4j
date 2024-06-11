@@ -1,5 +1,6 @@
 package com.github.houbb.nginx4j.bs;
 
+import com.github.houbb.nginx4j.config.NginxCommonConfigEntry;
 import com.github.houbb.nginx4j.config.NginxUserServerConfig;
 import com.github.houbb.nginx4j.config.NginxUserServerLocationConfig;
 import com.github.houbb.nginx4j.constant.NginxUserServerConfigDefaultConst;
@@ -11,6 +12,13 @@ import java.util.List;
  * @since 0.12.0
  */
 public class NginxUserServerConfigBs {
+
+    /**
+     * 配置列表
+     *
+     * @since 0.21.0
+     */
+    private List<NginxCommonConfigEntry> configEntryList = new ArrayList<>();
 
     /**
      * 文件编码
@@ -77,6 +85,11 @@ public class NginxUserServerConfigBs {
 
     public static NginxUserServerConfigBs newInstance() {
         return new NginxUserServerConfigBs();
+    }
+
+    public NginxUserServerConfigBs configEntryList(List<NginxCommonConfigEntry> configEntryList) {
+        this.configEntryList = configEntryList;
+        return this;
     }
 
     public NginxUserServerConfigBs locationConfigList(List<NginxUserServerLocationConfig> locationConfigList) {
@@ -147,6 +160,7 @@ public class NginxUserServerConfigBs {
         config.setGzipTypes(gzipTypes);
         config.setLocations(locationConfigList);
         config.setDefaultLocation(defaultLocationConfig);
+        config.setConfigEntryList(configEntryList);
 
         return config;
     }

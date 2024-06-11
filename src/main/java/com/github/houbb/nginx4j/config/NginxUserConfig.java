@@ -12,6 +12,12 @@ import java.util.Set;
 public class NginxUserConfig extends NginxCommonUserConfig {
 
     /**
+     * 配置列表
+     * @since 0.21.0
+     */
+    private List<NginxCommonConfigEntry> configEntryList;
+
+    /**
      * 主配置
      * @since 0.18.0
      */
@@ -51,6 +57,16 @@ public class NginxUserConfig extends NginxCommonUserConfig {
      * @since 0.14.0
      */
     private NginxUserServerConfig defaultServerConfig;
+
+    @Override
+    public List<NginxCommonConfigEntry> getConfigEntryList() {
+        return configEntryList;
+    }
+
+    @Override
+    public void setConfigEntryList(List<NginxCommonConfigEntry> configEntryList) {
+        this.configEntryList = configEntryList;
+    }
 
     public NginxUserMainConfig getMainConfig() {
         return mainConfig;

@@ -9,6 +9,8 @@ import com.github.houbb.nginx4j.config.param.INginxParamManager;
 import com.github.houbb.nginx4j.config.param.NginxParamManagerBase;
 import com.github.houbb.nginx4j.config.param.NginxParamManagerDefault;
 import com.github.houbb.nginx4j.exception.Nginx4jException;
+import com.github.houbb.nginx4j.support.condition.NginxIf;
+import com.github.houbb.nginx4j.support.condition.NginxIfDefault;
 import com.github.houbb.nginx4j.support.index.NginxIndexFile;
 import com.github.houbb.nginx4j.support.index.NginxIndexFileDefault;
 import com.github.houbb.nginx4j.support.placeholder.INginxPlaceholderManager;
@@ -18,6 +20,11 @@ import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchMan
 import com.github.houbb.nginx4j.support.server.NginxServerNetty;
 
 public class Nginx4jBs {
+    /**
+     * if 策略
+     * @since 0.21.0
+     */
+    private NginxIf nginxIf = new NginxIfDefault();
 
     /**
      * 首页内容
@@ -59,6 +66,11 @@ public class Nginx4jBs {
     private INginxPlaceholderManager nginxPlaceholderManager = new NginxPlaceholderManagerDefault();
 
     private NginxConfig nginxConfig;
+
+    public Nginx4jBs nginxIf(NginxIf nginxIf) {
+        this.nginxIf = nginxIf;
+        return this;
+    }
 
     public Nginx4jBs nginxPlaceholderManager(INginxPlaceholderManager nginxPlaceholderManager) {
         ArgUtil.notNull(nginxPlaceholderManager, "nginxPlaceholderManager");
@@ -118,6 +130,7 @@ public class Nginx4jBs {
         nginxConfig.setNginxLocationMatch(nginxLocationMatch);
         nginxConfig.setNginxParamManager(nginxParamManager);
         nginxConfig.setNginxPlaceholderManager(nginxPlaceholderManager);
+        nginxConfig.setNginxIf(nginxIf);
 
         return this;
     }
