@@ -50,6 +50,12 @@ public class NginxUserConfigBs {
 
     private final Set<Integer> serverPortSet = new HashSet<>();
 
+    /**
+     * HTTP 配置
+     * @since 0.21.0
+     */
+    private NginxUserHttpConfig httpConfig = new NginxUserHttpConfig();
+
     public NginxUserConfigBs mainConfig(NginxUserMainConfig mainConfig) {
         this.mainConfig = mainConfig;
         return this;
@@ -78,6 +84,11 @@ public class NginxUserConfigBs {
         return this;
     }
 
+    public NginxUserConfigBs httpConfig(NginxUserHttpConfig httpConfig) {
+        this.httpConfig = httpConfig;
+        return this;
+    }
+
     public NginxUserConfig build() {
         NginxUserConfig config = new NginxUserConfig();
         config.setServerPortSet(serverPortSet);
@@ -86,6 +97,7 @@ public class NginxUserConfigBs {
         config.setMainConfig(mainConfig);
         config.setEventsConfig(eventsConfig);
         config.setConfigEntryList(configEntryList);
+        config.setHttpConfig(httpConfig);
         return config;
     }
 

@@ -1,5 +1,6 @@
 package com.github.houbb.nginx4j.util;
 
+import com.github.houbb.heaven.annotation.CommonEager;
 import com.github.houbb.heaven.util.io.ResourceUtil;
 import com.github.houbb.nginx4j.support.index.NginxIndexFileDefault;
 
@@ -8,6 +9,7 @@ import com.github.houbb.nginx4j.support.index.NginxIndexFileDefault;
  *
  * @since 0.17.0
  */
+@CommonEager
 public class InnerFileUtil {
 
     public static String getRootPath() {

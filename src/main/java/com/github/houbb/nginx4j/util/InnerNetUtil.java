@@ -1,9 +1,11 @@
 package com.github.houbb.nginx4j.util;
 
+import com.github.houbb.heaven.annotation.CommonEager;
 import com.github.houbb.heaven.util.net.NetUtil;
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
 
+@CommonEager
 public class InnerNetUtil {
 
     private static final Log log = LogFactory.getLog(InnerNetUtil.class);

@@ -4,9 +4,11 @@ import com.github.houbb.heaven.util.util.CollectionUtil;
 import com.github.houbb.nginx4j.bs.NginxUserConfigBs;
 import com.github.houbb.nginx4j.config.*;
 import com.github.houbb.nginx4j.config.load.component.INginxUserEventsConfigLoad;
+import com.github.houbb.nginx4j.config.load.component.INginxUserHttpConfigLoad;
 import com.github.houbb.nginx4j.config.load.component.INginxUserMainConfigLoad;
 import com.github.houbb.nginx4j.config.load.component.INginxUserServerConfigLoad;
 import com.github.houbb.nginx4j.config.load.component.impl.NginxUserEventsConfigLoadFile;
+import com.github.houbb.nginx4j.config.load.component.impl.NginxUserHttpConfigLoadFile;
 import com.github.houbb.nginx4j.config.load.component.impl.NginxUserMainConfigLoadFile;
 import com.github.houbb.nginx4j.config.load.component.impl.NginxUserServerConfigLoadFile;
 import com.github.houbb.nginx4j.constant.NginxConfigTypeEnum;
@@ -50,6 +52,12 @@ public  class NginxUserConfigLoaderConfigComponentFile extends AbstractNginxUser
             NginxUserEventsConfig eventsConfig = eventsConfigLoad.load();
             configBs.eventsConfig(eventsConfig);
 
+            //3. http
+            NgxBlock httpBlock = (NgxBlock) conf.find(NgxConfig.BLOCK, "http");
+            INginxUserHttpConfigLoad httpConfigLoad = new NginxUserHttpConfigLoadFile(conf, httpBlock);
+            NginxUserHttpConfig httpConfig = httpConfigLoad.load();
+            configBs.httpConfig(httpConfig);
+
             //3. server 信息
             // 首先获取 block
             List<NgxEntry> servers = conf.findAll(NgxConfig.BLOCK, "http", "server"); // 示例3
@@ -63,9 +71,6 @@ public  class NginxUserConfigLoaderConfigComponentFile extends AbstractNginxUser
                     configBs.addServerConfig(serverConfig);
                 }
             }
-
-            // TODO... http 模块的基本属性
-
 
             //4. 基础的指令+if 模块
             List<NginxCommonConfigEntry> configEntryList = new ArrayList<>();

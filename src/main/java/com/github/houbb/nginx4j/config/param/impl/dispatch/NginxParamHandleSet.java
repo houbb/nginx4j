@@ -6,6 +6,7 @@ import com.github.houbb.nginx4j.config.NginxCommonConfigEntry;
 import com.github.houbb.nginx4j.config.param.AbstractNginxParamLifecycleDispatch;
 import com.github.houbb.nginx4j.constant.NginxConst;
 import com.github.houbb.nginx4j.exception.Nginx4jException;
+import com.github.houbb.nginx4j.support.placeholder.INginxPlaceholderManager;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
 
 import java.util.List;
@@ -32,11 +33,12 @@ public class NginxParamHandleSet extends AbstractNginxParamLifecycleDispatch {
     @Override
     public void doBeforeDispatch(NginxCommonConfigEntry configParam, NginxRequestDispatchContext context) {
         Map<String, Object> placeholderMap = context.getPlaceholderMap();
+        final INginxPlaceholderManager nginxPlaceholderManager = context.getNginxConfig().getNginxPlaceholderManager();
 
         // 处理
         List<String> values = configParam.getValues();
         String headerName = values.get(0);
-        String headerValue = values.get(1);
+        String headerValue = getPlaceholderStr(values.get(1), nginxPlaceholderManager, context);
 
         // 变量名必须以 $ 开始
         if(!headerName.startsWith(NginxConst.PLACEHOLDER_PREFIX)) {
@@ -44,6 +46,34 @@ public class NginxParamHandleSet extends AbstractNginxParamLifecycleDispatch {
         }
 
         placeholderMap.put(headerName, headerValue);
+    }
+
+    /**
+     * 获取占位符对应的值
+     * @param value 原始值
+     * @param placeholderManager 管理类
+     * @param context 上下文
+     * @return 结果
+     */
+    protected String getPlaceholderStr(String value,
+                                       final INginxPlaceholderManager placeholderManager,
+                                       final NginxRequestDispatchContext context) {
+        // value
+        if(value.startsWith(NginxConst.PLACEHOLDER_PREFIX)) {
+            Object actualValue = placeholderManager.getValue(context, value);
+            if(actualValue == null) {
+                logger.error("占位符未初始化 value={}", value);
+                throw new Nginx4jException("占位符未初始化" + value);
+            }
+
+            // 设置值
+            String actualValueStr = actualValue.toString();
+            logger.debug("占位符替换 value={}, actualValueStr={}", value, actualValueStr);
+            return actualValueStr;
+        }
+
+        // 原始值
+        return value;
     }
 
     @Override

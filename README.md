@@ -94,7 +94,7 @@ nginx4j 是基于 netty 实现的 nginx 的java 版本。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>nginx4j</artifactId>
-    <version>0.20.0</version>
+    <version>0.21.0</version>
 </dependency>
 ```
 
@@ -273,6 +273,7 @@ NginxUserConfig nginxUserConfig = NginxUserConfigLoaders.configFile("D:\\github\
 - [x] $ 占位符的实现
 - [x] 常见 cookie 的处理
 - [ ] if 指令的支持
+- [ ] map 变量修改指令
 - [ ] rewrite 指令，重写 URL
 - [ ] try_files 文件处理指令
 - [ ] return 返回指令

@@ -5,8 +5,10 @@ import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
 import com.github.houbb.nginx4j.config.NginxCommonConfigEntry;
 import com.github.houbb.nginx4j.config.NginxUserConfig;
+import com.github.houbb.nginx4j.config.NginxUserHttpConfig;
 import com.github.houbb.nginx4j.config.NginxUserServerLocationConfig;
 import com.github.houbb.nginx4j.config.param.*;
+import com.github.houbb.nginx4j.config.param.impl.dispatch.NginxParamHandleSet;
 import com.github.houbb.nginx4j.constant.NginxConfigTypeEnum;
 import com.github.houbb.nginx4j.constant.NginxConst;
 import com.github.houbb.nginx4j.exception.Nginx4jException;
@@ -130,7 +132,7 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
                         }
                     }
                 }
-            });
+            }, true);
         }
     }
 
@@ -142,6 +144,13 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
         // 基础
         if(CollectionUtil.isNotEmpty((nginxUserConfig.getConfigEntryList()))) {
             resultList.addAll(nginxUserConfig.getConfigEntryList());
+        }
+
+        // http
+        NginxUserHttpConfig nginxUserHttpConfig = nginxUserConfig.getHttpConfig();
+        List<NginxCommonConfigEntry> httpConfigEntryList = nginxUserHttpConfig.getConfigEntryList();
+        if(CollectionUtil.isNotEmpty(httpConfigEntryList)) {
+            resultList.addAll(httpConfigEntryList);
         }
 
         //server
@@ -164,6 +173,14 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
                                                final NginxRequestDispatchContext context,
                                                final LifecycleBaseContext baseContext,
                                                Consumer<LifecycleBaseContext> consumer) {
+        processNginxCommonConfigEntry(configParam, context, baseContext, consumer, false);
+    }
+
+    private void processNginxCommonConfigEntry(final NginxCommonConfigEntry configParam,
+                                               final NginxRequestDispatchContext context,
+                                               final LifecycleBaseContext baseContext,
+                                               Consumer<LifecycleBaseContext> consumer,
+                                               boolean executeIf) {
         // 参数管理类
         final INginxPlaceholderManager placeholderManager = context.getNginxConfig().getNginxPlaceholderManager();
 
@@ -174,17 +191,24 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
         if(NginxConfigTypeEnum.PARAM.equals(configTypeEnum)) {
             consumer.accept(baseContext);
         } else if(NginxConfigTypeEnum.IF.equals(configTypeEnum)){
-            // 判断是否满足条件
-            final NginxIf nginxIf = context.getNginxConfig().getNginxIf();
-            if(nginxIf.match(configParam, context)) {
-                List<NginxCommonConfigEntry> configEntryList = configParam.getChildren();
-                for(NginxCommonConfigEntry configEntryChild : configEntryList) {
-                    // 递归
-                    baseContext.setConfigParam(configEntryChild);
-                    this.processNginxCommonConfigEntry(configEntryChild, context, baseContext, consumer);
+            if(executeIf) {
+                // 判断是否满足条件
+                final NginxIf nginxIf = context.getNginxConfig().getNginxIf();
+                if(nginxIf.match(configParam, context)) {
+                    List<NginxCommonConfigEntry> configEntryList = configParam.getChildren();
+                    for(NginxCommonConfigEntry configEntryChild : configEntryList) {
+                        // 递归
+                        baseContext.setConfigParam(configEntryChild);
+                        this.processNginxCommonConfigEntry(configEntryChild, context, baseContext, consumer, executeIf);
+                    }
                 }
             }
         }
+    }
+
+
+    protected void processForSet(NginxCommonConfigEntry configParam) {
+
     }
 
     /**
@@ -201,13 +225,18 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
                                      final INginxPlaceholderManager placeholderManager,
                                      final NginxRequestDispatchContext context) {
         String name = configParam.getName();
-        if(name.equals("set")) {
-            logger.warn("暂时不处理 set 指令对应的操作符替换，后续可考虑改进。");
+        if("set".equals(name)) {
+            NginxParamHandleSet handleSet = new NginxParamHandleSet();
+            handleSet.doBeforeDispatch(configParam, context);
+            return;
+        }
+
+        // 跳过 if
+        if("if".equals(name)) {
             return;
         }
 
         // name 暂时不添加 $ 处理
-
         // value
         String value = configParam.getValue();
         String actualValue = getPlaceholderStr(value, placeholderManager, context);
