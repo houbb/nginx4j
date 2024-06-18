@@ -3,14 +3,8 @@ package com.github.houbb.nginx4j.config.load;
 import com.github.houbb.heaven.util.util.CollectionUtil;
 import com.github.houbb.nginx4j.bs.NginxUserConfigBs;
 import com.github.houbb.nginx4j.config.*;
-import com.github.houbb.nginx4j.config.load.component.INginxUserEventsConfigLoad;
-import com.github.houbb.nginx4j.config.load.component.INginxUserHttpConfigLoad;
-import com.github.houbb.nginx4j.config.load.component.INginxUserMainConfigLoad;
-import com.github.houbb.nginx4j.config.load.component.INginxUserServerConfigLoad;
-import com.github.houbb.nginx4j.config.load.component.impl.NginxUserEventsConfigLoadFile;
-import com.github.houbb.nginx4j.config.load.component.impl.NginxUserHttpConfigLoadFile;
-import com.github.houbb.nginx4j.config.load.component.impl.NginxUserMainConfigLoadFile;
-import com.github.houbb.nginx4j.config.load.component.impl.NginxUserServerConfigLoadFile;
+import com.github.houbb.nginx4j.config.load.component.*;
+import com.github.houbb.nginx4j.config.load.component.impl.*;
 import com.github.houbb.nginx4j.constant.NginxConfigTypeEnum;
 import com.github.houbb.nginx4j.util.InnerConfigEntryUtil;
 import com.github.odiszapc.nginxparser.*;
@@ -57,6 +51,18 @@ public  class NginxUserConfigLoaderConfigComponentFile extends AbstractNginxUser
             INginxUserHttpConfigLoad httpConfigLoad = new NginxUserHttpConfigLoadFile(conf, httpBlock);
             NginxUserHttpConfig httpConfig = httpConfigLoad.load();
             configBs.httpConfig(httpConfig);
+
+            //3.1 map 模块
+            List<NgxEntry> mapList = conf.findAll(NgxConfig.BLOCK, "http", "map");
+            List<NginxUserMapConfig> userMapConfigs = new ArrayList<>();
+            if (CollectionUtil.isNotEmpty(mapList)) {
+                for (NgxEntry entry : mapList) {
+                    NgxBlock mapBlock = (NgxBlock) entry;
+                    final INginxUserMapConfigLoad mapConfigLoad = new NginxUserMapConfigLoadFile(conf, mapBlock);
+                    userMapConfigs.add(mapConfigLoad.load());
+                }
+            }
+            configBs.mapConfigs(userMapConfigs);
 
             //3. server 信息
             // 首先获取 block

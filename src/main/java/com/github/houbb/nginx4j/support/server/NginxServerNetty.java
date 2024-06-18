@@ -138,7 +138,9 @@ public class NginxServerNetty implements INginxServer {
         currentNginxConfig.setNginxLocationMatch(nginxConfig.getNginxLocationMatch());
         currentNginxConfig.setNginxPlaceholderManager(nginxConfig.getNginxPlaceholderManager());
         currentNginxConfig.setNginxIf(nginxConfig.getNginxIf());
+        currentNginxConfig.setNginxMapDirective(nginxConfig.getNginxMapDirective());
         //TODO: 全局每次加属性，这里记得修改
+
 
         // 当前的端口过滤
         NginxUserConfig originalUserConfig = nginxConfig.getNginxUserConfig();
@@ -147,6 +149,8 @@ public class NginxServerNetty implements INginxServer {
         currentUserConfig.setDefaultServerConfig(originalUserConfig.getDefaultServerConfig());
         currentUserConfig.setCurrentServerPort(port);
         currentUserConfig.setHttpConfig(originalUserConfig.getHttpConfig());
+        //map configs
+        currentUserConfig.setMapConfigs(originalUserConfig.getMapConfigs());
 
         // 按照端口号过滤
         List<NginxUserServerConfig> userServerConfigs = nginxConfig.getNginxUserConfig().getServerConfigs();

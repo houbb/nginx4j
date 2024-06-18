@@ -13,6 +13,8 @@ import com.github.houbb.nginx4j.support.condition.NginxIf;
 import com.github.houbb.nginx4j.support.condition.NginxIfDefault;
 import com.github.houbb.nginx4j.support.index.NginxIndexFile;
 import com.github.houbb.nginx4j.support.index.NginxIndexFileDefault;
+import com.github.houbb.nginx4j.support.map.NginxMapDirective;
+import com.github.houbb.nginx4j.support.map.NginxMapDirectiveDefault;
 import com.github.houbb.nginx4j.support.placeholder.INginxPlaceholderManager;
 import com.github.houbb.nginx4j.support.placeholder.NginxPlaceholderManagerDefault;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatch;
@@ -65,7 +67,19 @@ public class Nginx4jBs {
      */
     private INginxPlaceholderManager nginxPlaceholderManager = new NginxPlaceholderManagerDefault();
 
+    /**
+     * map 指令的处理
+     *
+     * @since 0.22.0
+     */
+    private NginxMapDirective nginxMapDirective = new NginxMapDirectiveDefault();
+
     private NginxConfig nginxConfig;
+
+    public Nginx4jBs nginxMapDirective(NginxMapDirective nginxMapDirective) {
+        this.nginxMapDirective = nginxMapDirective;
+        return this;
+    }
 
     public Nginx4jBs nginxIf(NginxIf nginxIf) {
         this.nginxIf = nginxIf;
@@ -131,6 +145,7 @@ public class Nginx4jBs {
         nginxConfig.setNginxParamManager(nginxParamManager);
         nginxConfig.setNginxPlaceholderManager(nginxPlaceholderManager);
         nginxConfig.setNginxIf(nginxIf);
+        nginxConfig.setNginxMapDirective(nginxMapDirective);
 
         return this;
     }

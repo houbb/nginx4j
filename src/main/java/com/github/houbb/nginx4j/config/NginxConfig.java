@@ -4,6 +4,7 @@ import com.github.houbb.nginx4j.config.location.INginxLocationMatch;
 import com.github.houbb.nginx4j.config.param.INginxParamManager;
 import com.github.houbb.nginx4j.support.condition.NginxIf;
 import com.github.houbb.nginx4j.support.index.NginxIndexFile;
+import com.github.houbb.nginx4j.support.map.NginxMapDirective;
 import com.github.houbb.nginx4j.support.placeholder.INginxPlaceholderManager;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatch;
 
@@ -46,6 +47,16 @@ public class NginxConfig {
      * @since 0.17.0
      */
     private INginxPlaceholderManager nginxPlaceholderManager;
+
+    private NginxMapDirective nginxMapDirective;
+
+    public NginxMapDirective getNginxMapDirective() {
+        return nginxMapDirective;
+    }
+
+    public void setNginxMapDirective(NginxMapDirective nginxMapDirective) {
+        this.nginxMapDirective = nginxMapDirective;
+    }
 
     public NginxIf getNginxIf() {
         return nginxIf;

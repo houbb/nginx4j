@@ -17,7 +17,6 @@ public class NginxUserConfig extends NginxCommonUserConfig {
      */
     private NginxUserMainConfig mainConfig;
 
-
     /**
      * events 配置
      * @since 0.18.0
@@ -57,6 +56,21 @@ public class NginxUserConfig extends NginxCommonUserConfig {
      * @since 0.14.0
      */
     private NginxUserServerConfig defaultServerConfig;
+
+    /**
+     * map 指令的配置信息
+     *
+     * @since 0.22.0
+     */
+    private List<NginxUserMapConfig> mapConfigs;
+
+    public List<NginxUserMapConfig> getMapConfigs() {
+        return mapConfigs;
+    }
+
+    public void setMapConfigs(List<NginxUserMapConfig> mapConfigs) {
+        this.mapConfigs = mapConfigs;
+    }
 
     public NginxUserHttpConfig getHttpConfig() {
         return httpConfig;

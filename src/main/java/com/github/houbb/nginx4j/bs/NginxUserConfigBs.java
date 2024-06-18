@@ -27,6 +27,8 @@ public class NginxUserConfigBs {
      */
     private List<NginxCommonConfigEntry> configEntryList = new ArrayList<>();
 
+
+
     public static NginxUserConfigBs newInstance() {
         return new NginxUserConfigBs();
     }
@@ -55,6 +57,18 @@ public class NginxUserConfigBs {
      * @since 0.21.0
      */
     private NginxUserHttpConfig httpConfig = new NginxUserHttpConfig();
+
+    /**
+     * map 指令的配置信息
+     *
+     * @since 0.22.0
+     */
+    private List<NginxUserMapConfig> mapConfigs = new ArrayList<>();
+
+    public NginxUserConfigBs mapConfigs(List<NginxUserMapConfig> mapConfigs) {
+        this.mapConfigs = mapConfigs;
+        return this;
+    }
 
     public NginxUserConfigBs mainConfig(NginxUserMainConfig mainConfig) {
         this.mainConfig = mainConfig;
@@ -98,6 +112,7 @@ public class NginxUserConfigBs {
         config.setEventsConfig(eventsConfig);
         config.setConfigEntryList(configEntryList);
         config.setHttpConfig(httpConfig);
+        config.setMapConfigs(mapConfigs);
         return config;
     }
 

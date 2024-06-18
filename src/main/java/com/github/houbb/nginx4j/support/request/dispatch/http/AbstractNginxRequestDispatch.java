@@ -13,6 +13,7 @@ import com.github.houbb.nginx4j.constant.NginxConfigTypeEnum;
 import com.github.houbb.nginx4j.constant.NginxConst;
 import com.github.houbb.nginx4j.exception.Nginx4jException;
 import com.github.houbb.nginx4j.support.condition.NginxIf;
+import com.github.houbb.nginx4j.support.map.NginxMapDirective;
 import com.github.houbb.nginx4j.support.placeholder.INginxPlaceholderManager;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatch;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
@@ -97,6 +98,9 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
         // 提前处理内置的各种参数
         placeholderManager.beforeDispatch(context);
 
+        // v.22.0 map 的处理，生命周期只能在 dispatch 前吗？后期也许可以拓展的更多？
+        final NginxMapDirective mapDirective = context.getNginxConfig().getNginxMapDirective();
+        mapDirective.map(context);
 
         //1. 当前的配置
         NginxUserServerLocationConfig locationConfig = context.getCurrentUserServerLocationConfig();
