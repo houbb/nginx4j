@@ -10,6 +10,11 @@ import com.github.houbb.nginx4j.config.location.INginxLocationMatch;
 import com.github.houbb.nginx4j.constant.NginxConst;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatch;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
+import com.github.houbb.nginx4j.support.rewrite.NginxRewriteDirective;
+import com.github.houbb.nginx4j.support.rewrite.NginxRewriteDirectiveContext;
+import com.github.houbb.nginx4j.support.rewrite.NginxRewriteDirectiveDefault;
+import com.github.houbb.nginx4j.support.rewrite.NginxRewriteDirectiveResult;
+import com.github.houbb.nginx4j.util.InnerLocationConfigUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelId;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -36,6 +41,12 @@ public class NginxNettyServerHandler extends SimpleChannelInboundHandler<FullHtt
      */
     private static final Map<ChannelId, AtomicInteger> connectionRequestCount = new ConcurrentHashMap<>();
 
+    /**
+     * 后续可以提取到 nginx 配置中
+     * @since 0.23.0
+     */
+    private final NginxRewriteDirective nginxRewriteDirective = new NginxRewriteDirectiveDefault();
+
     public NginxNettyServerHandler(NginxConfig nginxConfig) {
         this.nginxConfig = nginxConfig;
     }
@@ -61,7 +72,17 @@ public class NginxNettyServerHandler extends SimpleChannelInboundHandler<FullHtt
 
         // 分发
         NginxUserServerConfig nginxUserServerConfig = getNginxUserServerConfig(request);
-        NginxUserServerLocationConfig currentLocationConfig = getCurrentServerLocation(nginxUserServerConfig, request);
+        // 当前配置
+        NginxUserServerLocationConfig currentLocationConfig = InnerLocationConfigUtil.getCurrentServerLocation(nginxConfig, nginxUserServerConfig, request);
+
+        //rewrite 判断
+        NginxRewriteDirectiveContext nginxRewriteDirectiveContext = new NginxRewriteDirectiveContext();
+        nginxRewriteDirectiveContext.setNginxConfig(nginxConfig);
+        nginxRewriteDirectiveContext.setCtx(ctx);
+        nginxRewriteDirectiveContext.setRequest(request);
+        nginxRewriteDirectiveContext.setNginxUserServerConfig(nginxUserServerConfig);
+        nginxRewriteDirectiveContext.setCurrentLocationConfig(currentLocationConfig);
+        NginxRewriteDirectiveResult rewriteDirectiveResult = nginxRewriteDirective.handleRewrite(nginxRewriteDirectiveContext);
 
         final NginxRequestDispatch requestDispatch = nginxConfig.getNginxRequestDispatch();
         NginxRequestDispatchContext context = new NginxRequestDispatchContext();
@@ -69,8 +90,10 @@ public class NginxNettyServerHandler extends SimpleChannelInboundHandler<FullHtt
         context.setNginxConfig(nginxConfig);
         context.setRequest(request);
         context.setCurrentNginxUserServerConfig(nginxUserServerConfig);
-        context.setCurrentUserServerLocationConfig(currentLocationConfig);
         context.setConnectionRequestCount(connectionRequestCount);
+        context.setNginxRewriteDirectiveResult(rewriteDirectiveResult);
+        // 配置可能因为 rewrite 而被替换
+        context.setCurrentUserServerLocationConfig(rewriteDirectiveResult.getCurrentLocationConfig());
 
         requestDispatch.dispatch(context);
 
@@ -81,32 +104,6 @@ public class NginxNettyServerHandler extends SimpleChannelInboundHandler<FullHtt
         String hostName = getHostName(request);
 
         return getNginxUserServerConfig(hostName);
-    }
-
-    /**
-     * 获取当前的服务端地址
-     * @param request 请求
-     * @param nginxUserServerConfig 配置
-     * @return 结果
-     * @since 0.16.0
-     */
-    private NginxUserServerLocationConfig getCurrentServerLocation(NginxUserServerConfig nginxUserServerConfig,
-                                                                   FullHttpRequest request) {
-        List<NginxUserServerLocationConfig> configList = nginxUserServerConfig.getLocations();
-        if(CollectionUtil.isNotEmpty(configList)) {
-            final INginxLocationMatch nginxLocationMatch = nginxConfig.getNginxLocationMatch();
-
-            for(NginxUserServerLocationConfig config : configList) {
-                // 是否匹配
-                if(nginxLocationMatch.matchConfig(config, request, nginxConfig)) {
-                    return config;
-                }
-            }
-        }
-
-        // 默认值
-        logger.info("未命中任何 location 配置，使用默认配置");
-        return nginxUserServerConfig.getDefaultLocation();
     }
 
     /**

@@ -39,6 +39,7 @@ public class NginxLocationMatchDefault implements INginxLocationMatch {
             // REGEX
             if(NginxLocationPathTypeEnum.REGEX.equals(pathTypeEnum) && requestUri.matches(configUrl)) {
                 logger.info("命中 REGEX 配置 requestUri={}, pathTypeEnum={}, configUrl={}", requestUri, pathTypeEnum, configUrl);
+                return true;
             }
         } else if(values.size() == 1) {
             String value = values.get(0);

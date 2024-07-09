@@ -78,7 +78,10 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
                         for(INginxParamLifecycleDispatch dispatch : dispatchList) {
                             LifecycleDispatchContext dispatchContext = (LifecycleDispatchContext) baseContext;
                             if(dispatch.match(dispatchContext)) {
-                                dispatch.afterDispatch(dispatchContext);
+                                boolean dispatchResult = dispatch.afterDispatch(dispatchContext);
+                                if(!dispatchResult) {
+                                    break;
+                                }
                             }
                         }
                     }
@@ -131,7 +134,10 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
                         for(INginxParamLifecycleDispatch dispatch : dispatchList) {
                             LifecycleDispatchContext dispatchContext = (LifecycleDispatchContext) baseContext;
                             if(dispatch.match(dispatchContext)) {
-                                dispatch.beforeDispatch(dispatchContext);
+                                boolean dispatchResult = dispatch.beforeDispatch(dispatchContext);
+                                if(!dispatchResult) {
+                                    break;
+                                }
                             }
                         }
                     }

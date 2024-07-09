@@ -23,7 +23,7 @@ public class NginxParamHandleProxyCookiePath extends AbstractNginxParamLifecycle
 
 
     @Override
-    public void doBeforeDispatch(NginxCommonConfigEntry configParam, NginxRequestDispatchContext context) {
+    public boolean doBeforeDispatch(NginxCommonConfigEntry configParam, NginxRequestDispatchContext context) {
 
         List<String> values = configParam.getValues();
         if(CollectionUtil.isEmpty(values) || values.size() < 2) {
@@ -44,11 +44,13 @@ public class NginxParamHandleProxyCookiePath extends AbstractNginxParamLifecycle
         }
 
         logger.info(">>>>>>>>>>>> doBeforeDispatch proxy_cookie_path replace regex={} => path={}", regex, path);
+
+        return true;
     }
 
     @Override
-    public void doAfterDispatch(NginxCommonConfigEntry configParam, NginxRequestDispatchContext context) {
-
+    public boolean doAfterDispatch(NginxCommonConfigEntry configParam, NginxRequestDispatchContext context) {
+        return true;
     }
 
     @Override

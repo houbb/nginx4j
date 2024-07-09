@@ -11,9 +11,9 @@ import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchCon
  */
 public abstract class AbstractNginxParamLifecycleDispatch implements INginxParamLifecycleDispatch {
 
-    public abstract void doBeforeDispatch(NginxCommonConfigEntry configParam, NginxRequestDispatchContext context);
+    public abstract boolean doBeforeDispatch(NginxCommonConfigEntry configParam, NginxRequestDispatchContext context);
 
-    public abstract void doAfterDispatch(NginxCommonConfigEntry configParam, NginxRequestDispatchContext context);
+    public abstract boolean doAfterDispatch(NginxCommonConfigEntry configParam, NginxRequestDispatchContext context);
 
     protected abstract String getKey(NginxCommonConfigEntry configParam, NginxRequestDispatchContext context);
 
@@ -23,13 +23,13 @@ public abstract class AbstractNginxParamLifecycleDispatch implements INginxParam
     }
 
     @Override
-    public void beforeDispatch(LifecycleDispatchContext context) {
-        doBeforeDispatch(context.getConfigParam(), context.getContext());
+    public boolean beforeDispatch(LifecycleDispatchContext context) {
+        return doBeforeDispatch(context.getConfigParam(), context.getContext());
     }
 
     @Override
-    public void afterDispatch(LifecycleDispatchContext context) {
-        doAfterDispatch(context.getConfigParam(), context.getContext());
+    public boolean afterDispatch(LifecycleDispatchContext context) {
+        return doAfterDispatch(context.getConfigParam(), context.getContext());
     }
 
     @Override

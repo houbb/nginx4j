@@ -30,7 +30,7 @@ public class NginxParamHandleProxySetHeader extends AbstractNginxParamLifecycleD
      * @param context     上下文
      */
     @Override
-    public void doBeforeDispatch(NginxCommonConfigEntry configParam, NginxRequestDispatchContext context) {
+    public boolean doBeforeDispatch(NginxCommonConfigEntry configParam, NginxRequestDispatchContext context) {
         List<String> values = configParam.getValues();
 
         // $ 占位符号后续处理
@@ -55,10 +55,13 @@ public class NginxParamHandleProxySetHeader extends AbstractNginxParamLifecycleD
                 logger.info(">>>>>>>>>>>> doBeforeDispatch headers.set({}, {});", headerName, headerValue);
             }
         }
+
+        return true;
     }
 
     @Override
-    public void doAfterDispatch(NginxCommonConfigEntry configParam, NginxRequestDispatchContext context) {
+    public boolean doAfterDispatch(NginxCommonConfigEntry configParam, NginxRequestDispatchContext context) {
+        return true;
     }
 
     @Override

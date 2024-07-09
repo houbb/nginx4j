@@ -7,6 +7,13 @@ import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatch;
  */
 public final class NginxRequestDispatches {
 
+    public static NginxRequestDispatch http301() {
+        return new NginxRequestDispatch301();
+    }
+    public static NginxRequestDispatch http302() {
+        return new NginxRequestDispatch302();
+    }
+
     public static NginxRequestDispatch http400() {
         return new NginxRequestDispatch400();
     }

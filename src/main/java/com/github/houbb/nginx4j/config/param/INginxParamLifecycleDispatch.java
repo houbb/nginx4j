@@ -13,14 +13,16 @@ public interface INginxParamLifecycleDispatch {
     /**
      * 开始分发前
      * @param context 上下文
+     * @return 是否继续执行下一个指令 v0.23.0
      */
-    void beforeDispatch(LifecycleDispatchContext context);
+    boolean beforeDispatch(LifecycleDispatchContext context);
 
     /**
      * 分发后
      * @param context 上下文
+     * @return 是否继续执行下一个指令 v0.23.0
      */
-    void afterDispatch(LifecycleDispatchContext context);
+    boolean afterDispatch(LifecycleDispatchContext context);
 
     /**
      * 是否匹配当前处理类

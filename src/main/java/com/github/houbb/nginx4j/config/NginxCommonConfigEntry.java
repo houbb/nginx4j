@@ -4,6 +4,7 @@ import com.github.houbb.nginx4j.constant.NginxConfigTypeEnum;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 public class NginxCommonConfigEntry implements Serializable {
 
@@ -72,6 +73,19 @@ public class NginxCommonConfigEntry implements Serializable {
 
     public void setType(NginxConfigTypeEnum type) {
         this.type = type;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        NginxCommonConfigEntry entry = (NginxCommonConfigEntry) o;
+        return Objects.equals(name, entry.name) && Objects.equals(value, entry.value) && Objects.equals(values, entry.values) && type == entry.type && Objects.equals(children, entry.children);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, value, values, type, children);
     }
 
     @Override

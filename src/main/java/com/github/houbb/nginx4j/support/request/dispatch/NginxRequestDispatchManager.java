@@ -7,6 +7,8 @@ import com.github.houbb.log.integration.core.LogFactory;
 import com.github.houbb.nginx4j.config.NginxConfig;
 import com.github.houbb.nginx4j.config.NginxUserServerConfig;
 import com.github.houbb.nginx4j.support.request.dispatch.http.NginxRequestDispatches;
+import com.github.houbb.nginx4j.support.rewrite.NginxRewriteDirectiveResult;
+import com.github.houbb.nginx4j.support.rewrite.NginxRewriteFlagEnum;
 import io.netty.handler.codec.http.FullHttpRequest;
 
 import java.io.File;
@@ -40,6 +42,20 @@ public class NginxRequestDispatchManager implements NginxRequestDispatch {
         /*如果无法解码400*/
         if (!requestInfoBo.decoderResult().isSuccess()) {
             return NginxRequestDispatches.http400();
+        }
+
+        //301
+        final NginxRewriteDirectiveResult rewriteDirectiveResult = context.getNginxRewriteDirectiveResult();
+        if(rewriteDirectiveResult.isMatchRewrite()) {
+            String rewriteFlag = rewriteDirectiveResult.getRewriteFlag();
+
+            if(NginxRewriteFlagEnum.PERMANENT.getCode().equals(rewriteFlag)) {
+                return NginxRequestDispatches.http301();
+            }
+
+            if(NginxRewriteFlagEnum.REDIRECT.getCode().equals(rewriteFlag)) {
+                return NginxRequestDispatches.http302();
+            }
         }
 
         // 文件

@@ -31,7 +31,7 @@ public class NginxParamHandleSet extends AbstractNginxParamLifecycleDispatch {
      * @param context     上下文
      */
     @Override
-    public void doBeforeDispatch(NginxCommonConfigEntry configParam, NginxRequestDispatchContext context) {
+    public boolean doBeforeDispatch(NginxCommonConfigEntry configParam, NginxRequestDispatchContext context) {
         Map<String, Object> placeholderMap = context.getPlaceholderMap();
         final INginxPlaceholderManager nginxPlaceholderManager = context.getNginxConfig().getNginxPlaceholderManager();
 
@@ -46,6 +46,8 @@ public class NginxParamHandleSet extends AbstractNginxParamLifecycleDispatch {
         }
 
         placeholderMap.put(headerName, headerValue);
+
+        return true;
     }
 
     /**
@@ -77,7 +79,8 @@ public class NginxParamHandleSet extends AbstractNginxParamLifecycleDispatch {
     }
 
     @Override
-    public void doAfterDispatch(NginxCommonConfigEntry configParam, NginxRequestDispatchContext context) {
+    public boolean doAfterDispatch(NginxCommonConfigEntry configParam, NginxRequestDispatchContext context) {
+        return true;
     }
 
     @Override
