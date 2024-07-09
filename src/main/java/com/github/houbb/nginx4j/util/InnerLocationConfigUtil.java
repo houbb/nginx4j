@@ -20,6 +20,7 @@ public class InnerLocationConfigUtil {
 
     /**
      * 获取当前的服务端地址
+     * @param nginxConfig 配置信息
      * @param request 请求
      * @param nginxUserServerConfig 配置
      * @return 结果
