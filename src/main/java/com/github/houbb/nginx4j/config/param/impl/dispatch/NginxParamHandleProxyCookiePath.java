@@ -57,4 +57,10 @@ public class NginxParamHandleProxyCookiePath extends AbstractNginxParamLifecycle
     protected String getKey(NginxCommonConfigEntry configParam, NginxRequestDispatchContext context) {
         return "proxy_cookie_path";
     }
+
+    @Override
+    public String directiveName() {
+        return "proxy_cookie_path";
+    }
+
 }

@@ -2,11 +2,6 @@ package com.github.houbb.nginx4j.support.rewrite;
 
 import com.github.houbb.nginx4j.config.NginxCommonConfigEntry;
 import com.github.houbb.nginx4j.config.NginxUserServerLocationConfig;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.FullHttpRequest;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 重写的结果

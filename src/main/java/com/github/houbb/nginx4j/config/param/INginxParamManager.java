@@ -8,6 +8,14 @@ import java.util.List;
 public interface INginxParamManager {
 
     /**
+     * 获取匹配的分发
+     * @param name 名称
+     * @return 结果
+     * @since 0.24.0
+     */
+    INginxParamLifecycleDispatch getMatchDispatch(final String name);
+
+    /**
      * 注册 dispatch
      * @param dispatch 处理类
      * @return 结果

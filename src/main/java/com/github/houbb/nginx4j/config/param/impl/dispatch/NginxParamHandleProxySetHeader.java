@@ -69,4 +69,8 @@ public class NginxParamHandleProxySetHeader extends AbstractNginxParamLifecycleD
         return "proxy_set_header";
     }
 
+    @Override
+    public String directiveName() {
+        return "proxy_set_header";
+    }
 }

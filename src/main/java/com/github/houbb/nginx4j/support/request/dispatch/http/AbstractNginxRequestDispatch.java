@@ -3,10 +3,7 @@ package com.github.houbb.nginx4j.support.request.dispatch.http;
 import com.github.houbb.heaven.util.util.CollectionUtil;
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
-import com.github.houbb.nginx4j.config.NginxCommonConfigEntry;
-import com.github.houbb.nginx4j.config.NginxUserConfig;
-import com.github.houbb.nginx4j.config.NginxUserHttpConfig;
-import com.github.houbb.nginx4j.config.NginxUserServerLocationConfig;
+import com.github.houbb.nginx4j.config.*;
 import com.github.houbb.nginx4j.config.param.*;
 import com.github.houbb.nginx4j.config.param.impl.dispatch.NginxParamHandleSet;
 import com.github.houbb.nginx4j.constant.NginxConfigTypeEnum;
@@ -17,9 +14,11 @@ import com.github.houbb.nginx4j.support.map.NginxMapDirective;
 import com.github.houbb.nginx4j.support.placeholder.INginxPlaceholderManager;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatch;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
+import com.github.houbb.nginx4j.support.returns.NginxReturnResult;
+import com.github.houbb.nginx4j.util.InnerRespUtil;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.HttpResponse;
+import io.netty.handler.codec.http.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +29,30 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
     private static final Log logger = LogFactory.getLog(AbstractNginxRequestDispatch.class);
 
     public abstract void doDispatch(final NginxRequestDispatchContext context);
+
+    /**
+     * @since 0.24.0
+     * @param request 请求
+     * @param context 上下文
+     * @return
+     */
+    protected FullHttpResponse buildHttpResponseForReturn(FullHttpRequest request,
+                                                   NginxRequestDispatchContext context) {
+        logger.info("[Nginx] NginxRequestDispatchReturn request for http={}", request);
+
+        final NginxReturnResult nginxReturnResult = context.getNginxReturnResult();
+        HttpResponseStatus responseStatus = HttpResponseStatus.valueOf(nginxReturnResult.getCode(),
+                nginxReturnResult.getValue());
+        FullHttpResponse response = InnerRespUtil.buildCommonResp(null, responseStatus, request);
+
+        //301
+        if(301 == nginxReturnResult.getCode()) {
+            response.headers().set(HttpHeaderNames.LOCATION, nginxReturnResult.getValue());
+        }
+
+        //TODO: 还有许多，是不是需要特殊处理？
+        return response;
+    }
 
     /**
      * 内容的分发处理
@@ -96,6 +119,8 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
      * @param context 上下文
      */
     protected void beforeDispatch(final NginxRequestDispatchContext context) {
+        logger.info("beforeDispatch context={}", context);
+
         // v0.17.0 占位符管理类
         final INginxPlaceholderManager placeholderManager = context.getNginxConfig().getNginxPlaceholderManager();
         // 提前处理内置的各种参数
@@ -111,38 +136,40 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
             return;
         }
 
-
         // 基础变量
-
         List<NginxCommonConfigEntry> directives = getAllDirectives(context);
         if(CollectionUtil.isEmpty(directives)) {
             return;
         }
 
         // 处理
+        // TODO: 这里为什么会死循环？？？
         for(NginxCommonConfigEntry configParam : directives) {
+            final INginxParamManager paramManager = context.getNginxConfig().getNginxParamManager();
+
+            final INginxParamLifecycleDispatch lifecycleDispatch = paramManager.getMatchDispatch(configParam.getName());
+            if(lifecycleDispatch == null) {
+                continue;
+            }
+
+            // 处理
             LifecycleDispatchContext baseContext = new LifecycleDispatchContext();
             baseContext.setContext(context);
             baseContext.setConfigParam(configParam);
+            baseContext.setBreakAllFlag(false);
 
             processNginxCommonConfigEntry(configParam, context, baseContext, new Consumer<LifecycleBaseContext>() {
                 @Override
                 public void accept(LifecycleBaseContext baseContext) {
-                    final INginxParamManager paramManager = context.getNginxConfig().getNginxParamManager();
-                    List<INginxParamLifecycleDispatch> dispatchList = paramManager.getDispatchList();
-                    if(CollectionUtil.isNotEmpty(dispatchList)) {
-                        for(INginxParamLifecycleDispatch dispatch : dispatchList) {
-                            LifecycleDispatchContext dispatchContext = (LifecycleDispatchContext) baseContext;
-                            if(dispatch.match(dispatchContext)) {
-                                boolean dispatchResult = dispatch.beforeDispatch(dispatchContext);
-                                if(!dispatchResult) {
-                                    break;
-                                }
-                            }
-                        }
-                    }
+                    LifecycleDispatchContext dispatchContext = (LifecycleDispatchContext) baseContext;
+                    boolean dispatchResult = lifecycleDispatch.beforeDispatch(dispatchContext);
                 }
             }, true);
+
+            if(baseContext.isBreakAllFlag()) {
+                logger.info("直接终止处理");
+                return;
+            }
         }
     }
 
@@ -236,6 +263,8 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
                                      final NginxRequestDispatchContext context) {
         String name = configParam.getName();
         if("set".equals(name)) {
+            //TODO: 这里直接 return?? 避免死循环？
+
             NginxParamHandleSet handleSet = new NginxParamHandleSet();
             handleSet.doBeforeDispatch(configParam, context);
             return;

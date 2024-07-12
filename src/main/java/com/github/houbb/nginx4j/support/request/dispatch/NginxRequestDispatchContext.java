@@ -3,6 +3,7 @@ package com.github.houbb.nginx4j.support.request.dispatch;
 import com.github.houbb.nginx4j.config.NginxConfig;
 import com.github.houbb.nginx4j.config.NginxUserServerConfig;
 import com.github.houbb.nginx4j.config.NginxUserServerLocationConfig;
+import com.github.houbb.nginx4j.support.returns.NginxReturnResult;
 import com.github.houbb.nginx4j.support.rewrite.NginxRewriteDirectiveResult;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelId;
@@ -97,6 +98,20 @@ public class NginxRequestDispatchContext {
      * @since 0.23.0
      */
     private NginxRewriteDirectiveResult nginxRewriteDirectiveResult;
+
+    /**
+     * 返回结果
+     * @since 0.24.0
+     */
+    private NginxReturnResult nginxReturnResult;
+
+    public NginxReturnResult getNginxReturnResult() {
+        return nginxReturnResult;
+    }
+
+    public void setNginxReturnResult(NginxReturnResult nginxReturnResult) {
+        this.nginxReturnResult = nginxReturnResult;
+    }
 
     public NginxRewriteDirectiveResult getNginxRewriteDirectiveResult() {
         return nginxRewriteDirectiveResult;

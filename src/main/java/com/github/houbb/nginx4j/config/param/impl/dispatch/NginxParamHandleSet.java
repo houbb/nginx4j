@@ -88,4 +88,9 @@ public class NginxParamHandleSet extends AbstractNginxParamLifecycleDispatch {
         return "set";
     }
 
+    @Override
+    public String directiveName() {
+        return "set";
+    }
+
 }

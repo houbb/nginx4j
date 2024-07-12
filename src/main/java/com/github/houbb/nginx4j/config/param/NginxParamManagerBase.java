@@ -4,7 +4,9 @@ import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 基础实现
@@ -16,11 +18,17 @@ public class NginxParamManagerBase implements INginxParamManager {
 
     private final List<INginxParamLifecycleComplete> completeList = new ArrayList<>();
     private final List<INginxParamLifecycleDispatch> dispatchList = new ArrayList<>();
+    private final Map<String, INginxParamLifecycleDispatch> dispatchMap = new HashMap<>();
     private final List<INginxParamLifecycleWrite> writeList = new ArrayList<>();
 
     @Override
+    public INginxParamLifecycleDispatch getMatchDispatch(String name) {
+        return dispatchMap.get(name);
+    }
+
+    @Override
     public INginxParamManager registerDispatch(INginxParamLifecycleDispatch dispatch) {
-        dispatchList.add(dispatch);
+        dispatchMap.put(dispatch.directiveName(), dispatch);
         return this;
     }
 

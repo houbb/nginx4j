@@ -13,6 +13,21 @@ public class LifecycleBaseContext {
 
     private NginxRequestDispatchContext context;
 
+    /**
+     * 跳出所有的循环
+     * @since 0.24.0
+     */
+    private boolean breakAllFlag;
+
+    public boolean isBreakAllFlag() {
+        return breakAllFlag;
+    }
+
+    public void setBreakAllFlag(boolean breakAllFlag) {
+        this.breakAllFlag = breakAllFlag;
+    }
+
+
     public NginxCommonConfigEntry getConfigParam() {
         return configParam;
     }

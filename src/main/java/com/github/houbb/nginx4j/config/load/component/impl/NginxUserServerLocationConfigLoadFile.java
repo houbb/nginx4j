@@ -1,10 +1,15 @@
 package com.github.houbb.nginx4j.config.load.component.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.github.houbb.heaven.util.util.CollectionUtil;
+import com.github.houbb.heaven.util.util.JsonUtil;
+import com.github.houbb.log.integration.core.Log;
+import com.github.houbb.log.integration.core.LogFactory;
 import com.github.houbb.nginx4j.config.NginxCommonConfigEntry;
 import com.github.houbb.nginx4j.config.NginxUserServerLocationConfig;
 import com.github.houbb.nginx4j.config.load.component.INginxUserServerLocationConfigLoad;
 import com.github.houbb.nginx4j.constant.NginxLocationPathTypeEnum;
+import com.github.houbb.nginx4j.support.request.dispatch.http.NginxRequestDispatchReturn;
 import com.github.houbb.nginx4j.util.InnerConfigEntryUtil;
 import com.github.odiszapc.nginxparser.*;
 
@@ -16,6 +21,8 @@ import java.util.List;
  * @since 0.18.0
  */
 public class NginxUserServerLocationConfigLoadFile implements INginxUserServerLocationConfigLoad {
+
+    private static final Log logger = LogFactory.getLog(NginxUserServerLocationConfigLoadFile.class);
 
     /**
      * 全局配置
@@ -58,6 +65,7 @@ public class NginxUserServerLocationConfigLoadFile implements INginxUserServerLo
         }
         locationConfig.setConfigEntryList(configEntryList);
 
+        logger.info("[ConfigLoad] locationConfig={}", JSON.toJSONString(locationConfig));
         return locationConfig;
     }
 

@@ -7,10 +7,7 @@ import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchCon
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpUtil;
+import io.netty.handler.codec.http.*;
 
 public abstract class AbstractNginxRequestDispatchFullResp extends AbstractNginxRequestDispatch {
 
@@ -23,9 +20,16 @@ public abstract class AbstractNginxRequestDispatchFullResp extends AbstractNginx
     public void doDispatch(final NginxRequestDispatchContext context) {
         final FullHttpRequest request = context.getRequest();
         final NginxConfig nginxConfig = context.getNginxConfig();
-        FullHttpResponse response = buildFullHttpResponse(request, nginxConfig, context);
-        response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
 
+        // 响应
+        FullHttpResponse response = null;
+        if(context.getNginxReturnResult() != null) {
+            response = buildHttpResponseForReturn(request, context);
+        } else {
+            response = buildFullHttpResponse(request, nginxConfig, context);
+        }
+
+        response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
         final ChannelHandlerContext ctx = context.getCtx();
 
         // 结果响应

@@ -1,6 +1,9 @@
 package com.github.houbb.nginx4j.config.load;
 
+import com.alibaba.fastjson.JSON;
 import com.github.houbb.heaven.util.util.CollectionUtil;
+import com.github.houbb.log.integration.core.Log;
+import com.github.houbb.log.integration.core.LogFactory;
 import com.github.houbb.nginx4j.bs.NginxUserConfigBs;
 import com.github.houbb.nginx4j.config.*;
 import com.github.houbb.nginx4j.config.load.component.*;
@@ -21,6 +24,8 @@ import java.util.List;
  * @author 老马啸西风
  */
 public  class NginxUserConfigLoaderConfigComponentFile extends AbstractNginxUserConfigLoader {
+
+    private static final Log logger = LogFactory.getLog(NginxUserConfigLoaderConfigComponentFile.class);
 
     private final String filePath;
 
@@ -94,7 +99,9 @@ public  class NginxUserConfigLoaderConfigComponentFile extends AbstractNginxUser
             configBs.configEntryList(configEntryList);
 
             // 返回
-            return configBs.build();
+            NginxUserConfig nginxUserConfig = configBs.build();
+            logger.info("[ConfigLoad] nginxUserConfig={}", JSON.toJSONString(nginxUserConfig));
+            return nginxUserConfig;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

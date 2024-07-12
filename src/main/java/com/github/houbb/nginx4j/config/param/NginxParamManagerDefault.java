@@ -1,8 +1,6 @@
 package com.github.houbb.nginx4j.config.param;
 
-import com.github.houbb.nginx4j.config.param.impl.dispatch.NginxParamHandleProxyCookiePath;
-import com.github.houbb.nginx4j.config.param.impl.dispatch.NginxParamHandleProxySetHeader;
-import com.github.houbb.nginx4j.config.param.impl.dispatch.NginxParamHandleSet;
+import com.github.houbb.nginx4j.config.param.impl.dispatch.*;
 import com.github.houbb.nginx4j.config.param.impl.write.NginxParamHandleAddHeader;
 import com.github.houbb.nginx4j.config.param.impl.write.NginxParamHandleProxyCookieDomain;
 import com.github.houbb.nginx4j.config.param.impl.write.NginxParamHandleProxyCookieFlags;
@@ -23,11 +21,14 @@ public class NginxParamManagerDefault extends NginxParamManagerBase {
         this.registerDispatch(new NginxParamHandleSet());
         this.registerDispatch(new NginxParamHandleProxySetHeader());
         this.registerDispatch(new NginxParamHandleProxyCookiePath());
+        this.registerDispatch(new NginxParamHandleRewrite());
+        this.registerDispatch(new NginxParamHandleReturn());
 
         this.registerWrite(new NginxParamHandleAddHeader());
         this.registerWrite(new NginxParamHandleProxyHideHeader());
         this.registerWrite(new NginxParamHandleProxyCookieDomain());
         this.registerWrite(new NginxParamHandleProxyCookieFlags());
+
     }
 
 

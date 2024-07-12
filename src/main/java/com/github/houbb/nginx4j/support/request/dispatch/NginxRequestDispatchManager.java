@@ -44,6 +44,11 @@ public class NginxRequestDispatchManager implements NginxRequestDispatch {
             return NginxRequestDispatches.http400();
         }
 
+        // 如果存在 return
+        // 301+return 不应该放在这里实现。
+//        if(context.getNginxReturnResult() != null) {
+//            return NginxRequestDispatches.httpReturn();
+//        }
         //301
         final NginxRewriteDirectiveResult rewriteDirectiveResult = context.getNginxRewriteDirectiveResult();
         if(rewriteDirectiveResult.isMatchRewrite()) {

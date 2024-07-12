@@ -1,8 +1,5 @@
 package com.github.houbb.nginx4j.config.param;
 
-import com.github.houbb.nginx4j.config.NginxCommonConfigEntry;
-import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
-
 /**
  * 参数处理类-分发的声明周期管理
  *
@@ -30,5 +27,11 @@ public interface INginxParamLifecycleDispatch {
      * @return 结果
      */
     boolean match(LifecycleDispatchContext context);
+
+    /**
+     * @since 0.24.0
+     * @return 结果
+     */
+    String directiveName();
 
 }

@@ -150,7 +150,23 @@ public class AbstractNginxRequestDispatchFile extends AbstractNginxRequestDispat
         fillContext(context);
 
         // 响应
-        HttpResponse response = buildHttpResponse(context);
+        HttpResponse response = null;
+        if(context.getNginxReturnResult() != null) {
+            response = buildHttpResponseForReturn(request, context);
+            FullHttpResponse fullHttpResponse = (FullHttpResponse) response;
+            response.headers().set(HttpHeaderNames.CONTENT_LENGTH, fullHttpResponse.content().readableBytes());
+            // 结果响应
+            ChannelFuture lastContentFuture = super.writeAndFlush(ctx, response, context);
+            //如果不支持keep-Alive，服务器端主动关闭请求
+            if (!HttpUtil.isKeepAlive(request)) {
+                lastContentFuture.addListener(ChannelFutureListener.CLOSE);
+            }
+
+            return;
+        } else {
+            response = buildHttpResponse(context);
+        }
+
 
         // 添加请求头
         fillRespHeaders(context, request, response);
