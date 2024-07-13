@@ -40,8 +40,6 @@ nginx4j 是基于 netty 实现的 nginx 的java 版本。
 
 - cookie 的操作处理 proxy_cookie_domain/proxy_cookie_flags/proxy_cookie_path 内置支持 
 
-
-
 # 变更日志
 
 > [变更日志](CHANGE_LOG.md)
@@ -54,7 +52,7 @@ nginx4j 是基于 netty 实现的 nginx 的java 版本。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>nginx4j</artifactId>
-    <version>0.24.0</version>
+    <version>0.25.0</version>
 </dependency>
 ```
 
@@ -290,7 +288,7 @@ NginxUserConfig nginxUserConfig = NginxUserConfigLoaders.configFile("D:\\github\
 - [x] map 变量修改指令
 - [x] rewrite 指令，重写 URL
 - [x] return 返回指令
-- [ ] error_page 自定义错误页面
+- [x] error_page 自定义错误页面
 - [ ] try_files 文件处理指令
 - [ ] 更多 directive 指令实现
 - [ ] 更多文件格式的内置支持？

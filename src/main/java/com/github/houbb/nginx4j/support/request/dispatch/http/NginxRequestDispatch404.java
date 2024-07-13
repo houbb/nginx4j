@@ -18,7 +18,7 @@ public class NginxRequestDispatch404 extends AbstractNginxRequestDispatchFullRes
                                                      final NginxConfig nginxConfig,
                                                      NginxRequestDispatchContext context) {
         logger.warn("[Nginx] bad request for http={}", request);
-        return InnerRespUtil.buildCommonResp(null, HttpResponseStatus.NOT_FOUND, request);
+        return InnerRespUtil.buildCommonResp(null, HttpResponseStatus.NOT_FOUND, request, context);
     }
 
 }

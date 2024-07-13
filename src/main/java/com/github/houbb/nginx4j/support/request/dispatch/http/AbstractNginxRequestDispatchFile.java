@@ -145,31 +145,20 @@ public class AbstractNginxRequestDispatchFile extends AbstractNginxRequestDispat
         final File targetFile = context.getFile();
         final ChannelHandlerContext ctx = context.getCtx();
 
-        logger.info("[Nginx] start dispatch, path={}", targetFile.getAbsolutePath());
-        // 长度+开始等基本信息
-        fillContext(context);
-
-        // 响应
-        HttpResponse response = null;
         if(context.getNginxReturnResult() != null) {
-            response = buildHttpResponseForReturn(request, context);
-            FullHttpResponse fullHttpResponse = (FullHttpResponse) response;
-            response.headers().set(HttpHeaderNames.CONTENT_LENGTH, fullHttpResponse.content().readableBytes());
+            FullHttpResponse response = buildHttpResponseForReturn(request, context);
+            response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
             // 结果响应
             ChannelFuture lastContentFuture = super.writeAndFlush(ctx, response, context);
             //如果不支持keep-Alive，服务器端主动关闭请求
             if (!HttpUtil.isKeepAlive(request)) {
                 lastContentFuture.addListener(ChannelFutureListener.CLOSE);
             }
-
             return;
-        } else {
-            response = buildHttpResponse(context);
         }
 
-
-        // 添加请求头
-        fillRespHeaders(context, request, response);
+        logger.info("[Nginx] start dispatch, path={}", targetFile.getAbsolutePath());
+        HttpResponse response = buildHttpResponseForFile(context);
 
         //gzip
         boolean zipFlag = isZipEnable(context);
@@ -199,6 +188,18 @@ public class AbstractNginxRequestDispatchFile extends AbstractNginxRequestDispat
             // 完成
             super.beforeComplete(ctx, response, context);
         }
+    }
+
+    private HttpResponse buildHttpResponseForFile(NginxRequestDispatchContext context) {
+        final HttpRequest request = context.getRequest();
+
+        // 长度+开始等基本信息
+        fillContext(context);
+        // 响应
+        HttpResponse response = buildHttpResponse(context);
+        // 添加请求头
+        fillRespHeaders(context, request, response);
+        return response;
     }
 
     /**

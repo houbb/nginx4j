@@ -22,8 +22,7 @@ public class NginxRequestDispatch302 extends AbstractNginxRequestDispatchFullRes
                                                      final NginxConfig nginxConfig,
                                                      NginxRequestDispatchContext context) {
         logger.warn("[Nginx] 302 request for http={}", request);
-        FullHttpResponse response = InnerRespUtil.buildCommonResp(null, HttpResponseStatus.FOUND, request);
-        response.headers().set(HttpHeaderNames.LOCATION, request.uri());
+        FullHttpResponse response = InnerRespUtil.buildCommonResp(null, HttpResponseStatus.FOUND, request, context);
         return response;
     }
 

@@ -139,8 +139,8 @@ public class NginxServerNetty implements INginxServer {
         currentNginxConfig.setNginxPlaceholderManager(nginxConfig.getNginxPlaceholderManager());
         currentNginxConfig.setNginxIf(nginxConfig.getNginxIf());
         currentNginxConfig.setNginxMapDirective(nginxConfig.getNginxMapDirective());
+        currentNginxConfig.setNginxErrorPageManage(nginxConfig.getNginxErrorPageManage());
         //TODO: 全局每次加属性，这里记得修改
-
 
         // 当前的端口过滤
         NginxUserConfig originalUserConfig = nginxConfig.getNginxUserConfig();

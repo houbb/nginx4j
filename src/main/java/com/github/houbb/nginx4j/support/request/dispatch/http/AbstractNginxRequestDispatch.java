@@ -43,13 +43,7 @@ public abstract class AbstractNginxRequestDispatch implements NginxRequestDispat
         final NginxReturnResult nginxReturnResult = context.getNginxReturnResult();
         HttpResponseStatus responseStatus = HttpResponseStatus.valueOf(nginxReturnResult.getCode(),
                 nginxReturnResult.getValue());
-        FullHttpResponse response = InnerRespUtil.buildCommonResp(null, responseStatus, request);
-
-        //301
-        if(301 == nginxReturnResult.getCode()) {
-            response.headers().set(HttpHeaderNames.LOCATION, nginxReturnResult.getValue());
-        }
-
+        FullHttpResponse response = InnerRespUtil.buildCommonResp(null, responseStatus, request, context);
         //TODO: 还有许多，是不是需要特殊处理？
         return response;
     }

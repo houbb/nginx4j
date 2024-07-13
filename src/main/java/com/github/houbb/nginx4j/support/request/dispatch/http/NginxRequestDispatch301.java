@@ -25,8 +25,8 @@ public class NginxRequestDispatch301 extends AbstractNginxRequestDispatchFullRes
                                                      final NginxConfig nginxConfig,
                                                      NginxRequestDispatchContext context) {
         logger.warn("[Nginx] 301 request for http={}", request);
-        FullHttpResponse response = InnerRespUtil.buildCommonResp(null, HttpResponseStatus.MOVED_PERMANENTLY, request);
-        response.headers().set(HttpHeaderNames.LOCATION, request.uri());
+        FullHttpResponse response = InnerRespUtil.buildCommonResp(null, HttpResponseStatus.MOVED_PERMANENTLY, request,
+                context);
         return response;
     }
 

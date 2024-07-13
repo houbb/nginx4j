@@ -11,6 +11,8 @@ import com.github.houbb.nginx4j.config.param.NginxParamManagerDefault;
 import com.github.houbb.nginx4j.exception.Nginx4jException;
 import com.github.houbb.nginx4j.support.condition.NginxIf;
 import com.github.houbb.nginx4j.support.condition.NginxIfDefault;
+import com.github.houbb.nginx4j.support.errorpage.INginxErrorPageManage;
+import com.github.houbb.nginx4j.support.errorpage.NginxErrorPageManageDefault;
 import com.github.houbb.nginx4j.support.index.NginxIndexFile;
 import com.github.houbb.nginx4j.support.index.NginxIndexFileDefault;
 import com.github.houbb.nginx4j.support.map.NginxMapDirective;
@@ -76,6 +78,11 @@ public class Nginx4jBs {
 
     private NginxConfig nginxConfig;
 
+    /**
+     * @since 0.25.0
+     */
+    private INginxErrorPageManage nginxErrorPageManage = new NginxErrorPageManageDefault();
+
     public Nginx4jBs nginxMapDirective(NginxMapDirective nginxMapDirective) {
         this.nginxMapDirective = nginxMapDirective;
         return this;
@@ -132,6 +139,12 @@ public class Nginx4jBs {
         this.nginxServer = nginxServer;
     }
 
+    public void errorPageManage(INginxErrorPageManage errorPageManage) {
+        ArgUtil.notNull(errorPageManage, "errorPageManage");
+
+        this.nginxErrorPageManage = errorPageManage;
+    }
+
     public static Nginx4jBs newInstance() {
         return new Nginx4jBs();
     }
@@ -146,6 +159,7 @@ public class Nginx4jBs {
         nginxConfig.setNginxPlaceholderManager(nginxPlaceholderManager);
         nginxConfig.setNginxIf(nginxIf);
         nginxConfig.setNginxMapDirective(nginxMapDirective);
+        nginxConfig.setNginxErrorPageManage(nginxErrorPageManage);
 
         return this;
     }

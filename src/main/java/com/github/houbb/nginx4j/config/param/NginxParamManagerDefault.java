@@ -19,6 +19,7 @@ public class NginxParamManagerDefault extends NginxParamManagerBase {
         // 添加内置的策略
 
         this.registerDispatch(new NginxParamHandleSet());
+        this.registerDispatch(new NginxParamHandleErrorPage());
         this.registerDispatch(new NginxParamHandleProxySetHeader());
         this.registerDispatch(new NginxParamHandleProxyCookiePath());
         this.registerDispatch(new NginxParamHandleRewrite());

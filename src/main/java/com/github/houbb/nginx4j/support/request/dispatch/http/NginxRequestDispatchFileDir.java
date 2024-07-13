@@ -44,7 +44,7 @@ public class NginxRequestDispatchFileDir extends AbstractNginxRequestDispatchFul
             final String charset = userServerConfig.getCharset();
 
             byte[] fileContent = html.getBytes(charset);
-            FullHttpResponse response = InnerRespUtil.buildCommonResp(fileContent, HttpResponseStatus.OK, request);
+            FullHttpResponse response = InnerRespUtil.buildCommonResp(fileContent, HttpResponseStatus.OK, request, context);
             InnerRespUtil.setContentType(response, "text/html; charset=" + charset);
             return response;
         } catch (Exception e) {

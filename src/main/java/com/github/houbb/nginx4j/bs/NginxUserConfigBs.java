@@ -27,8 +27,6 @@ public class NginxUserConfigBs {
      */
     private List<NginxCommonConfigEntry> configEntryList = new ArrayList<>();
 
-
-
     public static NginxUserConfigBs newInstance() {
         return new NginxUserConfigBs();
     }

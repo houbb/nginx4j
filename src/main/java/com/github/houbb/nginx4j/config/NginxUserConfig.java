@@ -1,5 +1,7 @@
 package com.github.houbb.nginx4j.config;
 
+import com.github.houbb.nginx4j.support.errorpage.INginxErrorPageManage;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

@@ -3,6 +3,7 @@ package com.github.houbb.nginx4j.config;
 import com.github.houbb.nginx4j.config.location.INginxLocationMatch;
 import com.github.houbb.nginx4j.config.param.INginxParamManager;
 import com.github.houbb.nginx4j.support.condition.NginxIf;
+import com.github.houbb.nginx4j.support.errorpage.INginxErrorPageManage;
 import com.github.houbb.nginx4j.support.index.NginxIndexFile;
 import com.github.houbb.nginx4j.support.map.NginxMapDirective;
 import com.github.houbb.nginx4j.support.placeholder.INginxPlaceholderManager;
@@ -49,6 +50,19 @@ public class NginxConfig {
     private INginxPlaceholderManager nginxPlaceholderManager;
 
     private NginxMapDirective nginxMapDirective;
+
+    /**
+     * @since 0.25.0
+     */
+    private INginxErrorPageManage nginxErrorPageManage;
+
+    public INginxErrorPageManage getNginxErrorPageManage() {
+        return nginxErrorPageManage;
+    }
+
+    public void setNginxErrorPageManage(INginxErrorPageManage nginxErrorPageManage) {
+        this.nginxErrorPageManage = nginxErrorPageManage;
+    }
 
     public NginxMapDirective getNginxMapDirective() {
         return nginxMapDirective;

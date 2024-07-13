@@ -9,6 +9,7 @@ import com.github.houbb.nginx4j.config.NginxUserServerConfig;
 import com.github.houbb.nginx4j.support.request.dispatch.http.NginxRequestDispatches;
 import com.github.houbb.nginx4j.support.rewrite.NginxRewriteDirectiveResult;
 import com.github.houbb.nginx4j.support.rewrite.NginxRewriteFlagEnum;
+import com.github.houbb.nginx4j.util.InnerFileUtil;
 import io.netty.handler.codec.http.FullHttpRequest;
 
 import java.io.File;
@@ -64,7 +65,7 @@ public class NginxRequestDispatchManager implements NginxRequestDispatch {
         }
 
         // 文件
-        File targetFile = getTargetFile(requestInfoBo, context);
+        File targetFile = InnerFileUtil.getTargetFile(requestInfoBo.uri(), context);
         // 是否存在
         if(targetFile.exists()) {
             // 设置文件
@@ -99,35 +100,6 @@ public class NginxRequestDispatchManager implements NginxRequestDispatch {
         // 解析Range头
         String rangeHeader = request.headers().get("Range");
         return StringUtil.isNotEmpty(rangeHeader);
-    }
-
-    protected File getTargetFile(final FullHttpRequest request, final NginxRequestDispatchContext context) {
-        final NginxUserServerConfig nginxUserServerConfig = context.getCurrentNginxUserServerConfig();
-        boolean isRootPath = isRootPath(request, context);
-        final NginxConfig nginxConfig = context.getNginxConfig();
-
-        // 根路径
-        if(isRootPath) {
-            log.info("[Nginx] current req meet root path");
-            return nginxConfig.getNginxIndexFile().getIndexFile(context);
-        }
-
-        final String basicPath = nginxUserServerConfig.getRoot();
-        final String path = request.uri();
-
-        // other
-        String fullPath = FileUtil.buildFullPath(basicPath, path);
-        return new File(fullPath);
-    }
-
-    protected boolean isRootPath(final FullHttpRequest request, final NginxRequestDispatchContext context) {
-        final String path = request.uri();
-
-        //root path
-        if(StringUtil.isEmpty(path) || "/".equals(path)) {
-            return true;
-        }
-        return false;
     }
 
 }
