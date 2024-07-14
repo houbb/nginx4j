@@ -261,6 +261,12 @@ NginxUserConfig nginxUserConfig = NginxUserConfigLoaders.configFile("D:\\github\
 
 [从零手写实现 nginx-26-nginx rewrite 指令](https://houbb.github.io/2018/11/22/nginx-write-26-directives-rewrite)
 
+[从零手写实现 nginx-27-nginx return 指令](https://houbb.github.io/2018/11/22/nginx-write-27-directives-return)
+
+[从零手写实现 nginx-28-nginx error_pages 指令](https://houbb.github.io/2018/11/22/nginx-write-28-directives-error-pages)
+
+[从零手写实现 nginx-29-nginx try_files 指令](https://houbb.github.io/2018/11/22/nginx-write-29-directives-try_files)
+
 # ROAD-MAP
 
 ## static
@@ -289,7 +295,7 @@ NginxUserConfig nginxUserConfig = NginxUserConfigLoaders.configFile("D:\\github\
 - [x] rewrite 指令，重写 URL
 - [x] return 返回指令
 - [x] error_page 自定义错误页面
-- [ ] try_files 文件处理指令
+- [x] try_files 文件处理指令
 - [ ] 更多 directive 指令实现
 - [ ] 更多文件格式的内置支持？
 - [ ] ETag 和 Last-Modified + cache 相关
