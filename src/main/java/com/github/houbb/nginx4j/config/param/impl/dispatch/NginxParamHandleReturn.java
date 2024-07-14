@@ -45,7 +45,6 @@ public class NginxParamHandleReturn extends AbstractNginxParamLifecycleDispatch 
         if (values.size() == 2) {
             nginxReturnResult.setValue(values.get(1));
         }
-        nginxReturnResult.setValueList(values);
 
         // 设置结果
         context.setNginxReturnResult(nginxReturnResult);

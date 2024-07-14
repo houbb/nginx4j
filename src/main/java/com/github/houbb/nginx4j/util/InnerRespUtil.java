@@ -31,7 +31,8 @@ public class InnerRespUtil {
                                                    final HttpResponseStatus status,
                                                    final FullHttpRequest request,
                                                    NginxRequestDispatchContext context) {
-        // 编码
+        // 错误页编码，这里暂时不修改逻辑。
+        // 编码 其实可以把 file 的实现直接放在这里，但是会调整以前的实现，暂时保持不变。
         File errorHtmlFile = null;
         String code = String.valueOf(status.code());
         // 获取文件

@@ -42,8 +42,13 @@ public class InnerLocationConfigUtil {
         }
 
         // 默认值
-        logger.info("未命中任何 location 配置，使用默认配置");
-        return nginxUserServerConfig.getDefaultLocation();
+        NginxUserServerLocationConfig defaultConfig = nginxUserServerConfig.getDefaultLocation();
+        if(defaultConfig == null) {
+            defaultConfig = new NginxUserServerLocationConfig();
+        }
+
+        logger.info("未命中任何 location 配置，使用默认配置, default={}", defaultConfig);
+        return defaultConfig;
     }
 
 }

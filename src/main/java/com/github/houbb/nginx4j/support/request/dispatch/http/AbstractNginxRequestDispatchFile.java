@@ -145,18 +145,6 @@ public class AbstractNginxRequestDispatchFile extends AbstractNginxRequestDispat
         final File targetFile = context.getFile();
         final ChannelHandlerContext ctx = context.getCtx();
 
-        if(context.getNginxReturnResult() != null) {
-            FullHttpResponse response = buildHttpResponseForReturn(request, context);
-            response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
-            // 结果响应
-            ChannelFuture lastContentFuture = super.writeAndFlush(ctx, response, context);
-            //如果不支持keep-Alive，服务器端主动关闭请求
-            if (!HttpUtil.isKeepAlive(request)) {
-                lastContentFuture.addListener(ChannelFutureListener.CLOSE);
-            }
-            return;
-        }
-
         logger.info("[Nginx] start dispatch, path={}", targetFile.getAbsolutePath());
         HttpResponse response = buildHttpResponseForFile(context);
 

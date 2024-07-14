@@ -96,7 +96,7 @@ public class NginxNettyServerHandler extends SimpleChannelInboundHandler<FullHtt
         context.setCurrentUserServerLocationConfig(currentLocationConfig);
 
         // 配置可能因为 rewrite 而被替换
-        if(rewriteDirectiveResult.getCurrentLocationConfig() != null) {
+        if(rewriteDirectiveResult != null && rewriteDirectiveResult.getCurrentLocationConfig() != null) {
             context.setCurrentUserServerLocationConfig(rewriteDirectiveResult.getCurrentLocationConfig());
         }
 

@@ -22,13 +22,7 @@ public abstract class AbstractNginxRequestDispatchFullResp extends AbstractNginx
         final NginxConfig nginxConfig = context.getNginxConfig();
 
         // 响应
-        FullHttpResponse response = null;
-        if(context.getNginxReturnResult() != null) {
-            response = buildHttpResponseForReturn(request, context);
-        } else {
-            response = buildFullHttpResponse(request, nginxConfig, context);
-        }
-
+        FullHttpResponse response = buildFullHttpResponse(request, nginxConfig, context);
         response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
         final ChannelHandlerContext ctx = context.getCtx();
 

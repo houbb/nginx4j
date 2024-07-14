@@ -20,6 +20,10 @@ public class NginxRewriteDirectiveDefault implements NginxRewriteDirective {
     @Override
     public NginxRewriteDirectiveResult handleRewrite(NginxRewriteDirectiveContext context) {
         NginxUserServerLocationConfig currentLocationConfig = context.getCurrentLocationConfig();
+        if(currentLocationConfig == null) {
+            return null;
+        }
+
         // 判断是否存在 rewrite
         List<NginxCommonConfigEntry> nginxCommonConfigEntries = currentLocationConfig.getConfigEntryList();
 
