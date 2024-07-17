@@ -52,7 +52,7 @@ nginx4j 是基于 netty 实现的 nginx 的java 版本。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>nginx4j</artifactId>
-    <version>0.25.0</version>
+    <version>0.26.0</version>
 </dependency>
 ```
 
@@ -266,6 +266,12 @@ NginxUserConfig nginxUserConfig = NginxUserConfigLoaders.configFile("D:\\github\
 [从零手写实现 nginx-28-nginx error_pages 指令](https://houbb.github.io/2018/11/22/nginx-write-28-directives-error-pages)
 
 [从零手写实现 nginx-29-nginx try_files 指令](https://houbb.github.io/2018/11/22/nginx-write-29-directives-try_files)
+
+[从零手写实现 nginx-30-nginx proxy_pass upstream 指令](https://houbb.github.io/2018/11/22/nginx-write-30-proxy-pass)
+
+[从零手写实现 nginx-31-nginx load-balance 负载均衡](https://houbb.github.io/2018/11/22/nginx-write-31-load-balance)
+
+[从零手写实现 nginx-32-nginx load-balance 算法 java 实现](https://houbb.github.io/2018/11/22/nginx-write-32-load-balance-java-impl)
 
 # ROAD-MAP
 
