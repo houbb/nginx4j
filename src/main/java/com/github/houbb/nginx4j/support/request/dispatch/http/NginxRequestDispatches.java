@@ -37,4 +37,14 @@ public final class NginxRequestDispatches {
         return new NginxRequestDispatchHttpReturn();
     }
 
+    /**
+     * 结果
+     *
+     * @since 0.27.0
+     * @return 请求
+     */
+    public static NginxRequestDispatch proxyPass() {
+        return new NginxRequestDispatchProxyPass();
+    }
+
 }

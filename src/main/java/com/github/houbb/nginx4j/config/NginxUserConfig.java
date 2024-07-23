@@ -1,7 +1,6 @@
 package com.github.houbb.nginx4j.config;
 
-import com.github.houbb.nginx4j.support.errorpage.INginxErrorPageManage;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -65,6 +64,21 @@ public class NginxUserConfig extends NginxCommonUserConfig {
      * @since 0.22.0
      */
     private List<NginxUserMapConfig> mapConfigs;
+
+    /**
+     * upstream 配置列表
+     *
+     * @since 0.27.0
+     */
+    private List<NginxUserUpstreamConfig> upstreamConfigs;
+
+    public List<NginxUserUpstreamConfig> getUpstreamConfigs() {
+        return upstreamConfigs;
+    }
+
+    public void setUpstreamConfigs(List<NginxUserUpstreamConfig> upstreamConfigs) {
+        this.upstreamConfigs = upstreamConfigs;
+    }
 
     public List<NginxUserMapConfig> getMapConfigs() {
         return mapConfigs;

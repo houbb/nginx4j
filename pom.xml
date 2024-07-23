@@ -53,6 +53,11 @@
             <artifactId>log-integration</artifactId>
             <version>${log-integration.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.houbb</groupId>
+            <artifactId>load-balance</artifactId>
+            <version>0.0.5</version>
+        </dependency>
 
         <!--============================== OTHER ==============================-->
         <!-- Java Activation Framework 依赖 -->

@@ -3,6 +3,7 @@ package com.github.houbb.nginx4j.support.request.dispatch;
 import com.github.houbb.nginx4j.config.NginxConfig;
 import com.github.houbb.nginx4j.config.NginxUserServerConfig;
 import com.github.houbb.nginx4j.config.NginxUserServerLocationConfig;
+import com.github.houbb.nginx4j.support.balance.NginxLoadBalanceConfig;
 import com.github.houbb.nginx4j.support.returns.NginxReturnResult;
 import com.github.houbb.nginx4j.support.rewrite.NginxRewriteDirectiveResult;
 import io.netty.channel.ChannelHandlerContext;
@@ -104,6 +105,20 @@ public class NginxRequestDispatchContext {
      * @since 0.24.0
      */
     private NginxReturnResult nginxReturnResult;
+
+    /**
+     * 负载均衡配置
+     * @since 0.27.0
+     */
+    private NginxLoadBalanceConfig balanceConfig;
+
+    public NginxLoadBalanceConfig getBalanceConfig() {
+        return balanceConfig;
+    }
+
+    public void setBalanceConfig(NginxLoadBalanceConfig balanceConfig) {
+        this.balanceConfig = balanceConfig;
+    }
 
     public NginxReturnResult getNginxReturnResult() {
         return nginxReturnResult;
@@ -244,6 +259,15 @@ public class NginxRequestDispatchContext {
                 ", actualStart=" + actualStart +
                 ", currentNginxUserServerConfig=" + currentNginxUserServerConfig +
                 ", currentUserServerLocationConfig=" + currentUserServerLocationConfig +
+                ", placeholderMap=" + placeholderMap +
+                ", limitRate=" + limitRate +
+                ", httpResponse=" + httpResponse +
+                ", connectionRequestCount=" + connectionRequestCount +
+                ", requestStartTime=" + requestStartTime +
+                ", requestEndTime=" + requestEndTime +
+                ", nginxRewriteDirectiveResult=" + nginxRewriteDirectiveResult +
+                ", nginxReturnResult=" + nginxReturnResult +
+                ", balanceConfig=" + balanceConfig +
                 '}';
     }
 

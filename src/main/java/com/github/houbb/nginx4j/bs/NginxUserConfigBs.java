@@ -63,6 +63,18 @@ public class NginxUserConfigBs {
      */
     private List<NginxUserMapConfig> mapConfigs = new ArrayList<>();
 
+    /**
+     * upstream 配置列表
+     *
+     * @since 0.27.0
+     */
+    private List<NginxUserUpstreamConfig> upstreamConfigs = new ArrayList<>();
+
+    public NginxUserConfigBs upstreamConfigs(List<NginxUserUpstreamConfig> upstreamConfigs) {
+        this.upstreamConfigs = upstreamConfigs;
+        return this;
+    }
+
     public NginxUserConfigBs mapConfigs(List<NginxUserMapConfig> mapConfigs) {
         this.mapConfigs = mapConfigs;
         return this;
@@ -111,6 +123,7 @@ public class NginxUserConfigBs {
         config.setConfigEntryList(configEntryList);
         config.setHttpConfig(httpConfig);
         config.setMapConfigs(mapConfigs);
+        config.setUpstreamConfigs(upstreamConfigs);
         return config;
     }
 

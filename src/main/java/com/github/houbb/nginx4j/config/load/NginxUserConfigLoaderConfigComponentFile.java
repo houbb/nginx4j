@@ -8,7 +8,6 @@ import com.github.houbb.nginx4j.bs.NginxUserConfigBs;
 import com.github.houbb.nginx4j.config.*;
 import com.github.houbb.nginx4j.config.load.component.*;
 import com.github.houbb.nginx4j.config.load.component.impl.*;
-import com.github.houbb.nginx4j.constant.NginxConfigTypeEnum;
 import com.github.houbb.nginx4j.util.InnerConfigEntryUtil;
 import com.github.odiszapc.nginxparser.*;
 
@@ -97,6 +96,22 @@ public  class NginxUserConfigLoaderConfigComponentFile extends AbstractNginxUser
                 }
             }
             configBs.configEntryList(configEntryList);
+
+            //5. upstream
+            List<NgxEntry> upstreamEntryList = conf.findAll(NgxConfig.BLOCK, "http", "upstream");
+            List<NginxUserUpstreamConfig> upstreamConfigList = new ArrayList<>();
+            if(CollectionUtil.isNotEmpty(upstreamEntryList)) {
+                for (NgxEntry entry : upstreamEntryList) {
+                    // 每一个 server 的处理
+                    NgxBlock ngxBlock = (NgxBlock) entry;
+
+                    INginxUserUpstreamConfigLoad upstreamConfigLoad = new NginxUserUpstreamConfigLoadFile(conf, ngxBlock);
+                    NginxUserUpstreamConfig upstreamConfig = upstreamConfigLoad.load();
+                    upstreamConfigList.add(upstreamConfig);
+                }
+
+                configBs.upstreamConfigs(upstreamConfigList);
+            }
 
             // 返回
             NginxUserConfig nginxUserConfig = configBs.build();

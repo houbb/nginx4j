@@ -14,6 +14,9 @@ import com.github.houbb.nginx4j.config.param.LifecycleDispatchContext;
 import com.github.houbb.nginx4j.config.param.impl.dispatch.NginxParamHandleSet;
 import com.github.houbb.nginx4j.constant.NginxConfigTypeEnum;
 import com.github.houbb.nginx4j.constant.NginxConst;
+import com.github.houbb.nginx4j.support.balance.INginxLoadBalanceConfig;
+import com.github.houbb.nginx4j.support.balance.NginxLoadBalanceConfig;
+import com.github.houbb.nginx4j.support.balance.NginxLoadBalanceDefaultConfig;
 import com.github.houbb.nginx4j.support.condition.NginxIf;
 import com.github.houbb.nginx4j.support.map.NginxMapDirective;
 import com.github.houbb.nginx4j.support.placeholder.INginxPlaceholderManager;
@@ -70,6 +73,13 @@ public class NginxRequestDispatchManager implements NginxRequestDispatch {
         /*如果无法解码400*/
         if (!requestInfoBo.decoderResult().isSuccess()) {
             return NginxRequestDispatches.http400();
+        }
+
+        //proxy_pass
+        final INginxLoadBalanceConfig nginxLoadBalance = new NginxLoadBalanceDefaultConfig();
+        NginxLoadBalanceConfig balanceConfig = nginxLoadBalance.buildBalanceConfig(context);
+        if(balanceConfig.isNeedProxyPass()) {
+            return NginxRequestDispatches.proxyPass();
         }
 
         // 如果存在 return
@@ -226,10 +236,6 @@ public class NginxRequestDispatchManager implements NginxRequestDispatch {
         }
     }
 
-
-    protected void processForSet(NginxCommonConfigEntry configParam) {
-
-    }
 
     /**
      * 占位符处理
