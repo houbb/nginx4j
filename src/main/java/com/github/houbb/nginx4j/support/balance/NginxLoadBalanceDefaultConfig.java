@@ -1,15 +1,18 @@
 package com.github.houbb.nginx4j.support.balance;
 
+import com.github.houbb.heaven.util.lang.StringUtil;
 import com.github.houbb.heaven.util.util.CollectionUtil;
+import com.github.houbb.load.balance.support.server.IServer;
+import com.github.houbb.load.balance.support.server.impl.Server;
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
-import com.github.houbb.nginx4j.config.NginxCommonConfigEntry;
-import com.github.houbb.nginx4j.config.NginxUserServerLocationConfig;
+import com.github.houbb.nginx4j.config.*;
+import com.github.houbb.nginx4j.exception.Nginx4jErrorCode;
 import com.github.houbb.nginx4j.exception.Nginx4jException;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class NginxLoadBalanceDefaultConfig implements INginxLoadBalanceConfig {
 
@@ -29,15 +32,61 @@ public class NginxLoadBalanceDefaultConfig implements INginxLoadBalanceConfig {
         //1. serverList proxy_pass http://my_backend;
         for(NginxCommonConfigEntry entry : configEntryList) {
             if("proxy_pass".equals(entry.getName())) {
-                // 处理
-                List<String> values = entry.getValues();
+                config.setNeedProxyPass(true);
 
-                //TODO: 实现
+                final String url = entry.getValue();
+                String upstreamName = getUpstreamName(url, dispatchContext);
+                config.setUpstreamName(upstreamName);
+                // 获取对应的配置信息
+                final NginxUserUpstreamConfig upstreamConfig = getUpstreamConfig(upstreamName, url, dispatchContext);
+
+                List<IServer> serverList = buildServerList(upstreamName, url, dispatchContext);
+                config.setUpstreamServerList(serverList);
+
+
                 break;
             }
         }
 
         return config;
+    }
+
+    private NginxUserUpstreamConfig getUpstreamConfig(String upstreamName, String url, NginxRequestDispatchContext dispatchContext) {
+        if(StringUtil.isEmpty(upstreamName)) {
+            return null;
+        }
+
+        NginxUserConfig nginxUserConfig =  dispatchContext.getNginxConfig().getNginxUserConfig();
+
+        List<NginxUserUpstreamConfig> upstreamConfigs = nginxUserConfig.getUpstreamConfigs();
+        if(CollectionUtil.isEmpty(upstreamConfigs)) {
+            throw new Nginx4jException(Nginx4jErrorCode.UPSTREAM_NOT_FOUND);
+        }
+
+        // 遍历
+        for(NginxUserUpstreamConfig upstreamConfig : upstreamConfigs) {
+            if(upstreamName.equals(upstreamConfig.getUpstream())) {
+                return upstreamConfig;
+            }
+        }
+        throw new Nginx4jException(Nginx4jErrorCode.UPSTREAM_NOT_FOUND);
+    }
+
+    private List<IServer> buildServerList(String upstreamName, String url, NginxRequestDispatchContext dispatchContext) {
+        List<IServer> list = new ArrayList<>();
+
+        if(StringUtil.isEmpty(upstreamName)) {
+            IServer server = Server.newInstance().url(url);
+            list.add(server);
+        } else {
+
+        }
+
+        return list;
+    }
+
+    private String getUpstreamName(String url, NginxRequestDispatchContext dispatchContext) {
+        return "";
     }
 
     // 方法：判断 proxy_pass 的目标是 upstream 组还是具体的 URL

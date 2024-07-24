@@ -151,6 +151,7 @@ public class NginxServerNetty implements INginxServer {
         currentUserConfig.setHttpConfig(originalUserConfig.getHttpConfig());
         //map configs
         currentUserConfig.setMapConfigs(originalUserConfig.getMapConfigs());
+        currentUserConfig.setUpstreamConfigs(originalUserConfig.getUpstreamConfigs());
 
         // 按照端口号过滤
         List<NginxUserServerConfig> userServerConfigs = nginxConfig.getNginxUserConfig().getServerConfigs();

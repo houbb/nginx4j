@@ -1,8 +1,14 @@
 package com.github.houbb.nginx4j.exception;
 
+import com.github.houbb.heaven.response.respcode.RespCode;
+
 public class Nginx4jException extends RuntimeException {
 
     public Nginx4jException() {
+    }
+
+    public Nginx4jException(final RespCode respCode) {
+        super(respCode.getCode()+": " + respCode.getMsg());
     }
 
     public Nginx4jException(String message) {

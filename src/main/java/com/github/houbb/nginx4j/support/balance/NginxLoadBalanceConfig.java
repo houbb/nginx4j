@@ -15,14 +15,24 @@ public class NginxLoadBalanceConfig {
     private boolean needProxyPass;
 
     /**
+     * 获取对应的流名称
+     */
+    private String upstreamName;
+
+    /**
      * 服务器列表
      */
-    private List<IServer> serverList;
+    private List<IServer> upstreamServerList;
 
     /**
      * 代理策略
      */
-    private String proxyStrategy;
+    private String upstreamProxyStrategy;
+
+    /**
+     * 代理策略的值
+     */
+    private String upstreamProxyStrategyValue;
 
     public boolean isNeedProxyPass() {
         return needProxyPass;
@@ -32,28 +42,46 @@ public class NginxLoadBalanceConfig {
         this.needProxyPass = needProxyPass;
     }
 
-    public List<IServer> getServerList() {
-        return serverList;
+    public String getUpstreamName() {
+        return upstreamName;
     }
 
-    public void setServerList(List<IServer> serverList) {
-        this.serverList = serverList;
+    public void setUpstreamName(String upstreamName) {
+        this.upstreamName = upstreamName;
     }
 
-    public String getProxyStrategy() {
-        return proxyStrategy;
+    public List<IServer> getUpstreamServerList() {
+        return upstreamServerList;
     }
 
-    public void setProxyStrategy(String proxyStrategy) {
-        this.proxyStrategy = proxyStrategy;
+    public void setUpstreamServerList(List<IServer> upstreamServerList) {
+        this.upstreamServerList = upstreamServerList;
+    }
+
+    public String getUpstreamProxyStrategy() {
+        return upstreamProxyStrategy;
+    }
+
+    public void setUpstreamProxyStrategy(String upstreamProxyStrategy) {
+        this.upstreamProxyStrategy = upstreamProxyStrategy;
+    }
+
+    public String getUpstreamProxyStrategyValue() {
+        return upstreamProxyStrategyValue;
+    }
+
+    public void setUpstreamProxyStrategyValue(String upstreamProxyStrategyValue) {
+        this.upstreamProxyStrategyValue = upstreamProxyStrategyValue;
     }
 
     @Override
     public String toString() {
         return "NginxLoadBalanceConfig{" +
                 "needProxyPass=" + needProxyPass +
-                ", serverList=" + serverList +
-                ", proxyStrategy='" + proxyStrategy + '\'' +
+                ", upstreamName='" + upstreamName + '\'' +
+                ", upstreamServerList=" + upstreamServerList +
+                ", upstreamProxyStrategy='" + upstreamProxyStrategy + '\'' +
+                ", upstreamProxyStrategyValue='" + upstreamProxyStrategyValue + '\'' +
                 '}';
     }
 
