@@ -40,7 +40,7 @@ public class NginxLoadBalanceDefaultConfig implements INginxLoadBalanceConfig {
                 // 获取对应的配置信息
                 final NginxUserUpstreamConfig upstreamConfig = getUpstreamConfig(upstreamName, url, dispatchContext);
 
-                List<IServer> serverList = buildServerList(upstreamName, url, dispatchContext);
+                List<IServer> serverList = buildServerList(upstreamConfig, url, dispatchContext);
                 config.setUpstreamServerList(serverList);
 
 
@@ -49,6 +49,34 @@ public class NginxLoadBalanceDefaultConfig implements INginxLoadBalanceConfig {
         }
 
         return config;
+    }
+
+    private List<IServer> buildServerList(final NginxUserUpstreamConfig upstreamConfig,
+                                          String url,
+                                          NginxRequestDispatchContext dispatchContext) {
+        List<IServer> list = new ArrayList<>();
+
+        if(upstreamConfig == null) {
+            IServer server = Server.newInstance().url(url);
+            list.add(server);
+        } else {
+            // 如果配置存在
+            List<NginxUserUpstreamConfigItem> configItemList = upstreamConfig.getConfigItemList();
+            if(CollectionUtil.isEmpty(configItemList)) {
+                log.error("UPSTREAM_LIST_IS_EMPTY, upstreamConfig={}", upstreamConfig);
+                throw new Nginx4jException(Nginx4jErrorCode.UPSTREAM_LIST_IS_EMPTY);
+            }
+
+            for(NginxUserUpstreamConfigItem configItem : configItemList) {
+                IServer server = Server.newInstance()
+                        .url(configItem.getServer())
+                        .weight(Integer.parseInt(configItem.getWeight()));
+
+                list.add(server);
+            }
+        }
+
+        return list;
     }
 
     private NginxUserUpstreamConfig getUpstreamConfig(String upstreamName, String url, NginxRequestDispatchContext dispatchContext) {
@@ -60,7 +88,8 @@ public class NginxLoadBalanceDefaultConfig implements INginxLoadBalanceConfig {
 
         List<NginxUserUpstreamConfig> upstreamConfigs = nginxUserConfig.getUpstreamConfigs();
         if(CollectionUtil.isEmpty(upstreamConfigs)) {
-            throw new Nginx4jException(Nginx4jErrorCode.UPSTREAM_NOT_FOUND);
+            log.info("upstreamConfigs is empty, match config is null");
+            return null;
         }
 
         // 遍历
@@ -69,47 +98,35 @@ public class NginxLoadBalanceDefaultConfig implements INginxLoadBalanceConfig {
                 return upstreamConfig;
             }
         }
-        throw new Nginx4jException(Nginx4jErrorCode.UPSTREAM_NOT_FOUND);
+
+        log.info("upstreamConfigs match config not found!");
+        return null;
     }
 
-    private List<IServer> buildServerList(String upstreamName, String url, NginxRequestDispatchContext dispatchContext) {
-        List<IServer> list = new ArrayList<>();
 
-        if(StringUtil.isEmpty(upstreamName)) {
-            IServer server = Server.newInstance().url(url);
-            list.add(server);
-        } else {
 
+    /**
+     * 获取对应的 upstream 名称
+     * @param target 目标url
+     * @param dispatchContext 上下文
+     * @return 结果
+     */
+    private String getUpstreamName(String target, NginxRequestDispatchContext dispatchContext) {
+        if(StringUtil.isEmpty(target)) {
+            throw new Nginx4jException(Nginx4jErrorCode.PROXY_PASS_URL_NEED);
         }
-
-        return list;
-    }
-
-    private String getUpstreamName(String url, NginxRequestDispatchContext dispatchContext) {
-        return "";
-    }
-
-    // 方法：判断 proxy_pass 的目标是 upstream 组还是具体的 URL
-    private boolean isCheckProxyPassTarget(List<String> values, NginxRequestDispatchContext dispatchContext) {
-        // 移除 proxy_pass 前的空格，并确保字符串是以 "proxy_pass" 开头
-        if(values.size() <= 1) {
-            throw new Nginx4jException("proxy_pass 必须指定后续的内容");
-        }
-
-        // 提取 proxy_pass 的目标
-        String target = values.get(0);
 
         // 检查目标是否是上游服务器组
         // 目标字符串不能包含协议头，并且必须是上游服务器组集合的一部分
         if(target.startsWith("http://")) {
             String suffix = target.substring("http://".length());
-
+            return suffix;
         } else if(target.startsWith("https://")) {
             String suffix = target.substring("https://".length());
-
+            return suffix;
         }
 
-        throw new Nginx4jException("proxy_pass 非法的 http 协议 " + target);
+        throw new Nginx4jException(Nginx4jErrorCode.PROXY_PASS_MUST_START_WTH_HTTP);
     }
 
 }
