@@ -2,10 +2,8 @@ package com.github.houbb.nginx4j.support.request.dispatch.http;
 
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
-import com.github.houbb.nginx4j.config.NginxConfig;
-import com.github.houbb.nginx4j.config.NginxUserConfig;
 import com.github.houbb.nginx4j.config.NginxUserServerConfig;
-import com.github.houbb.nginx4j.constant.EnableStatusEnum;
+import com.github.houbb.nginx4j.constant.NginxEnableStatusEnum;
 import com.github.houbb.nginx4j.constant.NginxConst;
 import com.github.houbb.nginx4j.exception.Nginx4jException;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
@@ -126,7 +124,7 @@ public class AbstractNginxRequestDispatchFile extends AbstractNginxRequestDispat
     protected boolean isZeroCopyEnable(NginxRequestDispatchContext context) {
         final NginxUserServerConfig nginxUserServerConfig = context.getCurrentNginxUserServerConfig();
 
-        return EnableStatusEnum.isEnable(nginxUserServerConfig.getSendFile());
+        return NginxEnableStatusEnum.isEnable(nginxUserServerConfig.getSendFile());
     }
 
     protected void writeAndFlushOnComplete(final ChannelHandlerContext ctx,

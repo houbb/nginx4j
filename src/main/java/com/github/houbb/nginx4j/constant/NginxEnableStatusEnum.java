@@ -1,6 +1,6 @@
 package com.github.houbb.nginx4j.constant;
 
-public enum EnableStatusEnum {
+public enum NginxEnableStatusEnum {
 
     ON("on", "启用"),
     OFF("off", "关闭"),
@@ -9,7 +9,7 @@ public enum EnableStatusEnum {
     private final String code;
     private final String desc;
 
-    EnableStatusEnum(String code, String desc) {
+    NginxEnableStatusEnum(String code, String desc) {
         this.code = code;
         this.desc = desc;
     }

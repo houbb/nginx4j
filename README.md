@@ -40,6 +40,8 @@ nginx4j 是基于 netty 实现的 nginx 的java 版本。
 
 - cookie 的操作处理 proxy_cookie_domain/proxy_cookie_flags/proxy_cookie_path 内置支持 
 
+- proxy_pass 反向代理实现
+
 # 变更日志
 
 > [变更日志](CHANGE_LOG.md)
@@ -52,7 +54,7 @@ nginx4j 是基于 netty 实现的 nginx 的java 版本。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>nginx4j</artifactId>
-    <version>0.26.0</version>
+    <version>0.27.0</version>
 </dependency>
 ```
 
@@ -273,6 +275,12 @@ NginxUserConfig nginxUserConfig = NginxUserConfigLoaders.configFile("D:\\github\
 
 [从零手写实现 nginx-32-nginx load-balance 算法 java 实现](https://houbb.github.io/2018/11/22/nginx-write-32-load-balance-java-impl)
 
+[从零手写实现 nginx-33-nginx http proxy_pass 测试验证](https://houbb.github.io/2018/11/22/nginx-write-33-http-proxy-pass-test)
+
+[从零手写实现 nginx-34-proxy_pass 配置加载处理](https://houbb.github.io/2018/11/22/nginx-write-34-http-proxy-pass-config-load)
+
+[从零手写实现 nginx-35-proxy_pass netty 如何实现？](https://houbb.github.io/2018/11/22/nginx-write-35-http-proxy-pass-netty)
+
 # ROAD-MAP
 
 ## static
@@ -313,8 +321,8 @@ NginxUserConfig nginxUserConfig = NginxUserConfigLoaders.configFile("D:\\github\
 
 ## 反向代理
 
-- [ ] reverse-proxy
-- [ ] load-balance
+- [x] reverse-proxy
+- [x] load-balance
 
 ## system
 

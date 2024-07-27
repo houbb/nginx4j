@@ -1,6 +1,6 @@
 package com.github.houbb.nginx4j.constant;
 
-public enum HttpStatusEnum {
+public enum NginxHttpStatusEnum {
 
     CONTINUE(100, "100 Continue", "Continue"),
     SWITCHING_PROTOCOLS(101, "101 Switching Protocols", "Switching Protocols"),
@@ -47,7 +47,7 @@ public enum HttpStatusEnum {
     private final String desc;
     private final String defaultDesc;
 
-    HttpStatusEnum(int code, String desc, String defaultDesc) {
+    NginxHttpStatusEnum(int code, String desc, String defaultDesc) {
         this.code = code;
         this.desc = desc;
         this.defaultDesc = defaultDesc;

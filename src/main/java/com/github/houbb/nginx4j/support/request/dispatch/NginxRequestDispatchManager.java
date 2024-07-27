@@ -78,6 +78,7 @@ public class NginxRequestDispatchManager implements NginxRequestDispatch {
         //proxy_pass
         final INginxLoadBalanceConfig nginxLoadBalance = new NginxLoadBalanceDefaultConfig();
         NginxLoadBalanceConfig balanceConfig = nginxLoadBalance.buildBalanceConfig(context);
+        context.setBalanceConfig(balanceConfig);
         if(balanceConfig.isNeedProxyPass()) {
             return NginxRequestDispatches.proxyPass();
         }

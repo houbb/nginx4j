@@ -34,6 +34,19 @@ public class NginxLoadBalanceConfig {
      */
     private String upstreamProxyStrategyValue;
 
+    /**
+     * 原始设置的 url
+     */
+    private String proxyPassUrl;
+
+    public String getProxyPassUrl() {
+        return proxyPassUrl;
+    }
+
+    public void setProxyPassUrl(String proxyPassUrl) {
+        this.proxyPassUrl = proxyPassUrl;
+    }
+
     public boolean isNeedProxyPass() {
         return needProxyPass;
     }
@@ -82,6 +95,7 @@ public class NginxLoadBalanceConfig {
                 ", upstreamServerList=" + upstreamServerList +
                 ", upstreamProxyStrategy='" + upstreamProxyStrategy + '\'' +
                 ", upstreamProxyStrategyValue='" + upstreamProxyStrategyValue + '\'' +
+                ", proxyPassUrl='" + proxyPassUrl + '\'' +
                 '}';
     }
 

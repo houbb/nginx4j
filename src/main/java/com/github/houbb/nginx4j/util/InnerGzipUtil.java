@@ -4,7 +4,7 @@ import com.github.houbb.heaven.util.io.FileUtil;
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
 import com.github.houbb.nginx4j.config.NginxUserServerConfig;
-import com.github.houbb.nginx4j.constant.EnableStatusEnum;
+import com.github.houbb.nginx4j.constant.NginxEnableStatusEnum;
 import com.github.houbb.nginx4j.exception.Nginx4jException;
 import com.github.houbb.nginx4j.support.request.dispatch.NginxRequestDispatchContext;
 import io.netty.channel.ChannelHandlerContext;
@@ -45,7 +45,7 @@ public class InnerGzipUtil {
                                    final NginxRequestDispatchContext context) {
         final NginxUserServerConfig nginxUserServerConfig = context.getCurrentNginxUserServerConfig();
 
-        if(EnableStatusEnum.ON.getCode().equalsIgnoreCase(nginxUserServerConfig.getGzip())) {
+        if(NginxEnableStatusEnum.ON.getCode().equalsIgnoreCase(nginxUserServerConfig.getGzip())) {
             // 大小
             long configSize = nginxUserServerConfig.getGzipMinLength();
             long fileLength = targetFile.length();
